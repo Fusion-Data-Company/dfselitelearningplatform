@@ -213,7 +213,7 @@ export default function AdminPage() {
             <Tabs value={activeTab} className="space-y-8">
               <Card className="glassmorphism border-border">
                 <CardContent className="p-4">
-                  <TabsList className="grid grid-cols-5 w-full bg-transparent">
+                  <TabsList className="grid grid-cols-6 w-full bg-transparent">
                     <TabsTrigger 
                       value="content" 
                       className="data-[state=active]:section-active"
@@ -221,6 +221,14 @@ export default function AdminPage() {
                     >
                       <BookOpen className="w-4 h-4 mr-2" />
                       Content Map
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="users" 
+                      className="data-[state=active]:section-active"
+                      data-testid="tab-users"
+                    >
+                      <Users className="w-4 h-4 mr-2" />
+                      User Management
                     </TabsTrigger>
                     <TabsTrigger 
                       value="agents" 
@@ -260,6 +268,38 @@ export default function AdminPage() {
 
               {/* Content Map Tab */}
               <TabsContent value="content">
+                <div className="mb-6">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <Card className="education-card border-primary/20">
+                      <CardContent className="p-4 text-center">
+                        <BookOpen className="w-8 h-8 mx-auto mb-2 text-primary" />
+                        <p className="text-2xl font-bold text-primary">24</p>
+                        <p className="text-sm text-muted-foreground">Total Lessons</p>
+                      </CardContent>
+                    </Card>
+                    <Card className="education-card border-secondary/20">
+                      <CardContent className="p-4 text-center">
+                        <FileText className="w-8 h-8 mx-auto mb-2 text-secondary" />
+                        <p className="text-2xl font-bold text-secondary">3.2K</p>
+                        <p className="text-sm text-muted-foreground">Content Chunks</p>
+                      </CardContent>
+                    </Card>
+                    <Card className="education-card border-accent/20">
+                      <CardContent className="p-4 text-center">
+                        <TrendingUp className="w-8 h-8 mx-auto mb-2 text-accent" />
+                        <p className="text-2xl font-bold text-accent">94%</p>
+                        <p className="text-sm text-muted-foreground">Content Health</p>
+                      </CardContent>
+                    </Card>
+                    <Card className="education-card border-chart-2/20">
+                      <CardContent className="p-4 text-center">
+                        <Database className="w-8 h-8 mx-auto mb-2 text-chart-2" />
+                        <p className="text-2xl font-bold text-chart-2">45 GB</p>
+                        <p className="text-sm text-muted-foreground">Storage Used</p>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                   <div className="lg:col-span-2">
                     <Card className="glassmorphism border-border">
@@ -392,6 +432,128 @@ export default function AdminPage() {
                         </div>
                       </CardContent>
                     </Card>
+                  </div>
+                </div>
+              </TabsContent>
+
+              {/* User Management Tab */}
+              <TabsContent value="users">
+                <div className="space-y-6">
+                  {/* User Stats */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <Card className="education-card border-primary/20">
+                      <CardContent className="p-4 text-center">
+                        <Users className="w-8 h-8 mx-auto mb-2 text-primary" />
+                        <p className="text-2xl font-bold text-primary">1,247</p>
+                        <p className="text-sm text-muted-foreground">Total Users</p>
+                      </CardContent>
+                    </Card>
+                    <Card className="education-card border-secondary/20">
+                      <CardContent className="p-4 text-center">
+                        <div className="w-8 h-8 mx-auto mb-2 bg-secondary rounded-full flex items-center justify-center">
+                          <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                        </div>
+                        <p className="text-2xl font-bold text-secondary">324</p>
+                        <p className="text-sm text-muted-foreground">Active Now</p>
+                      </CardContent>
+                    </Card>
+                    <Card className="education-card border-accent/20">
+                      <CardContent className="p-4 text-center">
+                        <TrendingUp className="w-8 h-8 mx-auto mb-2 text-accent" />
+                        <p className="text-2xl font-bold text-accent">23</p>
+                        <p className="text-sm text-muted-foreground">New Today</p>
+                      </CardContent>
+                    </Card>
+                    <Card className="education-card border-chart-2/20">
+                      <CardContent className="p-4 text-center">
+                        <Tag className="w-8 h-8 mx-auto mb-2 text-chart-2" />
+                        <p className="text-2xl font-bold text-chart-2">89%</p>
+                        <p className="text-sm text-muted-foreground">Pass Rate</p>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* User List */}
+                    <div className="lg:col-span-2">
+                      <Card className="education-card border-primary/20">
+                        <CardContent className="p-6">
+                          <div className="flex items-center justify-between mb-6">
+                            <h3 className="cinzel text-xl font-bold">Recent Users</h3>
+                            <Button className="floating-action px-4 py-2">
+                              <Plus className="w-4 h-4 mr-2" />
+                              Add User
+                            </Button>
+                          </div>
+                          
+                          <div className="space-y-4">
+                            {[
+                              { name: "Sarah Chen", email: "sarah.chen@email.com", role: "Student", progress: 85, lastActive: "2 hours ago", status: "active" },
+                              { name: "Michael Rodriguez", email: "m.rodriguez@email.com", role: "Student", progress: 92, lastActive: "5 minutes ago", status: "active" },
+                              { name: "Emily Johnson", email: "emily.j@email.com", role: "Instructor", progress: 100, lastActive: "1 day ago", status: "inactive" },
+                              { name: "David Kim", email: "david.kim@email.com", role: "Student", progress: 67, lastActive: "3 hours ago", status: "active" },
+                              { name: "Lisa Thompson", email: "lisa.t@email.com", role: "Student", progress: 45, lastActive: "1 hour ago", status: "active" }
+                            ].map((user, index) => (
+                              <div key={index} className="flex items-center justify-between p-4 glassmorphism-card rounded-xl border border-border/50">
+                                <div className="flex items-center space-x-4">
+                                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+                                    <span className="text-white font-bold text-sm">{user.name.split(' ').map(n => n[0]).join('')}</span>
+                                  </div>
+                                  <div>
+                                    <p className="font-medium text-foreground">{user.name}</p>
+                                    <p className="text-sm text-muted-foreground">{user.email}</p>
+                                  </div>
+                                </div>
+                                <div className="flex items-center space-x-4">
+                                  <div className="text-right">
+                                    <p className="text-sm font-medium">{user.progress}% Complete</p>
+                                    <p className="text-xs text-muted-foreground">{user.lastActive}</p>
+                                  </div>
+                                  <Badge variant={user.status === 'active' ? 'default' : 'secondary'} className={user.status === 'active' ? 'bg-green-500/20 text-green-600 border-green-500/30' : ''}>
+                                    {user.role}
+                                  </Badge>
+                                  <Button variant="ghost" size="sm">
+                                    <Edit className="w-4 h-4" />
+                                  </Button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+
+                    {/* User Activity */}
+                    <div>
+                      <Card className="education-card border-secondary/20">
+                        <CardContent className="p-6">
+                          <h3 className="cinzel text-lg font-bold mb-4">Live Activity</h3>
+                          <div className="space-y-3">
+                            {[
+                              { action: "Started quiz: Health Insurance", user: "Sarah C.", time: "2m ago", type: "quiz" },
+                              { action: "Completed lesson: HMO Basics", user: "Michael R.", time: "5m ago", type: "lesson" },
+                              { action: "AI chat with CoachBot", user: "David K.", time: "8m ago", type: "ai" },
+                              { action: "Generated iFlash cards", user: "Lisa T.", time: "12m ago", type: "flashcard" },
+                              { action: "Earned CE certificate", user: "Emily J.", time: "15m ago", type: "certificate" }
+                            ].map((activity, index) => (
+                              <div key={index} className="flex items-start space-x-3 p-3 glassmorphism-card rounded-lg border border-border/30">
+                                <div className={`w-2 h-2 rounded-full mt-2 ${
+                                  activity.type === 'quiz' ? 'bg-accent' :
+                                  activity.type === 'lesson' ? 'bg-primary' :
+                                  activity.type === 'ai' ? 'bg-secondary' :
+                                  activity.type === 'flashcard' ? 'bg-chart-2' :
+                                  'bg-chart-4'
+                                }`}></div>
+                                <div className="flex-1">
+                                  <p className="text-sm font-medium">{activity.action}</p>
+                                  <p className="text-xs text-muted-foreground">{activity.user} • {activity.time}</p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
                   </div>
                 </div>
               </TabsContent>

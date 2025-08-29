@@ -10,6 +10,8 @@ import LessonPage from "@/pages/lesson";
 import QuizPage from "@/pages/quiz";
 import ExamPage from "@/pages/exam";
 import IFlashPage from "@/pages/iflash";
+import AgentsPage from "@/pages/agents";
+import CETrackingPage from "@/pages/ce-tracking";
 import AdminPage from "@/pages/admin";
 import NotFound from "@/pages/not-found";
 
@@ -22,6 +24,8 @@ function Router() {
       <Route path="/quiz/:bankId?" component={QuizPage} />
       <Route path="/exam/:bankId?" component={ExamPage} />
       <Route path="/iflash" component={IFlashPage} />
+      <Route path="/agents" component={AgentsPage} />
+      <Route path="/ce-tracking" component={CETrackingPage} />
       <Route path="/admin/:tab?" component={AdminPage} />
       <Route component={NotFound} />
     </Switch>

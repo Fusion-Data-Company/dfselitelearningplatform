@@ -7,6 +7,8 @@ import {
   HelpCircle, 
   Clock, 
   Layers3, 
+  Brain,
+  Award,
   Settings,
   ChevronRight 
 } from "lucide-react";
@@ -20,6 +22,8 @@ export default function Sidebar() {
     { href: "/quiz", icon: HelpCircle, label: "Practice Quiz", color: "text-accent" },
     { href: "/exam", icon: Clock, label: "Timed Exam", color: "text-destructive" },
     { href: "/iflash", icon: Layers3, label: "iFlash Review", color: "text-chart-2" },
+    { href: "/agents", icon: Brain, label: "AI Agents", color: "text-chart-3" },
+    { href: "/ce-tracking", icon: Award, label: "CE Tracking", color: "text-chart-5" },
     { href: "/admin", icon: Settings, label: "Admin Panel", color: "text-chart-4" },
   ];
 

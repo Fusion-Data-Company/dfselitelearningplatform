@@ -16,7 +16,15 @@ import {
   Award, 
   Play,
   ChevronRight,
-  BarChart3
+  BarChart3,
+  Clock,
+  Target,
+  Users,
+  Calendar,
+  Star,
+  Activity,
+  Zap,
+  Trophy
 } from "lucide-react";
 
 interface CourseProgress {
@@ -111,6 +119,77 @@ export default function Dashboard() {
                 gradient="from-chart-4 to-chart-4/80"
                 testId="card-ce-hours"
               />
+            </div>
+
+            {/* Performance Analytics */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <Card className="education-card border-accent/20">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="cinzel text-lg font-bold">Study Time Today</h3>
+                    <Clock className="w-5 h-5 text-accent" />
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Active Learning</span>
+                      <span className="font-bold text-accent">2h 35m</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Goal</span>
+                      <span className="text-sm text-muted-foreground">3h 00m</span>
+                    </div>
+                    <div className="w-full bg-muted/30 rounded-full h-2">
+                      <div className="bg-accent h-2 rounded-full" style={{ width: '87%' }}></div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card className="education-card border-chart-2/20">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="cinzel text-lg font-bold">This Week</h3>
+                    <Activity className="w-5 h-5 text-chart-2" />
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Lessons</span>
+                      <span className="font-bold text-chart-2">8 completed</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Quizzes</span>
+                      <span className="font-bold text-chart-2">3 passed</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Average Score</span>
+                      <span className="font-bold text-chart-2">89%</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card className="education-card border-chart-4/20">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="cinzel text-lg font-bold">Achievements</h3>
+                    <Trophy className="w-5 h-5 text-chart-4" />
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex items-center space-x-3">
+                      <Star className="w-4 h-4 text-yellow-500" />
+                      <span className="text-sm font-medium">Quiz Master</span>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <Star className="w-4 h-4 text-yellow-500" />
+                      <span className="text-sm font-medium">Study Streak</span>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <Star className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-sm text-muted-foreground">Speed Learner</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
