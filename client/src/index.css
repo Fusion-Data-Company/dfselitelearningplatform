@@ -685,6 +685,9 @@
   .sidebar-nav:hover {
     /* Individual color schemes now handled in React component */
     transform: translateX(8px) scale(1.02);
+    /* Override Button ghost variant's purple accent hover */
+    background: none !important;
+    color: inherit !important;
   }
 
   .sidebar-nav:hover::before {
