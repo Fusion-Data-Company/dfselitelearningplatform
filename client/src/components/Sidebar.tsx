@@ -282,10 +282,16 @@ export default function Sidebar() {
               ];
               const trackColor = trackColors[index % 3];
               
+              // Generate academic course metadata
+              const courseId = `DFS-215-${String(index + 1).padStart(3, '0')}`;
+              const enrollmentStatus = track.progress === 100 ? 'Certified' : track.progress > 0 ? 'Enrolled' : 'Available';
+              const courseDescription = 'Professional development course for DFS-215 certification requirements. Click to view detailed curriculum and learning objectives.';
+              
               return (
                 <Link key={track.id} href="/lesson/hmo-balance-billing">
                   <div 
-                    className={`p-5 education-card border ${trackColor.border} transition-all duration-300 group cursor-pointer hover:shadow-lg relative overflow-hidden`}
+                    className={`p-6 education-card border ${trackColor.border} transition-all duration-300 group cursor-pointer hover:shadow-lg relative overflow-hidden academic-course-card`}
+                    title={`Course Description: ${courseDescription}`}
                     style={{
                       boxShadow: `0 0 15px ${trackColor.hex}15, 0 0 25px ${trackColor.hex}08, inset 0 1px 0 rgba(255,255,255,0.05)`
                     }}
@@ -298,16 +304,42 @@ export default function Sidebar() {
                   >
                     <div className={`absolute inset-0 bg-gradient-to-r from-transparent ${trackColor.shimmer} to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000`}></div>
                     <div className="relative z-10">
-                      <div className="flex justify-between items-center mb-3">
-                        <div className="flex items-center space-x-3">
-                          <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${trackColor.dot} animate-pulse`}></div>
-                          <span className={`text-base font-bold ${trackColor.text} cinzel tracking-wide`}>
-                            {track.title.length > 25 ? track.title.substring(0, 25) + '...' : track.title}
+                      <div className="flex justify-between items-start mb-4">
+                        <div className="flex-1 min-w-0">
+                          {/* Academic Course Header */}
+                          <div className="flex items-center space-x-2 mb-2">
+                            <div className={`w-2 h-2 rounded-full bg-gradient-to-r ${trackColor.dot}`}></div>
+                            <span className="text-xs font-mono text-muted-foreground bg-muted/20 px-2 py-1 rounded border border-border/30 hover:bg-muted/30 transition-colors" title={`Course ID: ${courseId}`}>
+                              {courseId}
+                            </span>
+                          </div>
+                          
+                          {/* Course Title */}
+                          <h3 className={`text-lg font-bold ${trackColor.text} cinzel tracking-wide leading-tight mb-2 hover:${trackColor.text.replace('text-', 'text-').replace('-100', '-50')} transition-colors cursor-pointer`} title={courseDescription}>
+                            {track.title}
+                          </h3>
+                          
+                          {/* Course Metadata */}
+                          <div className="flex items-center space-x-4 text-xs text-muted-foreground">
+                            <span className="flex items-center space-x-1">
+                              <div className="w-1 h-1 rounded-full bg-current opacity-60"></div>
+                              <span>{track.ceHours || 0} CE Hours</span>
+                            </span>
+                            <span className="flex items-center space-x-1">
+                              <div className="w-1 h-1 rounded-full bg-current opacity-60"></div>
+                              <span>{track.completedLessons}/{track.totalLessons} Lessons</span>
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <div className="flex flex-col items-end space-y-2">
+                          <Badge className={`bg-gradient-to-r ${trackColor.badge} text-xs font-bold border backdrop-blur-sm`}>
+                            {track.progress}%
+                          </Badge>
+                          <span className="text-xs text-muted-foreground geist">
+                            {track.progress === 100 ? 'Complete' : 'In Progress'}
                           </span>
                         </div>
-                        <Badge className={`bg-gradient-to-r ${trackColor.badge} text-xs font-bold border backdrop-blur-sm`}>
-                          {track.progress}%
-                        </Badge>
                       </div>
                       <div className={`w-full bg-gradient-to-r from-black/60 via-gray-800/40 to-black/60 rounded-full h-3 relative overflow-hidden border border-${trackColor.name === 'primary' ? 'cyan' : trackColor.name === 'secondary' ? 'emerald' : 'violet'}-500/20`}>
                         <div 
@@ -318,12 +350,20 @@ export default function Sidebar() {
                         </div>
                       </div>
                       <div className="mt-3 flex justify-between items-center">
-                        <span className={`text-xs ${trackColor.text} bg-gradient-to-r from-black/70 to-black/50 px-2 py-1 rounded border border-${trackColor.name === 'primary' ? 'cyan' : trackColor.name === 'secondary' ? 'emerald' : 'violet'}-500/30 geist font-medium`}>
-                          {track.completedLessons}/{track.totalLessons} lessons
-                        </span>
-                        <span className={`text-xs ${trackColor.text} cinzel font-semibold`}>
-                          Click to Start →
-                        </span>
+                        <div className="flex items-center space-x-3">
+                          <span className={`text-xs ${trackColor.text} bg-gradient-to-r from-black/50 to-black/30 px-3 py-1.5 rounded-md border border-${trackColor.name === 'primary' ? 'cyan' : trackColor.name === 'secondary' ? 'emerald' : 'violet'}-500/20 geist font-medium flex items-center space-x-2`}>
+                            <span className="opacity-70">Status:</span>
+                            <span className="font-semibold">
+                              {enrollmentStatus}
+                            </span>
+                          </span>
+                        </div>
+                        <div className="flex items-center space-x-2 text-xs">
+                          <span className={`${trackColor.text} cinzel font-semibold opacity-80 group-hover:opacity-100 transition-opacity`}>
+                            Enter Course
+                          </span>
+                          <ChevronRight className={`w-4 h-4 ${trackColor.text} opacity-60 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300`} />
+                        </div>
                       </div>
                     </div>
                   </div>

@@ -50,6 +50,10 @@
   --font-sans: 'Inter', 'Geist', sans-serif;
   --font-serif: 'Cinzel', serif;
   --font-mono: 'Fira Code', monospace;
+
+  /* Academic Course Card */
+  --academic-spacing: 1.5rem;
+  --academic-border-radius: 16px;
   
   /* Enterprise Design Tokens */
   --radius: 16px;
@@ -692,6 +696,29 @@
 
   .sidebar-nav:hover::before {
     /* Removed - blocking individual color glows */
+  }
+
+  /* Academic Course Cards */
+  .academic-course-card {
+    font-family: var(--font-sans);
+    position: relative;
+    background: linear-gradient(135deg, 
+      hsla(var(--card), 0.95) 0%, 
+      hsla(var(--muted), 0.02) 100%
+    );
+    backdrop-filter: blur(16px) saturate(1.2);
+    border-radius: var(--academic-border-radius);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .academic-course-card:hover {
+    transform: translateY(-2px) scale(1.01);
+    backdrop-filter: blur(20px) saturate(1.4);
+  }
+
+  .academic-course-card h3 {
+    letter-spacing: 0.025em;
+    line-height: 1.2;
   }
 
   /* Elite Progress System */
