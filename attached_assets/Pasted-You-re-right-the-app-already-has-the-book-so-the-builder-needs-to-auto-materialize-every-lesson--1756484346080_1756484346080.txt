@@ -1,0 +1,199 @@
+You’re right—the app already “has the book,” so the builder needs to auto-materialize every lesson, quiz, and exam directly from that DOCX and publish them. Here’s a no-excuses, one-pass blueprint that will do exactly that. It’s a cut-and-paste patch for your Replit builder: idempotent, deterministic, and fully verifiable.
+
+⸻
+
+EMERGENCY PATCH — “BUILD ALL LESSONS FROM DOCX”
+
+Project Architecture Overview
+
+DOCX → Markdown → Outline → Tracks → Modules → Lessons → Chunks → Banks/Questions → Exam Form
+└─ One idempotent job: seed:dfs215:import_publish
+
+FILE ASSUMPTION
+	•	Source path (already uploaded): /mnt/data/215 DFS Blended - Self Study Course July 2025.docx
+
+⸻
+
+COMPONENT SPECIFICATIONS (What to build right now)
+
+COMPONENT: docx-parse.ts
+
+PURPOSE: Convert DOCX → Markdown with clean headings & callouts.
+INPUTS: Local DOCX file path.
+OUTPUTS: Array of {level:number, text:string, html?:string, page?:number} nodes.
+DEPENDENCIES: mammoth, remark/rehype.
+BUILDER INSTRUCTIONS:
+	•	Step 1: Use mammoth.convertToHtml; sanitize; convert to markdown.
+	•	Step 2: Normalize headings:
+	•	H1 = Track
+	•	H2 = Module
+	•	H3 = Lesson
+	•	H4/H5 = Subsections within a lesson
+	•	Step 3: Preserve callouts: “Definition”, “Example”, “Note”, “Figure”.
+	•	Step 4: Detect assessments:
+	•	Section titles containing Quiz, Review Questions, Self-Test, Practice Exam.
+	•	Q/A lines using patterns below (regex examples are short, not full code).
+
+VALIDATION: Return ≥ 6 H1 tracks; each lesson (H3) has at least one content block.
+
+REGEX HINTS (≤10 lines, examples):
+	•	MCQ split: /^\s*(\d+)[\.\)]\s+(.+?)\s*$/ for stem lines
+	•	Options: /^\s*[A-D][\)\.\:]\s+(.+)$/i
+	•	Answer keys: /^\s*Answer\s*[:\-]\s*([A-D])\b/i or (Correct:\s*[A-D])
+	•	T/F: /^\s*(True|False)\b/i
+
+⸻
+
+COMPONENT: outline-map.ts
+
+PURPOSE: Map headings → LMS objects & URLs.
+INPUTS: Node stream from parser.
+OUTPUTS: Track[] → Module[] → Lesson[] (slugged)
+BUILDER INSTRUCTIONS:
+	•	Step 1: Create tracks for major parts (e.g., “Law & Ethics”, “Health Insurance & Managed Care”, “Disability Income”, “Social Insurances (OASDI & Medicare)”, “Life Insurance”, “Annuities & Variable”, “FIGA / DFS / CFO”, “Buyer’s Guides & Glossary”, “Practice Exams/Quizzes”, “CE: Law & Ethics 4-hr”).
+	•	Step 2: For each H3 Lesson, create:
+	•	lessons row {title, slug, module_id, order, kind: 'reading'|'practice'|'ce'}
+	•	content_units:
+	•	one md unit containing the lesson text (H4 subsections rendered as ## etc.)
+	•	Step 3: Mark CE lessons kind='ce' when the H1/H2 path includes “CE” or “Law & Ethics 4-hr”.
+
+VALIDATION: Visiting /course/[track]/[module]/lesson/[slug] renders content with a section index.
+
+⸻
+
+COMPONENT: chunk-embed.ts
+
+PURPOSE: Chunk each lesson for retrieval/agents and iFlash.
+INPUTS: Markdown per lesson.
+OUTPUTS: content_chunks with vec embeddings and headings path.
+DEPENDENCIES: token splitter (≈600 tokens, 80 overlap), pgvector.
+BUILDER INSTRUCTIONS:
+	•	Step 1: Split; compute embeddings; upsert content_chunks(lesson_id, text, tokens, vec, headings).
+	•	Step 2: Keep refs to page/figure if present.
+
+VALIDATION: retrieve_content('HMO balance billing') returns a chunk from the Managed Care lesson.
+
+⸻
+
+COMPONENT: question-extract.ts
+
+PURPOSE: Turn detected Q/A blocks into structured items.
+INPUTS: Assessment nodes from docx-parse.
+OUTPUTS: questions with {type, stem, options[], answerKey[], loTags[], chunkRefs[]}.
+BUILDER INSTRUCTIONS:
+	•	Step 1: For each detected quiz/exam section, create or reuse a question_banks row:
+	•	bank key names like law-ethics-core, health-managed-fundamentals, etc.
+	•	Step 2: For each item:
+	•	MCQ/MS: fill options[] array (strip “A)”, “B)” labels), set answerKey indices.
+	•	T/F: map to options [True, False], answerKey [0] or [1].
+	•	Scenario: stem is vignette; options as above.
+	•	Step 3: chunkRefs: query content_chunks for the stem keywords; attach top chunkId+lesson slug (this enables remediation + citations).
+	•	Step 4: Tag difficulty heuristically:
+	•	If contains “EXCEPT”, “NOT”, multi-step calc → H
+	•	If pure definition → E
+	•	Else → M
+
+VALIDATION: Each bank ends with ≥ 10 items, each with at least one chunkRef.
+
+⸻
+
+COMPONENT: exam-blueprint.ts
+
+PURPOSE: Build the timed exam form from banks.
+INPUTS: counts per topic; difficulty mix (E40/M45/H15).
+OUTPUTS: One exam_configs record + assembled form.
+BUILDER INSTRUCTIONS:
+	•	Step 1: Topic weights:
+law_ethics:8, health:12, disability:6, social_ins:8, life:10, annuities_variable:4, figa_dfs:2
+	•	Step 2: Pull items per topic/difficulty quotas; randomize & persist order.
+	•	Step 3: Save exam_configs(id:'dfs-215-sim', duration_sec:3600, rules:{shuffle:true, oneSubmit:true, proctor:true}).
+
+VALIDATION: /exam/dfs-215-sim shows Begin Exam and runs end-to-end.
+
+⸻
+
+COMPONENT: publisher.ts
+
+PURPOSE: Idempotent “publish all.”
+INPUTS: Parsed outline + extracted banks.
+OUTPUTS: Published tracks/modules/lessons/content, public visibility.
+BUILDER INSTRUCTIONS:
+	•	Step 1: Upsert (by slugs) all tracks/modules/lessons with published=true and visibility='public'.
+	•	Step 2: Write a content_version snapshot (e.g., v1.0-dfs-215-2025-07) for rollback.
+
+VALIDATION: Dashboard lists all tracks/modules; clicking any lesson shows content.
+
+⸻
+
+BUILD SEQUENCE (single job)
+
+PHASE 1 — Seed Runner
+	•	□ Create job seed:dfs215:import_publish.
+	•	Read DOCX.
+	•	Run docx-parse → outline-map → chunk-embed → question-extract → exam-blueprint → publisher.
+	•	Idempotent: use slug hashes (track: law-ethics, module: intro, lesson: definitions-ethics) so re-runs update, not duplicate.
+
+Expected console summary (example):
+
+{ tracks: 8, modules: 34, lessons: 96, chunks: 11,430,
+  banks: 9, items: 620, examForm: 'dfs-215-sim', version: 'v1.0-dfs-215-2025-07' }
+
+PHASE 2 — Wiring Pages
+	•	/quiz pulls all banks; starting quiz builds from question_banks.
+	•	/exam/[examId] reads exam_configs.
+	•	Lesson player shows Objectives → Reading → Media → iFlash → Practice automatically if a bank exists for that lesson.
+
+⸻
+
+TESTING CHECKPOINTS (must pass)
+
+CHECKPOINT 1 — Outline & Publish
+✓ Visit three random lessons (Law & Ethics, Managed Care, OASDI). Content renders with section index.
+
+CHECKPOINT 2 — Retrieval & Citations
+✓ Ask CoachBot “Why is balance billing restricted under HMOs?” → 1–3 passages with chunkId citations from Managed Care.
+
+CHECKPOINT 3 — Quiz
+✓ /quiz → start health-managed-fundamentals → score page shows item analysis, each miss has Remediate (opens cited passage) + Generate iFlash (creates 3 cards).
+
+CHECKPOINT 4 — Exam
+✓ /exam/dfs-215-sim runs 60-min timer, autosaves, locks on submit; debrief lists 3 weak topics with lesson links.
+
+CHECKPOINT 5 — Idempotency
+✓ Re-run job with same DOCX; counts remain identical; diffs show only timestamp/version.
+
+⸻
+
+DEPLOYMENT CONFIGURATION
+
+ENV:
+	•	DOCX_SOURCE_PATH=/mnt/data/215 DFS Blended - Self Study Course July 2025.docx
+	•	PUBLISH_VISIBILITY=public
+	•	EXAM_BUILD_WEIGHTS (JSON) — optional override
+
+REPLIT TASK (put at end of your builder prompt):
+
+RUN NOW: Execute seed:dfs215:import_publish using DOCX at ${DOCX_SOURCE_PATH}. If the file is missing, fail fast with a clear error. After success, output the summary counts and the first 10 lesson slugs.
+
+⸻
+
+ROLLBACK
+	•	Keep content_version snapshot.
+	•	To roll back: set site to version vX.Y (use outline snapshot + disable new banks/exam).
+	•	Never delete student data.
+
+⸻
+
+Troubleshooting (fast)
+	•	“Lessons show but empty” → Verify content_units created for each H3; if not, check the H3 parser boundary conditions.
+	•	“No quizzes appear” → Ensure question_banks got rows and /quiz reads them; validate regex extraction for options.
+	•	“Exam button missing” → exam_configs not saved or RLS hiding it; set visibility='public'.
+
+⸻
+
+FINAL BUILDER COMMAND (paste verbatim)
+
+Build every lesson & assessment from the DFS-215 DOCX:
+	1.	Implement the five components above; 2) create job seed:dfs215:import_publish; 3) run it once; 4) print the counts; 5) make the lessons/banks/exam visible to students; 6) ensure /quiz and /exam/dfs-215-sim are fully operational today.
+
+When the builder runs this, your dashboard tiles will link to real, fully populated lessons and both Practice Quiz and Timed Exam will work off the extracted banks—no placeholders, no manual copy/paste.
