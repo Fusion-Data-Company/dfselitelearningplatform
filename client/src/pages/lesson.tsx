@@ -106,15 +106,15 @@ export default function LessonPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen education-bg">
         <Navigation />
         <Sidebar />
         <main className="ml-64 pt-16 min-h-screen">
           <div className="p-8">
             <div className="max-w-6xl mx-auto">
-              <div className="animate-pulse space-y-6">
-                <div className="h-32 bg-muted rounded-2xl"></div>
-                <div className="h-96 bg-muted rounded-2xl"></div>
+              <div className="space-y-6">
+                <div className="elite-skeleton h-32 rounded-2xl"></div>
+                <div className="elite-skeleton h-96 rounded-2xl"></div>
               </div>
             </div>
           </div>
@@ -125,14 +125,25 @@ export default function LessonPage() {
 
   if (!lesson) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen education-bg">
         <Navigation />
         <Sidebar />
         <main className="ml-64 pt-16 min-h-screen">
           <div className="p-8">
             <div className="max-w-6xl mx-auto text-center">
-              <h1 className="cinzel text-3xl font-bold mb-4">Lesson Not Found</h1>
-              <p className="text-muted-foreground">The requested lesson could not be found.</p>
+              <Card className="education-card p-12">
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-destructive to-destructive/80 flex items-center justify-center mx-auto mb-6">
+                  <BookOpen className="w-10 h-10 text-white" />
+                </div>
+                <h1 className="cinzel text-3xl font-bold mb-4 text-foreground">Lesson Not Found</h1>
+                <p className="text-muted-foreground mb-6">The requested lesson could not be found or has been moved.</p>
+                <Button 
+                  onClick={() => window.location.href = '/'}
+                  className="floating-action px-6 py-3"
+                >
+                  Return to Dashboard
+                </Button>
+              </Card>
             </div>
           </div>
         </main>
@@ -154,8 +165,8 @@ export default function LessonPage() {
         <div className="p-8">
           <div className="max-w-6xl mx-auto">
             {/* Lesson Header */}
-            <Card className="glassmorphism-card border-border/50 mb-6">
-              <CardContent className="p-8">
+            <Card className="glassmorphism-card border-secondary/30 mb-8">
+              <CardContent className="p-8 relative overflow-hidden">
                 <div className="flex items-center justify-between mb-6">
                   <div>
                     <div className="flex items-center space-x-3 mb-3">

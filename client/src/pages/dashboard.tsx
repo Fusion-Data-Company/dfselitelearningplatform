@@ -15,7 +15,8 @@ import {
   Layers3, 
   Award, 
   Play,
-  ChevronRight 
+  ChevronRight,
+  BarChart3
 } from "lucide-react";
 
 interface CourseProgress {
@@ -38,7 +39,7 @@ export default function Dashboard() {
   });
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen education-bg">
       <Navigation />
       <Sidebar />
       
@@ -46,13 +47,35 @@ export default function Dashboard() {
         <div className="p-8">
           <div className="max-w-7xl mx-auto">
             {/* Header */}
-            <div className="mb-8">
-              <h2 className="cinzel text-3xl font-bold text-foreground mb-2">
-                Student Dashboard
-              </h2>
-              <p className="text-muted-foreground">
-                Welcome back, {user?.firstName || 'Student'}! Track your progress through the DFS-215 curriculum
-              </p>
+            <div className="glassmorphism-card rounded-2xl p-8 mb-8">
+              <div className="flex items-center space-x-4 mb-6">
+                <div className="w-16 h-16 bg-gradient-to-br from-primary via-secondary to-accent rounded-2xl flex items-center justify-center animate-elite-glow">
+                  <BarChart3 className="w-8 h-8 text-white drop-shadow-lg" />
+                </div>
+                <div>
+                  <h1 className="cinzel text-4xl font-bold text-shimmer mb-2">
+                    Elite Dashboard
+                  </h1>
+                  <p className="text-lg text-muted-foreground geist">
+                    Welcome back, {user?.firstName || 'Student'}! Track your progress through the DFS-215 curriculum
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-6 text-sm text-muted-foreground">
+                <div className="flex items-center space-x-2">
+                  <TrendingUp className="w-4 h-4 text-primary" />
+                  <span>Real-time Progress</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Brain className="w-4 h-4 text-secondary" />
+                  <span>AI-Powered Learning</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Shield className="w-4 h-4 text-accent" />
+                  <span>Certification Ready</span>
+                </div>
+              </div>
             </div>
 
             {/* Stats Cards */}
@@ -93,16 +116,14 @@ export default function Dashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Course Tracks */}
               <div className="space-y-6">
-                <Card className="glassmorphism border-border">
-                  <CardContent className="p-6">
-                    <h3 className="cinzel text-xl font-bold mb-4">Course Tracks</h3>
+                <Card className="education-card border-primary/20 hover:border-primary/40 transition-all duration-300">
+                  <CardContent className="p-8">
+                    <h3 className="cinzel text-2xl font-bold mb-6 text-elite">Course Tracks</h3>
                     <div className="space-y-4">
                       {progressLoading ? (
                         <div className="space-y-4">
                           {[1, 2, 3].map((i) => (
-                            <div key={i} className="animate-pulse">
-                              <div className="h-20 bg-muted rounded-xl"></div>
-                            </div>
+                            <div key={i} className="elite-skeleton h-24 rounded-2xl"></div>
                           ))}
                         </div>
                       ) : (
@@ -173,12 +194,12 @@ export default function Dashboard() {
               {/* Right Column */}
               <div className="space-y-6">
                 {/* Recent Activity */}
-                <Card className="glassmorphism border-border">
-                  <CardContent className="p-6">
-                    <h3 className="cinzel text-xl font-bold mb-4">Recent Activity</h3>
-                    <div className="space-y-3">
-                      <div className="flex items-center space-x-3 p-3 bg-card rounded-xl">
-                        <div className="w-8 h-8 bg-primary/20 rounded-lg flex items-center justify-center">
+                <Card className="education-card border-secondary/20 hover:border-secondary/40 transition-all duration-300">
+                  <CardContent className="p-8">
+                    <h3 className="cinzel text-2xl font-bold mb-6 text-elite">Recent Activity</h3>
+                    <div className="space-y-4">
+                      <div className="flex items-center space-x-4 p-4 glassmorphism-card rounded-2xl border border-primary/20 hover:border-primary/40 transition-all duration-300 group">
+                        <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                           <BookOpen className="w-4 h-4 text-primary" />
                         </div>
                         <div className="flex-1">

@@ -179,7 +179,7 @@ export default function AdminPage() {
   // Redirect if not admin
   if (!isAdmin) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen education-bg">
         <Navigation />
         <Sidebar />
         <main className="ml-64 pt-16 min-h-screen">
@@ -198,7 +198,7 @@ export default function AdminPage() {
   const currentAgent = agentProfiles?.find(agent => agent.id === selectedAgent);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen education-bg">
       <Navigation />
       <Sidebar />
       

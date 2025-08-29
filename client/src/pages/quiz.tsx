@@ -283,7 +283,7 @@ export default function QuizPage() {
   // Show quiz results
   if (quizResults) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen education-bg">
         <Navigation />
         <Sidebar />
         
@@ -359,7 +359,7 @@ export default function QuizPage() {
     const isFlagged = flaggedQuestions.has(currentQuestion.id);
 
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen education-bg">
         <Navigation />
         <Sidebar />
         
