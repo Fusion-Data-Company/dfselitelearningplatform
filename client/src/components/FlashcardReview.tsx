@@ -123,8 +123,8 @@ export default function FlashcardReview({ cards, onComplete }: FlashcardReviewPr
       label: "Good",
       icon: "😊",
       description: "1d",
-      color: "border-yellow-500/30 hover:bg-yellow-500/10 text-yellow-600",
-      bgGradient: "from-yellow-500/10 to-yellow-500/5"
+      color: "border-blue-500/30 hover:bg-blue-500/10 text-blue-600",
+      bgGradient: "from-blue-500/10 to-blue-500/5"
     },
     {
       quality: 3,

@@ -93,7 +93,7 @@ export default function QuizQuestion({
                 variant="outline"
                 size="sm"
                 onClick={onFlag}
-                className={`${isFlagged ? 'border-yellow-500 bg-yellow-500/10 text-yellow-600' : 'border-muted/30'}`}
+                className={`${isFlagged ? 'border-orange-500 bg-orange-500/10 text-orange-600' : 'border-muted/30'}`}
               >
                 <Flag className={`w-4 h-4 ${isFlagged ? 'fill-current' : ''}`} />
               </Button>
@@ -122,7 +122,7 @@ export default function QuizQuestion({
                   variant="outline" 
                   className={`text-xs ${
                     question.difficulty === 'E' ? 'border-green-500/30 text-green-600 bg-green-500/10' :
-                    question.difficulty === 'M' ? 'border-yellow-500/30 text-yellow-600 bg-yellow-500/10' :
+                    question.difficulty === 'M' ? 'border-blue-500/30 text-blue-600 bg-blue-500/10' :
                     'border-red-500/30 text-red-600 bg-red-500/10'
                   }`}
                 >

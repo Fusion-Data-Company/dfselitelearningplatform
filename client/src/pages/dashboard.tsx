@@ -205,11 +205,11 @@ export default function Dashboard() {
                   </div>
                   <div className="space-y-3">
                     <div className="flex items-center space-x-3">
-                      <Star className="w-4 h-4 text-yellow-500" />
+                      <Star className="w-4 h-4 text-primary" />
                       <span className="text-sm font-medium">Quiz Master</span>
                     </div>
                     <div className="flex items-center space-x-3">
-                      <Star className="w-4 h-4 text-yellow-500" />
+                      <Star className="w-4 h-4 text-primary" />
                       <span className="text-sm font-medium">Study Streak</span>
                     </div>
                     <div className="flex items-center space-x-3">

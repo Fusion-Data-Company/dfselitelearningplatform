@@ -178,7 +178,7 @@ export default function CETrackingPage() {
                                 <div className="flex items-center space-x-3">
                                   <div className={`w-3 h-3 rounded-full ${
                                     req.completed >= req.required ? 'bg-green-500' :
-                                    req.completed > 0 ? 'bg-yellow-500' : 'bg-red-500'
+                                    req.completed > 0 ? 'bg-blue-500' : 'bg-red-500'
                                   }`}></div>
                                   <h4 className="font-semibold">{req.category}</h4>
                                 </div>
@@ -279,7 +279,7 @@ export default function CETrackingPage() {
                           
                           <div className="flex items-center justify-between p-3 glassmorphism-card rounded-lg border border-border/30">
                             <div className="flex items-center space-x-2">
-                              <Star className="w-4 h-4 text-yellow-500" />
+                              <Star className="w-4 h-4 text-primary" />
                               <span className="text-sm font-medium">CE Credits Needed</span>
                             </div>
                             <span className="text-sm font-medium">{Math.max(0, totalRequired - totalCompleted)} hrs</span>
@@ -369,7 +369,7 @@ export default function CETrackingPage() {
                             </div>
                             <div className="flex justify-between">
                               <span className="text-sm">CE Completion Due:</span>
-                              <Badge className="bg-yellow-500/20 text-yellow-600 border-yellow-500/30">Nov 15, 2025</Badge>
+                              <Badge className="bg-orange-500/20 text-orange-600 border-orange-500/30">Nov 15, 2025</Badge>
                             </div>
                           </div>
                         </div>

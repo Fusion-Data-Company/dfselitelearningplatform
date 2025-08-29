@@ -400,7 +400,7 @@ export default function LessonPage() {
                 {checkpoint.gate?.type === 'time' && (
                   <div className="flex items-center space-x-2 text-sm">
                     <Timer className="w-4 h-4" />
-                    <span className={minimumReadingMet ? "text-green-500" : "text-yellow-500"}>
+                    <span className={minimumReadingMet ? "text-green-500" : "text-orange-500"}>
                       Minimum {Math.floor((checkpoint.gate.value || 300) / 60)} min reading
                     </span>
                   </div>
@@ -419,7 +419,7 @@ export default function LessonPage() {
                 <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                   {!minimumReadingMet && checkpoint.gate?.type === 'time' && (
                     <>
-                      <AlertTriangle className="w-4 h-4 text-yellow-500" />
+                      <AlertTriangle className="w-4 h-4 text-orange-500" />
                       <span>Please spend adequate time reading to proceed</span>
                     </>
                   )}
