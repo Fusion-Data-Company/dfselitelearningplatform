@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
 import { GraduationCap, Bell, Settings, ChevronDown, Search, User, LogOut, BookOpen, Trophy } from "lucide-react";
 import { useState } from "react";
+import ThemeToggle from "./ThemeToggle";
 
 export default function Navigation() {
   const { user } = useAuth();
@@ -68,6 +69,9 @@ export default function Navigation() {
 
           {/* Right Section - Real Functional Elements */}
           <div className="flex items-center space-x-3">
+            
+            {/* Theme Toggle */}
+            <ThemeToggle />
             
             {/* Search Functionality */}
             <div className="relative">
