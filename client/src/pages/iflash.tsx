@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Navigation from "@/components/Navigation";
 import Sidebar from "@/components/Sidebar";
@@ -22,8 +22,12 @@ import {
 interface Flashcard {
   id: string;
   type: string;
-  front: string;
-  back: string;
+  front?: string;
+  back?: string;
+  prompt?: string;
+  options?: string[];
+  answerIndex?: number;
+  rationale?: string;
   sourceId?: string;
   difficulty: number;
   interval: number;
@@ -49,6 +53,16 @@ export default function IFlashPage() {
   const { data: flashcards = [], isLoading: cardsLoading } = useQuery<Flashcard[]>({
     queryKey: ['/api/iflash/cards'],
   });
+
+  // Auto-start session when cards are loaded (for immediate testing)
+  useEffect(() => {
+    if (flashcards.length > 0 && !sessionActive && currentCardIndex === 0 && reviewedCount === 0) {
+      console.log('Auto-starting session with', flashcards.length, 'cards');
+      setSessionActive(true);
+    }
+  }, [flashcards.length, sessionActive, currentCardIndex, reviewedCount]);
+
+  const shouldAutoStart = flashcards.length > 0 && !sessionActive && currentCardIndex === 0;
 
   const { data: stats, isLoading: statsLoading } = useQuery<StudyStats>({
     queryKey: ['/api/iflash/stats'],
@@ -172,7 +186,7 @@ export default function IFlashPage() {
         <div className="p-8">
           <div className="max-w-5xl mx-auto">
             
-            {!sessionActive ? (
+            {(!sessionActive && !shouldAutoStart) ? (
               // Study Session Overview
               <>
                 <div className="glassmorphism-card rounded-2xl p-8 mb-8">
@@ -268,6 +282,15 @@ export default function IFlashPage() {
                         <Play className="w-5 h-5 mr-2" />
                         Start Review Session
                       </Button>
+                      <Button
+                        onClick={handleStartSession}
+                        variant="outline"
+                        size="sm"
+                        className="ml-4"
+                        data-testid="button-quick-start"
+                      >
+                        Quick Start
+                      </Button>
                       
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                         <div className="p-3 bg-card rounded-lg">
@@ -288,7 +311,7 @@ export default function IFlashPage() {
                 </Card>
               </>
             ) : (
-              // Active Review Session
+              // Active Review Session (including auto-started)
               <>
                 {/* Session Progress */}
                 <div className="mb-6">
