@@ -27,57 +27,71 @@ interface CourseProgress {
 }
 
 export default function Sidebar() {
-  // Helper function to clean up messy course titles
-  const getCleanCourseTitle = (title: string) => {
-    // Map complex titles to clean academic course names
-    const titleMappings: { [key: string]: { title: string; topics: string[] } } = {
-      'Law & Ethics': {
-        title: 'Professional Ethics & Law',
-        topics: ['Fiduciary Duties', 'Professional Responsibility', 'Regulatory Compliance', 'CE Requirements']
+  // Heavy-duty parser for messy concatenated lesson titles
+  const parseComplexCourseData = (messyTitle: string) => {
+    // Extract main course concepts by parsing the chaotic text
+    const coursePatterns = {
+      'Managed Care': {
+        title: 'Managed Care Organizations',
+        color: 'emerald',
+        topics: messyTitle.match(/(?:HMO|PPO|EPO|POS|Network|Provider|Managed Care|Health Plan)/gi)?.slice(0, 4) || ['HMO Models', 'PPO Networks', 'Provider Relations', 'Care Management']
       },
-      'Health Insurance & Managed Care': {
-        title: 'Health Insurance Systems',
-        topics: ['HMO/PPO/EPO Models', 'Managed Care Organizations', 'Balance Billing', 'Network Contracts']
+      'Medicare': {
+        title: 'Medicare & Social Insurance', 
+        color: 'blue',
+        topics: messyTitle.match(/(?:Medicare|OASDI|Social Security|Disability|Benefits)/gi)?.slice(0, 4) || ['Medicare Parts A-D', 'OASDI Benefits', 'Disability Coverage', 'Eligibility Rules']
       },
-      'Social Insurance (OASDI)': {
-        title: 'Social Security & Medicare',
-        topics: ['OASDI Benefits', 'Medicare Parts A-D', 'Dual Eligibility', 'Disability Determination']
+      'FOUR.*Types|Types.*Managed': {
+        title: 'Healthcare Delivery Systems',
+        color: 'cyan', 
+        topics: ['HMO Organizations', 'PPO Networks', 'EPO Plans', 'POS Models']
       },
-      'Disability Income Insurance': {
+      'FEDERALLY|State Regulated|Health Plan': {
+        title: 'Healthcare Regulation & Compliance',
+        color: 'violet',
+        topics: ['Federal Regulations', 'State Oversight', 'Grandfathered Plans', 'Essential Benefits']
+      },
+      'Disability.*INCOME|INCOME.*Insurance': {
         title: 'Disability Income Insurance',
-        topics: ['Individual DI Plans', 'Group Coverage', 'Elimination Periods', 'Benefit Structures']
+        color: 'orange',
+        topics: ['Individual Coverage', 'Group Plans', 'Benefit Periods', 'Elimination Periods']
       },
-      'Life Insurance': {
+      'Life Insurance|Term|Whole Life': {
         title: 'Life Insurance Products',
-        topics: ['Term Life', 'Whole Life', 'Universal Life', 'Policy Riders', 'Replacement Rules']
+        color: 'red',
+        topics: ['Term Life', 'Whole Life', 'Universal Life', 'Variable Life']
       },
-      'Annuities & Variable Products': {
-        title: 'Annuities & Variable Products',
-        topics: ['Fixed Annuities', 'Variable Annuities', 'Prospectus Requirements', 'Separate Accounts']
-      },
-      'FIGA/DFS/CFO': {
-        title: 'Florida Insurance Regulation',
-        topics: ['FIGA Coverage', 'DFS Oversight', 'CFO Regulations', 'Consumer Protection']
+      'Law.*Ethics|Ethics.*Law|Professional': {
+        title: 'Professional Ethics & Law',
+        color: 'pink',
+        topics: ['Fiduciary Duties', 'Professional Standards', 'Legal Compliance', 'CE Requirements']
       }
     };
     
-    // Find matching clean title
-    for (const [key, value] of Object.entries(titleMappings)) {
-      if (title.includes(key) || title === key) {
-        return value;
+    // Find matching pattern
+    for (const [pattern, data] of Object.entries(coursePatterns)) {
+      if (new RegExp(pattern, 'i').test(messyTitle)) {
+        return {
+          title: data.title,
+          topics: data.topics.map(topic => typeof topic === 'string' ? topic : topic.replace(/[^a-zA-Z0-9\s-]/g, '').trim()).filter(t => t.length > 2).slice(0, 4),
+          colorType: data.color
+        };
       }
     }
     
-    // Fallback: create clean title from messy one
-    const cleanTitle = title
-      .replace(/I /g, '')
-      .replace(/\s+/g, ' ')
-      .split(/[,|&]/)[0]
-      .trim();
+    // Extract bullet points from messy title
+    const bulletPoints = messyTitle
+      .replace(/I\s+/g, '• ')
+      .split(/\s*[•|]\s*/)
+      .filter(item => item.length > 5 && item.length < 50)
+      .slice(0, 4)
+      .map(item => item.replace(/\d+/g, '').replace(/[^a-zA-Z\s]/g, '').trim())
+      .filter(item => item.length > 3);
     
     return {
-      title: cleanTitle.length > 30 ? cleanTitle.substring(0, 30) + '...' : cleanTitle,
-      topics: ['Professional Development', 'Certification Requirements']
+      title: 'Professional Development Course',
+      topics: bulletPoints.length > 0 ? bulletPoints : ['Insurance Principles', 'Regulatory Compliance', 'Product Knowledge', 'Sales Practices'],
+      colorType: 'default'
     };
   };
 
@@ -339,68 +353,74 @@ export default function Sidebar() {
               // Generate academic course metadata
               const courseId = `DFS-215-${String(index + 1).padStart(3, '0')}`;
               const enrollmentStatus = track.progress === 100 ? 'Certified' : track.progress > 0 ? 'Enrolled' : 'Available';
-              const cleanCourse = getCleanCourseTitle(track.title);
-              const courseDescription = `${cleanCourse.title} - ${cleanCourse.topics.join(' • ')}`;
+              const parsedCourse = parseComplexCourseData(track.title);
+              const courseDescription = `${parsedCourse.title} - ${parsedCourse.topics.join(' • ')}`;
+              
+              // Get color scheme based on course type
+              const courseColorScheme = parsedCourse.colorType === 'emerald' ? trackColors[1] :
+                                      parsedCourse.colorType === 'blue' ? trackColors[2] :
+                                      parsedCourse.colorType === 'cyan' ? trackColors[0] :
+                                      trackColor;
               
               return (
                 <Link key={track.id} href="/lesson/hmo-balance-billing">
                   <div 
-                    className={`p-10 education-card border ${trackColor.border} transition-all duration-300 group cursor-pointer hover:shadow-lg relative overflow-hidden academic-course-card min-h-[280px]`}
+                    className={`p-12 education-card border ${courseColorScheme.border} transition-all duration-300 group cursor-pointer hover:shadow-lg relative overflow-hidden academic-course-card min-h-[320px]`}
                     title={`Course Description: ${courseDescription}`}
                     style={{
-                      boxShadow: `0 0 15px ${trackColor.hex}15, 0 0 25px ${trackColor.hex}08, inset 0 1px 0 rgba(255,255,255,0.05)`
+                      boxShadow: `0 0 20px ${courseColorScheme.hex}20, 0 0 40px ${courseColorScheme.hex}10, 0 0 60px ${courseColorScheme.hex}05, inset 0 1px 0 rgba(255,255,255,0.08)`
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.boxShadow = `0 0 25px ${trackColor.hex}25, 0 0 40px ${trackColor.hex}15, inset 0 1px 0 rgba(255,255,255,0.1)`;
+                      e.currentTarget.style.boxShadow = `0 0 30px ${courseColorScheme.hex}30, 0 0 60px ${courseColorScheme.hex}20, 0 0 90px ${courseColorScheme.hex}10, inset 0 1px 0 rgba(255,255,255,0.12)`;
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.boxShadow = `0 0 15px ${trackColor.hex}15, 0 0 25px ${trackColor.hex}08, inset 0 1px 0 rgba(255,255,255,0.05)`;
+                      e.currentTarget.style.boxShadow = `0 0 20px ${courseColorScheme.hex}20, 0 0 40px ${courseColorScheme.hex}10, 0 0 60px ${courseColorScheme.hex}05, inset 0 1px 0 rgba(255,255,255,0.08)`;
                     }}
                   >
-                    <div className={`absolute inset-0 bg-gradient-to-r from-transparent ${trackColor.shimmer} to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000`}></div>
+                    <div className={`absolute inset-0 bg-gradient-to-r from-transparent ${courseColorScheme.shimmer} to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000`}></div>
                     <div className="relative z-10">
                       <div className="flex justify-between items-start mb-4">
                         <div className="flex-1 min-w-0">
                           {/* Academic Course Header */}
-                          <div className="flex items-center space-x-4 mb-4">
-                            <div className={`w-4 h-4 rounded-full bg-gradient-to-r ${trackColor.dot} flex-shrink-0`}></div>
+                          <div className="flex items-center space-x-5 mb-5">
+                            <div className={`w-5 h-5 rounded-full bg-gradient-to-r ${courseColorScheme.dot} flex-shrink-0 shadow-lg`} style={{boxShadow: `0 0 12px ${courseColorScheme.hex}40`}}></div>
                             <span className="text-sm font-mono text-muted-foreground bg-muted/20 px-4 py-2.5 rounded-lg border border-border/30 hover:bg-muted/30 transition-colors" title={`Course ID: ${courseId}`}>
                               {courseId}
                             </span>
                           </div>
                           
                           {/* Course Title */}
-                          <h3 className={`text-xl font-bold ${trackColor.text} cinzel tracking-wide leading-snug mb-3 hover:${trackColor.text.replace('text-', 'text-').replace('-100', '-50')} transition-colors cursor-pointer`} title={courseDescription} style={{fontFamily: 'Cinzel, serif'}}>
-                            {cleanCourse.title}
+                          <h3 className={`text-xl font-bold ${courseColorScheme.text} cinzel tracking-wide leading-snug mb-4 hover:${courseColorScheme.text.replace('text-', 'text-').replace('-100', '-50')} transition-colors cursor-pointer`} title={courseDescription} style={{fontFamily: 'Cinzel, serif'}}>
+                            {parsedCourse.title}
                           </h3>
                           
-                          {/* Course Topics */}
-                          <div className="mb-4">
-                            <ul className="space-y-1">
-                              {cleanCourse.topics.slice(0, 2).map((topic, topicIndex) => (
-                                <li key={topicIndex} className="flex items-center space-x-2 text-sm text-muted-foreground">
-                                  <div className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${trackColor.dot} opacity-60 flex-shrink-0`}></div>
-                                  <span className="cinzel font-medium" style={{fontFamily: 'Cinzel, serif'}}>{topic}</span>
+                          {/* Course Topics as Bullet List */}
+                          <div className="mb-5">
+                            <ul className="space-y-2">
+                              {parsedCourse.topics.map((topic, topicIndex) => (
+                                <li key={topicIndex} className="flex items-start space-x-3 text-sm text-muted-foreground">
+                                  <div className={`w-2 h-2 rounded-full bg-gradient-to-r ${courseColorScheme.dot} opacity-70 flex-shrink-0 mt-1.5`}></div>
+                                  <span className="cinzel font-medium leading-relaxed" style={{fontFamily: 'Cinzel, serif'}}>{topic}</span>
                                 </li>
                               ))}
                             </ul>
                           </div>
                           
                           {/* Course Metadata */}
-                          <div className="flex items-center space-x-8 text-sm text-muted-foreground mb-5">
+                          <div className="grid grid-cols-2 gap-4 text-sm text-muted-foreground mb-6">
                             <span className="flex items-center space-x-3 cinzel font-medium">
-                              <div className="w-3 h-3 rounded-full bg-current opacity-60 flex-shrink-0"></div>
+                              <div className="w-4 h-4 rounded-full bg-current opacity-60 flex-shrink-0"></div>
                               <span>{track.ceHours || 0} CE Hours</span>
                             </span>
                             <span className="flex items-center space-x-3 cinzel font-medium">
-                              <div className="w-3 h-3 rounded-full bg-current opacity-60 flex-shrink-0"></div>
+                              <div className="w-4 h-4 rounded-full bg-current opacity-60 flex-shrink-0"></div>
                               <span>{track.completedLessons}/{track.totalLessons} Lessons</span>
                             </span>
                           </div>
                         </div>
                         
                         <div className="flex flex-col items-end space-y-3">
-                          <Badge className={`bg-gradient-to-r ${trackColor.badge} text-sm font-bold border backdrop-blur-sm px-3 py-1.5 cinzel`} style={{fontFamily: 'Cinzel, serif'}}>
+                          <Badge className={`bg-gradient-to-r ${courseColorScheme.badge} text-sm font-bold border backdrop-blur-sm px-4 py-2 cinzel`} style={{fontFamily: 'Cinzel, serif'}}>
                             {track.progress}%
                           </Badge>
                           <span className="text-sm text-muted-foreground cinzel font-medium" style={{fontFamily: 'Cinzel, serif'}}>
@@ -417,8 +437,8 @@ export default function Sidebar() {
                         </div>
                       </div>
                       <div className="mt-3 flex justify-between items-center">
-                        <div className="flex items-center space-x-5">
-                          <span className={`text-sm ${trackColor.text} bg-gradient-to-r from-black/50 to-black/30 px-5 py-2.5 rounded-lg border border-${trackColor.name === 'primary' ? 'cyan' : trackColor.name === 'secondary' ? 'emerald' : 'violet'}-500/20 cinzel font-medium flex items-center space-x-4`} style={{fontFamily: 'Cinzel, serif'}}>
+                        <div className="flex items-center space-x-6">
+                          <span className={`text-sm ${courseColorScheme.text} bg-gradient-to-r from-black/50 to-black/30 px-6 py-3 rounded-lg border border-${courseColorScheme.name === 'primary' ? 'cyan' : courseColorScheme.name === 'secondary' ? 'emerald' : 'violet'}-500/30 cinzel font-medium flex items-center space-x-4`} style={{fontFamily: 'Cinzel, serif', boxShadow: `0 0 15px ${courseColorScheme.hex}20`}}>
                             <span className="opacity-70">Status:</span>
                             <span className="font-semibold">
                               {enrollmentStatus}
@@ -426,10 +446,10 @@ export default function Sidebar() {
                           </span>
                         </div>
                         <div className="flex items-center space-x-4 text-sm">
-                          <span className={`${trackColor.text} cinzel font-semibold opacity-80 group-hover:opacity-100 transition-opacity`} style={{fontFamily: 'Cinzel, serif'}}>
+                          <span className={`${courseColorScheme.text} cinzel font-semibold opacity-80 group-hover:opacity-100 transition-opacity`} style={{fontFamily: 'Cinzel, serif'}}>
                             Enter Course
                           </span>
-                          <ChevronRight className={`w-6 h-6 ${trackColor.text} opacity-60 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300 flex-shrink-0`} />
+                          <ChevronRight className={`w-7 h-7 ${courseColorScheme.text} opacity-60 group-hover:opacity-100 group-hover:translate-x-2 transition-all duration-300 flex-shrink-0`} style={{filter: `drop-shadow(0 0 8px ${courseColorScheme.hex}60)`}} />
                         </div>
                       </div>
                     </div>
