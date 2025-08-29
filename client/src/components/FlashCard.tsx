@@ -51,7 +51,7 @@ export default function FlashCard({ card, onReview, cardNumber, totalCards }: Fl
     <div className="space-y-6">
       {/* Card Info */}
       <div className="text-center">
-        <h2 className="cinzel text-3xl font-bold mb-2 transcendent-text">iFlash Review Session</h2>
+        <h2 className="cinzel text-3xl font-bold mb-2">iFlash Review Session</h2>
         <p className="text-muted-foreground">
           Card {cardNumber} of {totalCards} • 
           {card.reviewCount === 0 ? ' New card' : ` Reviewed ${card.reviewCount} times`}
@@ -60,7 +60,7 @@ export default function FlashCard({ card, onReview, cardNumber, totalCards }: Fl
 
       {/* Flashcard */}
       <Card 
-        className={`glassmorphism border-border cursor-pointer flashcard hyper-interactive premium-hover quantum-distort ${isFlipped ? 'flipped' : ''}`}
+        className={`glassmorphism border-border cursor-pointer flashcard ${isFlipped ? 'flipped' : ''}`}
         onClick={handleFlip}
         data-testid="flashcard"
       >
@@ -74,7 +74,7 @@ export default function FlashCard({ card, onReview, cardNumber, totalCards }: Fl
                     {card.type.toUpperCase()}
                   </Badge>
                 </div>
-                <h3 className="cinzel text-xl font-bold mb-4 transcendent-text">{card.front}</h3>
+                <h3 className="cinzel text-xl font-bold mb-4">{card.front}</h3>
                 {!isFlipped && (
                   <p className="text-sm text-muted-foreground">Click to reveal answer</p>
                 )}
@@ -84,7 +84,7 @@ export default function FlashCard({ card, onReview, cardNumber, totalCards }: Fl
             {/* Back of card */}
             <div className="flashcard-back absolute inset-0 flex items-center justify-center text-center">
               <div>
-                <h3 className="cinzel text-xl font-bold mb-4 transcendent-text">{card.back}</h3>
+                <h3 className="cinzel text-xl font-bold mb-4 text-primary">{card.back}</h3>
                 {card.sourceId && (
                   <div className="inline-flex items-center space-x-2 text-xs bg-card px-3 py-2 rounded-lg">
                     <Book className="w-3 h-3 text-secondary" />
@@ -98,7 +98,7 @@ export default function FlashCard({ card, onReview, cardNumber, totalCards }: Fl
       </Card>
 
       {/* Card Stats */}
-      <div className="flex items-center justify-between text-sm text-muted-foreground glassmorphism p-4 rounded-xl holographic-interface">
+      <div className="flex items-center justify-between text-sm text-muted-foreground glassmorphism p-4 rounded-xl">
         <div>
           <p>Ease Factor: {card.difficulty.toFixed(1)}</p>
           <p>Current Interval: {card.interval} days</p>

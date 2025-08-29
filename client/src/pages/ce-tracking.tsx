@@ -83,7 +83,7 @@ export default function CETrackingPage() {
   const overallProgress = Math.round((totalCompleted / totalRequired) * 100);
 
   return (
-    <div className="min-h-screen ce-tracking-bg particle-field floating-elements">
+    <div className="min-h-screen education-bg">
       <Navigation />
       <Sidebar />
       
@@ -91,7 +91,7 @@ export default function CETrackingPage() {
         <div className="p-8">
           <div className="max-w-7xl mx-auto">
             {/* Header */}
-            <div className="ultra-glass rounded-2xl p-8 mb-8 micro-glow animate-quantum neural-card">
+            <div className="glassmorphism-card rounded-2xl p-8 mb-8">
               <div className="flex items-center space-x-4 mb-6">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center animate-elite-glow">
                   <Award className="w-8 h-8 text-white drop-shadow-lg" />

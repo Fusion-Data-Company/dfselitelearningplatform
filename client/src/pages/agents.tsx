@@ -149,7 +149,7 @@ export default function AgentsPage() {
   const currentMessages = activeAgent ? messages[activeAgent] || [] : [];
 
   return (
-    <div className="min-h-screen education-bg particle-field">
+    <div className="min-h-screen education-bg">
       <Navigation />
       <Sidebar />
       
@@ -157,33 +157,33 @@ export default function AgentsPage() {
         <div className="p-8">
           <div className="max-w-7xl mx-auto">
             {/* Header */}
-            <div className="ultra-glass rounded-2xl p-8 mb-8 micro-glow animate-divine">
+            <div className="glassmorphism-card rounded-2xl p-8 mb-8">
               <div className="flex items-center space-x-4 mb-6">
-                <div className="w-16 h-16 rounded-2xl morphing-bg flex items-center justify-center animate-quantum micro-bounce">
-                  <Sparkles className="w-8 h-8 text-white drop-shadow-lg animate-cosmic" />
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center animate-elite-glow">
+                  <Sparkles className="w-8 h-8 text-white drop-shadow-lg" />
                 </div>
                 <div>
-                  <h1 className="cinzel text-4xl font-bold holographic-text mb-2" data-text="AI Learning Agents">
+                  <h1 className="cinzel text-4xl font-bold text-shimmer mb-2">
                     AI Learning Agents
                   </h1>
-                  <p className="text-lg text-muted-foreground geist animate-particle">
+                  <p className="text-lg text-muted-foreground geist">
                     Three specialized AI tutors designed to accelerate your DFS-215 certification journey
                   </p>
                 </div>
               </div>
               
               <div className="flex items-center space-x-6 text-sm text-muted-foreground">
-                <div className="flex items-center space-x-2 micro-glow">
-                  <Brain className="w-4 h-4 text-primary animate-divine" />
-                  <span className="animate-particle">Personalized Coaching</span>
+                <div className="flex items-center space-x-2">
+                  <Brain className="w-4 h-4 text-primary" />
+                  <span>Personalized Coaching</span>
                 </div>
-                <div className="flex items-center space-x-2 micro-glow">
-                  <Target className="w-4 h-4 text-secondary animate-cosmic" />
-                  <span className="animate-particle">Adaptive Learning</span>
+                <div className="flex items-center space-x-2">
+                  <Target className="w-4 h-4 text-secondary" />
+                  <span>Adaptive Learning</span>
                 </div>
-                <div className="flex items-center space-x-2 micro-glow">
-                  <Award className="w-4 h-4 text-accent animate-quantum" />
-                  <span className="animate-particle">Exam Readiness</span>
+                <div className="flex items-center space-x-2">
+                  <Award className="w-4 h-4 text-accent" />
+                  <span>Exam Readiness</span>
                 </div>
               </div>
             </div>
@@ -191,7 +191,7 @@ export default function AgentsPage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Agent Selection */}
               <div className="space-y-6">
-                <h2 className="cinzel text-2xl font-bold holographic-text mb-4" data-text="Choose Your AI Tutor">Choose Your AI Tutor</h2>
+                <h2 className="cinzel text-2xl font-bold text-shimmer mb-4">Choose Your AI Tutor</h2>
                 
                 {agents.map((agent) => {
                   const Icon = agent.icon;
@@ -200,10 +200,10 @@ export default function AgentsPage() {
                   return (
                     <Card
                       key={agent.id}
-                      className={`ultra-glass cursor-pointer group relative overflow-hidden micro-glow micro-tilt ${
+                      className={`education-card cursor-pointer transition-all duration-300 group relative overflow-hidden ${
                         isActive 
-                          ? 'ring-2 ring-primary/30 scale-105 animate-divine' 
-                          : 'hover:border-primary/40 animate-quantum'
+                          ? 'border-primary/60 ring-2 ring-primary/30 scale-105' 
+                          : 'border-border/20 hover:border-primary/40'
                       }`}
                       onClick={() => setActiveAgent(agent.id)}
                     >
@@ -212,12 +212,12 @@ export default function AgentsPage() {
                         
                         <div className="relative z-10">
                           <div className="flex items-center space-x-3 mb-4">
-                            <div className={`w-12 h-12 rounded-2xl morphing-bg flex items-center justify-center animate-cosmic micro-bounce`}>
-                              <Icon className="w-6 h-6 text-white animate-holographic" />
+                            <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${agent.color} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
+                              <Icon className="w-6 h-6 text-white" />
                             </div>
                             <div>
-                              <h3 className="font-bold text-lg text-foreground holographic-text" data-text="{agent.name}">{agent.name}</h3>
-                              <Badge variant="outline" className={`text-xs ${agent.accentColor} animate-particle`}>
+                              <h3 className="font-bold text-lg text-foreground">{agent.name}</h3>
+                              <Badge variant="outline" className={`text-xs ${agent.accentColor}`}>
                                 {agent.specialty}
                               </Badge>
                             </div>
@@ -256,15 +256,15 @@ export default function AgentsPage() {
                 {activeAgent ? (
                   <div className="space-y-6">
                     {/* Chat Header */}
-                    <Card className="ultra-glass micro-glow animate-quantum">
+                    <Card className="education-card border-primary/20">
                       <CardContent className="p-6">
                         <div className="flex items-center space-x-4">
-                          <div className={`w-12 h-12 rounded-2xl morphing-bg flex items-center justify-center animate-divine micro-bounce`}>
-                            {currentAgent && <currentAgent.icon className="w-6 h-6 text-white animate-cosmic" />}
+                          <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${currentAgent?.color} flex items-center justify-center`}>
+                            {currentAgent && <currentAgent.icon className="w-6 h-6 text-white" />}
                           </div>
                           <div>
-                            <h3 className="font-bold text-xl text-foreground holographic-text" data-text="{currentAgent?.name}">{currentAgent?.name}</h3>
-                            <p className="text-muted-foreground text-sm animate-particle">{currentAgent?.description}</p>
+                            <h3 className="font-bold text-xl text-foreground">{currentAgent?.name}</h3>
+                            <p className="text-muted-foreground text-sm">{currentAgent?.description}</p>
                           </div>
                           <div className="ml-auto">
                             <Badge className="bg-green-500/20 text-green-600 border-green-500/30">
@@ -277,15 +277,15 @@ export default function AgentsPage() {
                     </Card>
 
                     {/* Messages */}
-                    <Card className="ultra-glass micro-glow animate-cosmic">
+                    <Card className="education-card border-primary/20">
                       <CardContent className="p-0">
                         <ScrollArea className="h-96 p-6">
                           {currentMessages.length === 0 ? (
                             <div className="text-center py-12">
-                              <div className={`w-16 h-16 rounded-2xl morphing-bg flex items-center justify-center mx-auto mb-4 animate-divine micro-bounce`}>
-                                {currentAgent && <currentAgent.icon className="w-8 h-8 text-white animate-cosmic" />}
+                              <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${currentAgent?.color} flex items-center justify-center mx-auto mb-4`}>
+                                {currentAgent && <currentAgent.icon className="w-8 h-8 text-white" />}
                               </div>
-                              <h4 className="font-bold text-lg mb-2 holographic-text" data-text="Start a conversation with {currentAgent?.name}">Start a conversation with {currentAgent?.name}</h4>
+                              <h4 className="font-bold text-lg mb-2">Start a conversation with {currentAgent?.name}</h4>
                               <p className="text-muted-foreground text-sm mb-6">
                                 Ask questions about your studies, get personalized recommendations, or seek help with specific topics.
                               </p>
@@ -298,7 +298,7 @@ export default function AgentsPage() {
                                   <Button
                                     key={index}
                                     variant="outline"
-                                    className="ultra-glass text-left justify-start text-sm micro-glow micro-tilt"
+                                    className="text-left justify-start border-border/50 hover:border-primary/50 text-sm"
                                     onClick={() => setInputValue(suggestion)}
                                   >
                                     💡 {suggestion}
@@ -312,8 +312,8 @@ export default function AgentsPage() {
                                 <div key={index} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                                   <div className={`max-w-sm p-4 rounded-2xl ${
                                     message.role === 'user' 
-                                      ? 'divine-button text-white' 
-                                      : 'ultra-glass border border-border/50 micro-glow'
+                                      ? 'bg-primary text-primary-foreground' 
+                                      : 'glassmorphism-card border border-border/50'
                                   }`}>
                                     <div className="geist text-sm leading-relaxed">
                                       {message.content}
@@ -336,14 +336,14 @@ export default function AgentsPage() {
                               ))}
                               {chatMutation.isPending && (
                                 <div className="flex justify-start">
-                                  <div className="ultra-glass border border-border/50 p-4 rounded-2xl max-w-sm micro-glow animate-quantum">
+                                  <div className="glassmorphism-card border border-border/50 p-4 rounded-2xl max-w-sm">
                                     <div className="flex items-center space-x-2">
                                       <div className="flex space-x-1">
-                                        <div className="w-2 h-2 bg-primary rounded-full animate-quantum"></div>
-                                        <div className="w-2 h-2 bg-primary rounded-full animate-cosmic" style={{animationDelay: '0.1s'}}></div>
-                                        <div className="w-2 h-2 bg-primary rounded-full animate-divine" style={{animationDelay: '0.2s'}}></div>
+                                        <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
+                                        <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                                        <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
                                       </div>
-                                      <span className="text-xs text-muted-foreground animate-particle">Thinking...</span>
+                                      <span className="text-xs text-muted-foreground">Thinking...</span>
                                     </div>
                                   </div>
                                 </div>
@@ -355,7 +355,7 @@ export default function AgentsPage() {
                     </Card>
 
                     {/* Input */}
-                    <Card className="ultra-glass micro-glow animate-divine">
+                    <Card className="education-card border-primary/20">
                       <CardContent className="p-4">
                         <div className="flex items-end space-x-3">
                           <div className="flex-1">
@@ -364,28 +364,28 @@ export default function AgentsPage() {
                               onChange={(e) => setInputValue(e.target.value)}
                               onKeyPress={handleKeyPress}
                               placeholder={`Ask ${currentAgent?.name} anything about DFS-215...`}
-                              className="min-h-[80px] resize-none ultra-glass border-border/50 focus:border-primary/50 micro-glow"
+                              className="min-h-[80px] resize-none border-border/50 focus:border-primary/50"
                               disabled={chatMutation.isPending}
                             />
                           </div>
                           <Button
                             onClick={handleSendMessage}
                             disabled={!inputValue.trim() || chatMutation.isPending}
-                            className="divine-button px-6 py-3 h-auto text-white font-bold micro-tilt"
+                            className="floating-action px-6 py-3 h-auto"
                           >
-                            <Send className="w-5 h-5 animate-cosmic" />
+                            <Send className="w-5 h-5" />
                           </Button>
                         </div>
                       </CardContent>
                     </Card>
                   </div>
                 ) : (
-                  <Card className="ultra-glass text-center micro-glow animate-quantum">
+                  <Card className="education-card border-border/20">
                     <CardContent className="p-12 text-center">
-                      <div className="w-24 h-24 rounded-3xl morphing-bg flex items-center justify-center mx-auto mb-6 animate-divine micro-bounce">
-                        <Brain className="w-12 h-12 text-white animate-cosmic" />
+                      <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center mx-auto mb-6">
+                        <Brain className="w-12 h-12 text-muted-foreground" />
                       </div>
-                      <h3 className="cinzel text-2xl font-bold mb-4 holographic-text" data-text="Select an AI Tutor">Select an AI Tutor</h3>
+                      <h3 className="cinzel text-2xl font-bold mb-4">Select an AI Tutor</h3>
                       <p className="text-muted-foreground max-w-md mx-auto leading-relaxed">
                         Choose one of our specialized AI learning agents to get personalized help with your DFS-215 certification studies.
                       </p>

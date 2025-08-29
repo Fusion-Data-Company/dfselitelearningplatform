@@ -24,8 +24,7 @@ import {
   Star,
   Activity,
   Zap,
-  Trophy,
-  Bot
+  Trophy
 } from "lucide-react";
 
 interface CourseProgress {
@@ -48,7 +47,7 @@ export default function Dashboard() {
   });
 
   return (
-    <div className="min-h-screen education-bg particle-field floating-elements">
+    <div className="min-h-screen education-bg">
       <Navigation />
       <Sidebar />
       
@@ -56,33 +55,33 @@ export default function Dashboard() {
         <div className="p-8">
           <div className="max-w-7xl mx-auto">
             {/* Header */}
-            <div className="ultra-glass rounded-2xl p-8 mb-8 micro-glow animate-quantum">
+            <div className="glassmorphism-card rounded-2xl p-8 mb-8">
               <div className="flex items-center space-x-4 mb-6">
-                <div className="w-16 h-16 morphing-bg rounded-2xl flex items-center justify-center animate-divine micro-bounce">
-                  <BarChart3 className="w-8 h-8 text-white drop-shadow-lg animate-cosmic" />
+                <div className="w-16 h-16 bg-gradient-to-br from-primary via-secondary to-accent rounded-2xl flex items-center justify-center animate-elite-glow">
+                  <BarChart3 className="w-8 h-8 text-white drop-shadow-lg" />
                 </div>
                 <div>
-                  <h1 className="cinzel text-4xl font-bold holographic-text mb-2" data-text="Elite Dashboard">
+                  <h1 className="cinzel text-4xl font-bold text-shimmer mb-2">
                     Elite Dashboard
                   </h1>
-                  <p className="text-lg text-muted-foreground geist animate-particle">
+                  <p className="text-lg text-muted-foreground geist">
                     Welcome back, {user?.firstName || 'Student'}! Track your progress through the DFS-215 curriculum
                   </p>
                 </div>
               </div>
               
               <div className="flex items-center space-x-6 text-sm text-muted-foreground">
-                <div className="flex items-center space-x-2 micro-glow">
-                  <TrendingUp className="w-4 h-4 text-primary animate-quantum" />
-                  <span className="animate-particle">Real-time Progress</span>
+                <div className="flex items-center space-x-2">
+                  <TrendingUp className="w-4 h-4 text-primary" />
+                  <span>Real-time Progress</span>
                 </div>
-                <div className="flex items-center space-x-2 micro-glow">
-                  <Brain className="w-4 h-4 text-secondary animate-cosmic" />
-                  <span className="animate-particle">AI-Powered Learning</span>
+                <div className="flex items-center space-x-2">
+                  <Brain className="w-4 h-4 text-secondary" />
+                  <span>AI-Powered Learning</span>
                 </div>
-                <div className="flex items-center space-x-2 micro-glow">
-                  <Shield className="w-4 h-4 text-accent animate-divine" />
-                  <span className="animate-particle">Certification Ready</span>
+                <div className="flex items-center space-x-2">
+                  <Shield className="w-4 h-4 text-accent" />
+                  <span>Certification Ready</span>
                 </div>
               </div>
             </div>
@@ -122,143 +121,13 @@ export default function Dashboard() {
               />
             </div>
 
-            {/* Advanced Analytics Dashboard */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-              {/* Real-time Performance Chart */}
-              <div className="lg:col-span-2 chart-container p-6 neural-card">
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-12 h-12 morphing-bg rounded-xl flex items-center justify-center animate-quantum">
-                      <Activity className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="cinzel text-xl font-bold holographic-text">Performance Analytics</h3>
-                      <p className="text-sm text-muted-foreground">Real-time learning metrics</p>
-                    </div>
-                  </div>
-                  <Badge className="divine-button px-3 py-1">Live</Badge>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4 mb-6">
-                  <div className="metric-card p-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">Study Efficiency</span>
-                      <TrendingUp className="w-4 h-4 text-primary animate-quantum" />
-                    </div>
-                    <div className="metric-value text-2xl font-bold mt-2">94.2%</div>
-                    <div className="elite-progress h-2 mt-3">
-                      <div className="elite-progress-fill" style={{ width: '94.2%' }}></div>
-                    </div>
-                  </div>
-                  
-                  <div className="metric-card p-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">Retention Rate</span>
-                      <Brain className="w-4 h-4 text-secondary animate-cosmic" />
-                    </div>
-                    <div className="metric-value text-2xl font-bold mt-2">87.6%</div>
-                    <div className="elite-progress h-2 mt-3">
-                      <div className="elite-progress-fill" style={{ width: '87.6%' }}></div>
-                    </div>
-                  </div>
-                  
-                  <div className="metric-card p-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">Exam Readiness</span>
-                      <Target className="w-4 h-4 text-accent animate-divine" />
-                    </div>
-                    <div className="metric-value text-2xl font-bold mt-2">92.1%</div>
-                    <div className="elite-progress h-2 mt-3">
-                      <div className="elite-progress-fill" style={{ width: '92.1%' }}></div>
-                    </div>
-                  </div>
-                  
-                  <div className="metric-card p-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">AI Interaction</span>
-                      <Zap className="w-4 h-4 text-chart-4 animate-morphing" />
-                    </div>
-                    <div className="metric-value text-2xl font-bold mt-2">156</div>
-                    <div className="text-xs text-muted-foreground mt-1">Sessions this week</div>
-                  </div>
-                </div>
-                
-                <div className="h-48 ultra-glass p-4 rounded-xl">
-                  <div className="text-center py-16 text-muted-foreground">
-                    <Activity className="w-12 h-12 mx-auto mb-4 animate-quantum" />
-                    <p className="font-medium">Advanced Performance Chart</p>
-                    <p className="text-sm">Real-time learning analytics visualization</p>
-                  </div>
-                </div>
-              </div>
-              
-              {/* AI Learning Assistant Panel */}
-              <div className="neural-card p-6">
-                <div className="flex items-center space-x-3 mb-6">
-                  <div className="w-10 h-10 morphing-bg rounded-xl flex items-center justify-center animate-divine">
-                    <Brain className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="cinzel text-lg font-bold holographic-text">AI Assistant</h3>
-                    <p className="text-xs text-muted-foreground">Your learning companion</p>
-                  </div>
-                </div>
-                
-                <div className="space-y-4">
-                  <div className="ultra-glass p-4 rounded-xl micro-glow">
-                    <div className="flex items-start space-x-3">
-                      <div className="w-8 h-8 bg-primary/20 rounded-lg flex items-center justify-center">
-                        <Bot className="w-4 h-4 text-primary" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium mb-1">StudyBuddy</p>
-                        <p className="text-xs text-muted-foreground">Ready to help with Law & Ethics concepts</p>
-                      </div>
-                      <Badge className="text-xs px-2 py-1 bg-primary/20 text-primary">Active</Badge>
-                    </div>
-                  </div>
-                  
-                  <div className="ultra-glass p-4 rounded-xl micro-glow">
-                    <div className="flex items-start space-x-3">
-                      <div className="w-8 h-8 bg-secondary/20 rounded-lg flex items-center justify-center">
-                        <Trophy className="w-4 h-4 text-secondary" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium mb-1">CoachBot</p>
-                        <p className="text-xs text-muted-foreground">Motivational learning strategies</p>
-                      </div>
-                      <Badge className="text-xs px-2 py-1 bg-secondary/20 text-secondary">Ready</Badge>
-                    </div>
-                  </div>
-                  
-                  <div className="ultra-glass p-4 rounded-xl micro-glow">
-                    <div className="flex items-start space-x-3">
-                      <div className="w-8 h-8 bg-accent/20 rounded-lg flex items-center justify-center">
-                        <Shield className="w-4 h-4 text-accent" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium mb-1">ProctorBot</p>
-                        <p className="text-xs text-muted-foreground">Exam supervision and monitoring</p>
-                      </div>
-                      <Badge className="text-xs px-2 py-1 bg-accent/20 text-accent">Standby</Badge>
-                    </div>
-                  </div>
-                </div>
-                
-                <Button className="w-full mt-6 divine-button" data-testid="button-chat-ai">
-                  <Brain className="w-4 h-4 mr-2" />
-                  Start AI Chat Session
-                </Button>
-              </div>
-            </div>
-            
-            {/* Enhanced Learning Modules */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              <Card className="ultra-glass micro-glow micro-tilt animate-quantum">
+            {/* Performance Analytics */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <Card className="education-card border-accent/20">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="cinzel text-lg font-bold holographic-text" data-text="Study Time Today">Study Time Today</h3>
-                    <Clock className="w-5 h-5 text-accent animate-cosmic" />
+                    <h3 className="cinzel text-lg font-bold">Study Time Today</h3>
+                    <Clock className="w-5 h-5 text-accent" />
                   </div>
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
@@ -270,17 +139,17 @@ export default function Dashboard() {
                       <span className="text-sm text-muted-foreground">3h 00m</span>
                     </div>
                     <div className="w-full bg-muted/30 rounded-full h-2">
-                      <div className="morphing-bg h-2 rounded-full animate-divine" style={{ width: '87%' }}></div>
+                      <div className="bg-accent h-2 rounded-full" style={{ width: '87%' }}></div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
               
-              <Card className="ultra-glass micro-glow micro-tilt animate-cosmic">
+              <Card className="education-card border-chart-2/20">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="cinzel text-lg font-bold holographic-text" data-text="This Week">This Week</h3>
-                    <Activity className="w-5 h-5 text-chart-2 animate-divine" />
+                    <h3 className="cinzel text-lg font-bold">This Week</h3>
+                    <Activity className="w-5 h-5 text-chart-2" />
                   </div>
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
@@ -299,11 +168,11 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
               
-              <Card className="ultra-glass micro-glow micro-tilt animate-divine">
+              <Card className="education-card border-chart-4/20">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="cinzel text-lg font-bold holographic-text" data-text="Achievements">Achievements</h3>
-                    <Trophy className="w-5 h-5 text-chart-4 animate-quantum" />
+                    <h3 className="cinzel text-lg font-bold">Achievements</h3>
+                    <Trophy className="w-5 h-5 text-chart-4" />
                   </div>
                   <div className="space-y-3">
                     <div className="flex items-center space-x-3">
@@ -326,9 +195,9 @@ export default function Dashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Course Tracks */}
               <div className="space-y-6">
-                <Card className="ultra-glass micro-glow animate-quantum">
+                <Card className="education-card border-primary/20 hover:border-primary/40 transition-all duration-300">
                   <CardContent className="p-8">
-                    <h3 className="cinzel text-2xl font-bold mb-6 holographic-text" data-text="Course Tracks">Course Tracks</h3>
+                    <h3 className="cinzel text-2xl font-bold mb-6 text-elite">Course Tracks</h3>
                     <div className="space-y-4">
                       {progressLoading ? (
                         <div className="space-y-4">
@@ -340,15 +209,15 @@ export default function Dashboard() {
                         courseProgress?.tracks.map((track) => (
                           <Card 
                             key={track.id}
-                            className="ultra-glass p-5 cursor-pointer group relative overflow-hidden micro-glow micro-tilt"
+                            className="education-card p-5 cursor-pointer group relative overflow-hidden"
                             data-testid={`track-${track.id}`}
                           >
                             <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                             <div className="relative z-10">
                               <div className="flex items-center justify-between mb-4">
                                 <div className="flex items-center space-x-3">
-                                  <div className="w-12 h-12 rounded-xl morphing-bg flex items-center justify-center animate-divine micro-bounce">
-                                    <BookOpen className="w-6 h-6 text-white animate-cosmic" />
+                                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+                                    <BookOpen className="w-6 h-6 text-white" />
                                   </div>
                                   <div>
                                     <h4 className="font-bold text-lg group-hover:text-primary transition-colors">
@@ -378,17 +247,17 @@ export default function Dashboard() {
                                 </div>
                                 <div className="w-full bg-muted/30 rounded-full h-3 relative overflow-hidden">
                                   <div 
-                                    className="morphing-bg h-3 rounded-full transition-all duration-500 ease-out relative animate-divine"
+                                    className="premium-gradient h-3 rounded-full transition-all duration-500 ease-out relative"
                                     style={{ width: `${track.progress}%` }}
                                   >
-                                    <div className="absolute inset-0 bg-white/20 animate-quantum"></div>
+                                    <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
                                   </div>
                                 </div>
                               </div>
                               
                               <div className="flex items-center justify-between">
                                 <span className="text-xs text-muted-foreground">Next: {track.progress < 100 ? 'Continue Learning' : 'Review Complete'}</span>
-                                <Button size="sm" className="divine-button text-xs px-3 py-1 text-white font-bold micro-tilt">
+                                <Button size="sm" className="bg-primary/10 hover:bg-primary/20 text-primary border-primary/30">
                                   {track.progress < 100 ? 'Continue' : 'Review'}
                                 </Button>
                               </div>
@@ -404,13 +273,13 @@ export default function Dashboard() {
               {/* Right Column */}
               <div className="space-y-6">
                 {/* Recent Activity */}
-                <Card className="ultra-glass micro-glow animate-cosmic">
+                <Card className="education-card border-secondary/20 hover:border-secondary/40 transition-all duration-300">
                   <CardContent className="p-8">
-                    <h3 className="cinzel text-2xl font-bold mb-6 holographic-text" data-text="Recent Activity">Recent Activity</h3>
+                    <h3 className="cinzel text-2xl font-bold mb-6 text-elite">Recent Activity</h3>
                     <div className="space-y-4">
-                      <div className="flex items-center space-x-4 p-4 ultra-glass rounded-2xl micro-glow group">
-                        <div className="w-10 h-10 morphing-bg rounded-xl flex items-center justify-center shadow-lg animate-divine micro-bounce">
-                          <BookOpen className="w-4 h-4 text-primary animate-cosmic" />
+                      <div className="flex items-center space-x-4 p-4 glassmorphism-card rounded-2xl border border-primary/20 hover:border-primary/40 transition-all duration-300 group">
+                        <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                          <BookOpen className="w-4 h-4 text-primary" />
                         </div>
                         <div className="flex-1">
                           <p className="text-sm font-medium">Completed HMO Balance Billing lesson</p>
@@ -442,18 +311,18 @@ export default function Dashboard() {
                 </Card>
 
                 {/* AI Agents Quick Access */}
-                <Card className="ultra-glass micro-glow animate-divine">
+                <Card className="ai-agent-panel border-primary/30">
                   <CardContent className="p-6">
-                    <h3 className="cinzel text-xl font-bold mb-4 holographic-text" data-text="AI Study Assistants">AI Study Assistants</h3>
+                    <h3 className="cinzel text-xl font-bold mb-4">AI Study Assistants</h3>
                     <div className="grid grid-cols-1 gap-3">
                       <Button 
                         variant="ghost"
-                        className="divine-button p-3 h-auto justify-start text-white font-medium micro-tilt"
+                        className="p-3 h-auto bg-card/50 hover:bg-card justify-start"
                         data-testid="button-coachbot"
                       >
                         <div className="flex items-center space-x-3">
-                          <div className="w-8 h-8 morphing-bg rounded-lg flex items-center justify-center animate-quantum micro-bounce">
-                            <Brain className="w-4 h-4 text-white animate-cosmic" />
+                          <div className="w-8 h-8 bg-primary/20 rounded-lg flex items-center justify-center">
+                            <Brain className="w-4 h-4 text-primary" />
                           </div>
                           <div className="text-left">
                             <p className="font-medium">CoachBot</p>
@@ -464,12 +333,12 @@ export default function Dashboard() {
                       
                       <Button 
                         variant="ghost"
-                        className="divine-button p-3 h-auto justify-start text-white font-medium micro-tilt"
+                        className="p-3 h-auto bg-card/50 hover:bg-card justify-start"
                         data-testid="button-studybuddy"
                       >
                         <div className="flex items-center space-x-3">
-                          <div className="w-8 h-8 morphing-bg rounded-lg flex items-center justify-center animate-divine micro-bounce">
-                            <Play className="w-4 h-4 text-white animate-holographic" />
+                          <div className="w-8 h-8 bg-secondary/20 rounded-lg flex items-center justify-center">
+                            <Play className="w-4 h-4 text-secondary" />
                           </div>
                           <div className="text-left">
                             <p className="font-medium">StudyBuddy</p>
@@ -480,12 +349,12 @@ export default function Dashboard() {
                       
                       <Button 
                         variant="ghost"
-                        className="divine-button p-3 h-auto justify-start text-white font-medium micro-tilt"
+                        className="p-3 h-auto bg-card/50 hover:bg-card justify-start"
                         data-testid="button-proctorbot"
                       >
                         <div className="flex items-center space-x-3">
-                          <div className="w-8 h-8 morphing-bg rounded-lg flex items-center justify-center animate-cosmic micro-bounce">
-                            <Shield className="w-4 h-4 text-white animate-quantum" />
+                          <div className="w-8 h-8 bg-accent/20 rounded-lg flex items-center justify-center">
+                            <Shield className="w-4 h-4 text-accent" />
                           </div>
                           <div className="text-left">
                             <p className="font-medium">ProctorBot</p>

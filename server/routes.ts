@@ -7,7 +7,6 @@ import { mcpServer } from "./services/mcp";
 import { iflashService } from "./services/iflash";
 import { examService } from "./services/exam";
 import { contentService } from "./services/content";
-import { questionBankService } from "./services/questionBank";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -19,7 +18,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       await contentService.initializeDefaultContent();
       await agentService.initializeDefaultAgents();
-      await questionBankService.initializeDefaultBanks();
       console.log('System initialization completed');
     } catch (error) {
       console.error('System initialization failed:', error);
