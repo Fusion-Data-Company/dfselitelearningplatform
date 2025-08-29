@@ -302,13 +302,13 @@ export class DatabaseStorage implements IStorage {
 
   // User progress
   async getUserProgress(userId: string, lessonId?: string): Promise<UserProgress[]> {
-    let conditions = eq(userProgress.userId, userId);
-    
     if (lessonId) {
-      conditions = and(conditions, eq(userProgress.lessonId, lessonId));
+      return await db.select().from(userProgress).where(
+        and(eq(userProgress.userId, userId), eq(userProgress.lessonId, lessonId))
+      );
     }
     
-    return await db.select().from(userProgress).where(conditions);
+    return await db.select().from(userProgress).where(eq(userProgress.userId, userId));
   }
 
   async updateUserProgress(userId: string, lessonId: string, progress: Partial<UserProgress>): Promise<UserProgress> {
