@@ -418,7 +418,9 @@ export default function Sidebar() {
                           </div>
                           
                           {/* Course Title */}
-                          <h3 className={`text-xl font-bold ${courseColorScheme.text} cinzel tracking-wide leading-snug mb-4 hover:${courseColorScheme.text.replace('text-', 'text-').replace('-100', '-50')} transition-colors cursor-pointer`} title={courseDescription} style={{fontFamily: 'Cinzel, serif'}}>
+                          <h3 className={`text-xl font-bold ${courseColorScheme.text} tracking-wide leading-snug mb-4 hover:${courseColorScheme.text.replace('text-', 'text-').replace('-100', '-50')} transition-colors cursor-pointer`} 
+                              title={courseDescription} 
+                              style={{fontFamily: 'Cinzel, serif', fontWeight: 700}}>
                             {parsedCourse.title}
                           </h3>
                           
@@ -428,7 +430,7 @@ export default function Sidebar() {
                               {parsedCourse.topics.map((topic, topicIndex) => (
                                 <li key={topicIndex} className="flex items-start space-x-3 text-sm text-muted-foreground">
                                   <div className={`w-2 h-2 rounded-full bg-gradient-to-r ${courseColorScheme.dot} opacity-70 flex-shrink-0 mt-1.5`}></div>
-                                  <span className="cinzel font-medium leading-relaxed" style={{fontFamily: 'Cinzel, serif'}}>{topic}</span>
+                                  <span className="font-medium leading-relaxed" style={{fontFamily: 'Cinzel, serif', fontSize: '0.875rem'}}>{topic}</span>
                                 </li>
                               ))}
                             </ul>
@@ -436,11 +438,11 @@ export default function Sidebar() {
                           
                           {/* Course Metadata */}
                           <div className="grid grid-cols-2 gap-4 text-sm text-muted-foreground mb-6">
-                            <span className="flex items-center space-x-3 cinzel font-medium">
+                            <span className="flex items-center space-x-3 font-medium" style={{fontFamily: 'Cinzel, serif'}}>
                               <div className="w-4 h-4 rounded-full bg-current opacity-60 flex-shrink-0"></div>
                               <span>{track.ceHours || 0} CE Hours</span>
                             </span>
-                            <span className="flex items-center space-x-3 cinzel font-medium">
+                            <span className="flex items-center space-x-3 font-medium" style={{fontFamily: 'Cinzel, serif'}}>
                               <div className="w-4 h-4 rounded-full bg-current opacity-60 flex-shrink-0"></div>
                               <span>{track.completedLessons}/{track.totalLessons} Lessons</span>
                             </span>
@@ -448,10 +450,10 @@ export default function Sidebar() {
                         </div>
                         
                         <div className="flex flex-col items-end space-y-3">
-                          <Badge className={`bg-gradient-to-r ${courseColorScheme.badge} text-sm font-bold border backdrop-blur-sm px-4 py-2 cinzel`} style={{fontFamily: 'Cinzel, serif'}}>
+                          <Badge className={`bg-gradient-to-r ${courseColorScheme.badge} text-sm font-bold border backdrop-blur-sm px-4 py-2`} style={{fontFamily: 'Cinzel, serif', fontWeight: 700}}>
                             {track.progress}%
                           </Badge>
-                          <span className="text-sm text-muted-foreground cinzel font-medium" style={{fontFamily: 'Cinzel, serif'}}>
+                          <span className="text-sm text-muted-foreground font-medium" style={{fontFamily: 'Cinzel, serif'}}>
                             {track.progress === 100 ? 'Complete' : 'In Progress'}
                           </span>
                         </div>
@@ -466,15 +468,15 @@ export default function Sidebar() {
                       </div>
                       <div className="mt-3 flex justify-between items-center">
                         <div className="flex items-center space-x-6">
-                          <span className={`text-sm ${courseColorScheme.text} bg-gradient-to-r from-black/50 to-black/30 px-6 py-3 rounded-lg border border-${courseColorScheme.name === 'primary' ? 'cyan' : courseColorScheme.name === 'secondary' ? 'emerald' : 'violet'}-500/30 cinzel font-medium flex items-center space-x-4`} style={{fontFamily: 'Cinzel, serif', boxShadow: `0 0 15px ${courseColorScheme.hex}20`}}>
-                            <span className="opacity-70">Status:</span>
-                            <span className="font-semibold">
+                          <span className={`text-sm ${courseColorScheme.text} bg-gradient-to-r from-black/50 to-black/30 px-6 py-3 rounded-lg border border-${courseColorScheme.name === 'primary' ? 'cyan' : courseColorScheme.name === 'secondary' ? 'emerald' : 'violet'}-500/30 font-medium flex items-center space-x-4`} style={{fontFamily: 'Cinzel, serif', boxShadow: `0 0 15px ${courseColorScheme.hex}20`}}>
+                            <span className="opacity-70" style={{fontFamily: 'Cinzel, serif'}}>Status:</span>
+                            <span className="font-semibold" style={{fontFamily: 'Cinzel, serif'}}>
                               {enrollmentStatus}
                             </span>
                           </span>
                         </div>
                         <div className="flex items-center space-x-4 text-sm">
-                          <span className={`${courseColorScheme.text} cinzel font-semibold opacity-80 group-hover:opacity-100 transition-opacity`} style={{fontFamily: 'Cinzel, serif'}}>
+                          <span className={`${courseColorScheme.text} font-semibold opacity-80 group-hover:opacity-100 transition-opacity`} style={{fontFamily: 'Cinzel, serif', fontWeight: 600}}>
                             Enter Course
                           </span>
                           <ChevronRight className={`w-7 h-7 ${courseColorScheme.text} opacity-60 group-hover:opacity-100 group-hover:translate-x-2 transition-all duration-300 flex-shrink-0`} style={{filter: `drop-shadow(0 0 8px ${courseColorScheme.hex}60)`}} />
