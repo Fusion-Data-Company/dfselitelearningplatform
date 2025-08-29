@@ -28,11 +28,11 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="fixed left-0 top-16 bottom-0 w-64 ultra-glass border-r border-border/30 p-6 overflow-y-auto particle-field">
+    <aside className="fixed left-0 top-16 bottom-0 w-64 ultra-glass border-r border-border/30 p-6 overflow-y-auto particle-field holographic-interface quantum-tunnel">
       <div className="space-y-6">
         {/* Navigation Menu */}
         <div className="space-y-2">
-          <h3 className="cinzel text-sm font-bold holographic-text uppercase tracking-wider mb-4" data-text="Navigation">
+          <h3 className="cinzel text-sm font-bold transcendent-text uppercase tracking-wider mb-4" data-text="Navigation">
             Navigation
           </h3>
           <nav className="space-y-1">
@@ -45,7 +45,7 @@ export default function Sidebar() {
                 <Link key={item.href} href={item.href}>
                   <Button
                     variant="ghost"
-                    className={`ultra-glass w-full justify-start h-auto p-4 geist font-medium micro-bounce micro-glow ${
+                    className={`ultra-glass w-full justify-start h-auto p-4 geist font-medium micro-bounce micro-glow hyper-interactive premium-hover ${
                       isActive ? 'animate-divine border-2 border-primary/50 micro-shimmer' : 'hover:animate-quantum'
                     }`}
                     data-testid={`nav-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
@@ -62,11 +62,11 @@ export default function Sidebar() {
 
         {/* Course Progress */}
         <div className="space-y-2">
-          <h3 className="cinzel text-sm font-bold holographic-text uppercase tracking-wider mb-4" data-text="Course Progress">
+          <h3 className="cinzel text-sm font-bold transcendent-text uppercase tracking-wider mb-4" data-text="Course Progress">
             Course Progress
           </h3>
           <div className="space-y-3">
-            <div className="p-5 ultra-glass micro-glow micro-tilt animate-quantum group">
+            <div className="p-5 ultra-glass micro-glow micro-tilt animate-quantum group neural-pulse hyper-interactive">
               <div className="flex justify-between items-center mb-4">
                 <span className="text-sm font-bold text-foreground geist group-hover:text-primary transition-colors animate-particle">Law & Ethics</span>
                 <Badge className="divine-button text-xs px-3 py-1">
