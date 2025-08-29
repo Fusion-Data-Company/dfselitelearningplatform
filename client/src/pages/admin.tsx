@@ -182,7 +182,7 @@ export default function AdminPage() {
       <div className="min-h-screen education-bg">
         <Navigation />
         <Sidebar />
-        <main className="ml-80 pt-16 min-h-screen">
+        <main className="ml-96 pt-16 min-h-screen">
           <div className="p-8">
             <div className="max-w-4xl mx-auto text-center">
               <Tag className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />

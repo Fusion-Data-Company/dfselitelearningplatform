@@ -418,7 +418,7 @@ export default function ExamPage() {
         
         {/* ProctorBot Panel */}
         {proctorActive && (
-          <div className="fixed top-16 left-80 right-0 z-40 ai-agent-panel border-b border-primary/30 p-4">
+          <div className="fixed top-16 left-96 right-0 z-40 ai-agent-panel border-b border-primary/30 p-4">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-accent/20 rounded-xl flex items-center justify-center">
                 <Shield className="w-5 h-5 text-accent" />
@@ -439,7 +439,7 @@ export default function ExamPage() {
           </div>
         )}
         
-        <main className={`ml-80 ${proctorActive ? 'pt-32' : 'pt-16'} min-h-screen`}>
+        <main className={`ml-96 ${proctorActive ? 'pt-32' : 'pt-16'} min-h-screen`}>
           <div className="p-8">
             <div className="max-w-5xl mx-auto">
               <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">

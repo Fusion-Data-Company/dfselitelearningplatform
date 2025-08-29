@@ -87,7 +87,7 @@ export default function CETrackingPage() {
       <Navigation />
       <Sidebar />
       
-      <main className="ml-80 pt-16 min-h-screen">
+      <main className="ml-96 pt-16 min-h-screen">
         <div className="p-8">
           <div className="max-w-7xl mx-auto">
             {/* Header */}

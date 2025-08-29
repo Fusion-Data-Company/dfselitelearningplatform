@@ -27,19 +27,107 @@ interface CourseProgress {
 }
 
 export default function Sidebar() {
-  // Helper function to get color hex values for glows
-  const getColorForGlow = (colorClass: string): string => {
-    const colorMap: { [key: string]: string } = {
-      'text-primary': '#6366f1',
-      'text-secondary': '#f59e0b', 
-      'text-accent': '#10b981',
-      'text-destructive': '#ef4444',
-      'text-chart-2': '#8b5cf6',
-      'text-chart-3': '#06b6d4',
-      'text-chart-4': '#f97316',
-      'text-chart-5': '#84cc16'
+  // Helper function to get color schemes for each navigation item
+  const getColorScheme = (colorClass: string) => {
+    const colorSchemes: { [key: string]: any } = {
+      'text-primary': {
+        name: 'primary',
+        hex: '#06b6d4',
+        glow: '#06b6d4',
+        rgb: '6, 182, 212',
+        activeGradient: 'from-cyan-500/25 via-cyan-800/30 to-cyan-700/20',
+        hoverGradient: 'from-cyan-500/15 via-cyan-800/20 to-cyan-700/10',
+        borderColor: 'border-cyan-400/40',
+        textColor: 'text-cyan-300',
+        iconBg: 'from-cyan-500/20 to-cyan-800/40',
+        iconBorder: 'border-cyan-500/30'
+      },
+      'text-secondary': {
+        name: 'secondary',
+        hex: '#10b981',
+        glow: '#10b981',
+        rgb: '16, 185, 129',
+        activeGradient: 'from-emerald-500/25 via-emerald-800/30 to-emerald-700/20',
+        hoverGradient: 'from-emerald-500/15 via-emerald-800/20 to-emerald-700/10',
+        borderColor: 'border-emerald-400/40',
+        textColor: 'text-emerald-300',
+        iconBg: 'from-emerald-500/20 to-emerald-800/40',
+        iconBorder: 'border-emerald-500/30'
+      },
+      'text-accent': {
+        name: 'accent',
+        hex: '#f59e0b',
+        glow: '#f59e0b',
+        rgb: '245, 158, 11',
+        activeGradient: 'from-amber-500/25 via-amber-800/30 to-amber-700/20',
+        hoverGradient: 'from-amber-500/15 via-amber-800/20 to-amber-700/10',
+        borderColor: 'border-amber-400/40',
+        textColor: 'text-amber-300',
+        iconBg: 'from-amber-500/20 to-amber-800/40',
+        iconBorder: 'border-amber-500/30'
+      },
+      'text-destructive': {
+        name: 'destructive',
+        hex: '#ef4444',
+        glow: '#ef4444',
+        rgb: '239, 68, 68',
+        activeGradient: 'from-red-500/25 via-red-800/30 to-red-700/20',
+        hoverGradient: 'from-red-500/15 via-red-800/20 to-red-700/10',
+        borderColor: 'border-red-400/40',
+        textColor: 'text-red-300',
+        iconBg: 'from-red-500/20 to-red-800/40',
+        iconBorder: 'border-red-500/30'
+      },
+      'text-chart-2': {
+        name: 'chart-2',
+        hex: '#8b5cf6',
+        glow: '#8b5cf6',
+        rgb: '139, 92, 246',
+        activeGradient: 'from-violet-500/25 via-violet-800/30 to-violet-700/20',
+        hoverGradient: 'from-violet-500/15 via-violet-800/20 to-violet-700/10',
+        borderColor: 'border-violet-400/40',
+        textColor: 'text-violet-300',
+        iconBg: 'from-violet-500/20 to-violet-800/40',
+        iconBorder: 'border-violet-500/30'
+      },
+      'text-chart-3': {
+        name: 'chart-3',
+        hex: '#3b82f6',
+        glow: '#3b82f6',
+        rgb: '59, 130, 246',
+        activeGradient: 'from-blue-500/25 via-blue-800/30 to-blue-700/20',
+        hoverGradient: 'from-blue-500/15 via-blue-800/20 to-blue-700/10',
+        borderColor: 'border-blue-400/40',
+        textColor: 'text-blue-300',
+        iconBg: 'from-blue-500/20 to-blue-800/40',
+        iconBorder: 'border-blue-500/30'
+      },
+      'text-chart-4': {
+        name: 'chart-4',
+        hex: '#f97316',
+        glow: '#f97316',
+        rgb: '249, 115, 22',
+        activeGradient: 'from-orange-500/25 via-orange-800/30 to-orange-700/20',
+        hoverGradient: 'from-orange-500/15 via-orange-800/20 to-orange-700/10',
+        borderColor: 'border-orange-400/40',
+        textColor: 'text-orange-300',
+        iconBg: 'from-orange-500/20 to-orange-800/40',
+        iconBorder: 'border-orange-500/30'
+      },
+      'text-chart-5': {
+        name: 'chart-5',
+        hex: '#ec4899',
+        glow: '#ec4899',
+        rgb: '236, 72, 153',
+        activeGradient: 'from-pink-500/25 via-pink-800/30 to-pink-700/20',
+        hoverGradient: 'from-pink-500/15 via-pink-800/20 to-pink-700/10',
+        borderColor: 'border-pink-400/40',
+        textColor: 'text-pink-300',
+        iconBg: 'from-pink-500/20 to-pink-800/40',
+        iconBorder: 'border-pink-500/30'
+      }
     };
-    return colorMap[colorClass] || '#6366f1';
+    return colorSchemes[colorClass] || colorSchemes['text-primary'];
   };
 
   const getColorForIndex = (index: number): string => {
@@ -64,7 +152,7 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="fixed left-0 top-16 bottom-0 w-80 glassmorphism-card border-r border-border/30 backdrop-blur-[32px] p-6 overflow-y-auto">
+    <aside className="fixed left-0 top-16 bottom-0 w-96 glassmorphism-card border-r border-border/30 backdrop-blur-[32px] p-6 overflow-y-auto">
       <div className="space-y-6">
         {/* Navigation Menu */}
         <div className="space-y-2">
@@ -76,42 +164,52 @@ export default function Sidebar() {
               const Icon = item.icon;
               const isActive = location === item.href || 
                 (item.href !== "/" && location.startsWith(item.href));
+              const colorScheme = getColorScheme(item.color);
               
               return (
                 <Link key={item.href} href={item.href}>
                   <Button
                     variant="ghost"
-                    className={`sidebar-nav w-full justify-start h-auto p-4 geist font-medium relative group overflow-hidden ${
+                    className={`sidebar-nav w-full justify-start h-auto p-4 geist font-medium relative group overflow-hidden transition-all duration-300 border backdrop-blur-md ${
                       isActive 
-                        ? 'bg-gradient-to-r from-cyan-500/25 via-black/30 to-cyan-700/20 text-cyan-300 border border-cyan-400/40 shadow-lg shadow-cyan-500/30 before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/10 before:to-transparent before:translate-x-[-100%] before:animate-[shimmer_2s_ease-in-out_infinite] backdrop-blur-md' 
-                        : 'hover:bg-gradient-to-r hover:from-cyan-500/15 hover:via-black/20 hover:to-cyan-700/10 hover:shadow-md hover:shadow-cyan-500/20 hover:backdrop-blur-sm'
+                        ? `bg-gradient-to-r ${colorScheme.activeGradient} ${colorScheme.textColor} ${colorScheme.borderColor} shadow-lg before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/8 before:to-transparent before:translate-x-[-100%] before:animate-[shimmer_2s_ease-in-out_infinite]` 
+                        : `hover:bg-gradient-to-r hover:${colorScheme.hoverGradient} hover:shadow-md hover:backdrop-blur-sm border-border/20 hover:${colorScheme.borderColor}`
                     }`}
                     data-testid={`nav-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
                     style={{
                       boxShadow: isActive 
-                        ? `0 0 25px #06b6d430, 0 0 45px #06b6d415, inset 0 1px 0 rgba(255,255,255,0.1)`
-                        : undefined
+                        ? `0 0 25px ${colorScheme.hex}30, 0 0 45px ${colorScheme.hex}15, inset 0 1px 0 rgba(255,255,255,0.1), inset 0 0 60px rgba(${colorScheme.rgb}, 0.05)`
+                        : `inset 0 1px 0 rgba(255,255,255,0.03), 0 1px 3px rgba(0,0,0,0.2)`
                     }}
                     onMouseEnter={(e) => {
                       if (!isActive) {
-                        e.currentTarget.style.boxShadow = `0 0 20px #06b6d425, 0 0 35px #06b6d412, inset 0 1px 0 rgba(255,255,255,0.05)`;
+                        e.currentTarget.style.boxShadow = `0 0 20px ${colorScheme.hex}25, 0 0 35px ${colorScheme.hex}12, inset 0 1px 0 rgba(255,255,255,0.06), inset 0 0 40px rgba(${colorScheme.rgb}, 0.08)`;
                       }
                     }}
                     onMouseLeave={(e) => {
                       if (!isActive) {
-                        e.currentTarget.style.boxShadow = '';
+                        e.currentTarget.style.boxShadow = `inset 0 1px 0 rgba(255,255,255,0.03), 0 1px 3px rgba(0,0,0,0.2)`;
                       }
                     }}
                   >
-                    <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-gradient-to-br from-cyan-500/20 to-black/40 mr-4 flex-shrink-0 border border-cyan-500/30">
-                      <Icon className={`w-6 h-6 ${isActive ? 'text-cyan-300 animate-pulse drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]' : item.color} transition-all duration-300`} />
+                    <div className={`flex items-center justify-center w-12 h-12 rounded-lg bg-gradient-to-br ${colorScheme.iconBg} mr-4 flex-shrink-0 border ${colorScheme.iconBorder} relative overflow-hidden`}>
+                      <Icon className={`w-6 h-6 ${isActive ? `${colorScheme.textColor} animate-pulse` : item.color} transition-all duration-300 relative z-10`} 
+                        style={{
+                          filter: isActive ? `drop-shadow(0 0 8px ${colorScheme.hex}aa)` : 'none'
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <span className={`text-base font-medium leading-tight ${isActive ? 'text-cyan-200' : 'text-foreground'} transition-colors duration-300 block`}>
+                      <span className={`text-base font-medium leading-tight ${isActive ? colorScheme.textColor : 'text-foreground group-hover:text-foreground/90'} transition-colors duration-300 block`}>
                         {item.label}
                       </span>
                     </div>
-                    {isActive && <ChevronRight className="w-4 h-4 ml-2 text-cyan-300 animate-pulse drop-shadow-[0_0_6px_rgba(6,182,212,0.8)] flex-shrink-0" />}
+                    {isActive && <ChevronRight className={`w-4 h-4 ml-2 ${colorScheme.textColor} animate-pulse flex-shrink-0`}
+                      style={{
+                        filter: `drop-shadow(0 0 6px ${colorScheme.hex}cc)`
+                      }} 
+                    />}
                   </Button>
                 </Link>
               );
