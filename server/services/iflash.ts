@@ -145,7 +145,7 @@ export class IFlashService {
     cardId: string,
     grade: number // 0-3: Again, Hard, Good, Easy
   ): Promise<Flashcard> {
-    const card = await storage.updateFlashcard(cardId, {});
+    const card = await storage.getFlashcard(cardId);
     if (!card || card.userId !== userId) {
       throw new Error('Flashcard not found or access denied');
     }

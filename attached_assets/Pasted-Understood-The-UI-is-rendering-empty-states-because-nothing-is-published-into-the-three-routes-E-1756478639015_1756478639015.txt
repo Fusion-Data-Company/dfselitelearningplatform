@@ -1,0 +1,90 @@
+Understood. The UI is rendering empty states because nothing is “published” into the three routes (Exam, iFlash Review, Practice Quiz). Here’s a hot-fix patch plan for your Replit Builder that will make each page show real data immediately. Atomic, verifiable, and zero guesswork.
+
+PHASE 0 — Sanity & Flags (2 min)
+	•	□ Ensure these envs exist (server-only): SUPABASE_*, OPENROUTER_API_KEY, MCP_SERVER_SECRET.
+	•	□ Feature flags:
+	•	IFLASH_ENABLED=true
+	•	EXAM_STRICT_MODE=true
+	•	SEED_ON_BOOT=true (temporary; removed after seed runs once)
+	•	Validation: /api/health returns { ok: true, features: { IFLASH_ENABLED: true } }.
+
+PHASE 1 — Content “Publish” Seed (Lessons show up) (5 min)
+
+PROBLEM: Lesson player & self-study pull from tracks/modules/lessons with published=true. Your ingest likely created drafts only.
+	•	□ Builder Action: Add a one-time seed that:
+	1.	Creates Track “Pre-Licensing” with order=1.
+	2.	Module “Health / Managed Care” (order=1).
+	3.	Lesson “HMOs & Balance Billing” (slug hmo-balance-billing, published=true).
+	4.	Content units: one md block (short sample paragraph) and one video placeholder URI.
+	5.	Run chunking+embeddings for that lesson (min 5 chunks).
+	•	Validation: Visit /course/pre-licensing/health/lesson/hmo-balance-billing → content renders; CoachBot answers and cites chunkIds.
+
+PHASE 2 — iFlash Autogen Seed (iFlash Review shows cards) (4 min)
+
+PROBLEM: iFlash Review is empty because no cards exist for the user.
+	•	□ Builder Action: On first login (or via a “Seed” button for admin), call MCP:
+iflash_generate({ sourceIds: <the new lesson's chunkIds>, style: 'exam' }) and insert 30 cards (term/mcq/cloze mix).
+Enforce the hash dedupe rule {ownerId|type|front|sourceId} to avoid duplicates.
+	•	Validation: /flash shows Due cards ≥ 10 and an SRS due counter. Review 3 cards → due counts update.
+
+PHASE 3 — Practice Quiz Seed (Practice Quiz page shows a start card) (4 min)
+
+PROBLEM: Practice Quiz Arena renders an empty “arena” because no question_banks/questions.
+	•	□ Builder Action: Create bank “Health / Managed Care – Fundamentals” with 20 items (MCQ + scenario). Items must include chunkRefs pointing to the seeded lesson chunks.
+	•	Validation: /quiz?bank=health-managed-care shows Start Quiz CTA; starting shows 10 randomized items; wrong answers show Remediate with a Generate iFlash button.
+
+PHASE 4 — Exam Config Seed (Exam page shows live CTA) (3 min)
+
+PROBLEM: Exam page checks for an exam_configs row and a buildable form; none exists.
+	•	□ Builder Action: Insert exam_configs record:
+	•	title: "DFS-215 Certification (Simulated)"
+	•	duration_sec: 3600
+	•	bank_weights: { law_ethics: 8, health: 12, disability: 6, social_insurance: 8, life: 10, annuities_variable: 4, figa_dfs: 2 }
+	•	rules: { shuffle:true, one_submit:true, proctor:true }
+	•	Compose form from any banks present; if bank coverage is thin, allow fallback to reuse items.
+	•	Validation: /exam/dfs-215 displays “Begin Exam” button (enabled), not “empty”.
+
+PHASE 5 — UI Empty-State → “Do The Thing” (2 min)
+
+Convert empty pages from passive messages to actionable CTAs:
+	•	iFlash Review (empty): Show button “Generate from Current Lesson” → invokes iflash_generate using last visited lesson’s chunkIds.
+Expected DOM: data-testid="iflash-generate-now".
+	•	Practice Quiz (no bank): Show “Create Starter Bank (10 Q)” for admins → runs seed.
+Expected DOM: data-testid="seed-quiz-bank".
+	•	Exam (no config): Show “Create Simulated Exam” for admins → runs Phase 4 seed.
+Expected DOM: data-testid="seed-exam-config".
+
+PHASE 6 — RLS/Role Guard (2 min)
+
+PROBLEM (common): Content seeded, but your student role can’t see it.
+	•	□ Builder Action: For seed rows, set owner_id = system and visibility = 'public'. RLS: students can read where visibility='public' OR owner_id=auth.uid().
+	•	Validation: Student can read seeded lessons, questions, flashcards.
+
+PHASE 7 — Quick Playwright Probes (copy/paste, ≤10 lines each)
+	•	Lesson renders: Assert data-testid="lesson-title" contains “HMOs & Balance Billing”.
+	•	iFlash has cards: Assert data-testid="iflash-due-count" > 0.
+	•	Quiz starts: Click data-testid="start-quiz"; expect question #1 visible.
+	•	Exam CTA: data-testid="start-exam" is enabled.
+
+PHASE 8 — Rollback Switch (1 min)
+	•	□ Turn off SEED_ON_BOOT after success to prevent reseeding on every deploy.
+
+⸻
+
+Single-Message “Do It Now” Payload (paste at end of your builder prompt)
+
+SEED NOW:
+	•	Publish one Health/Managed Care lesson (slug: hmo-balance-billing) with 5+ chunks.
+	•	Generate 30 iFlash cards from that lesson’s chunkIds and assign to current user.
+	•	Create bank “Health / Managed Care – Fundamentals” with 20 items referencing those chunks.
+	•	Create exam_configs for “DFS-215 Certification (Simulated)” using the official topic weights.
+	•	Update empty states so each page offers a CTA that creates what’s missing (quiz bank, flashcards, or exam config).
+	•	Confirm student role can see the seeded data (RLS visibility).
+	•	Output a short summary with counts: { lessons:1, chunks:>=5, cards:30, questions:20, exam:1 }.
+
+Expected immediate outcome:
+	•	Exam page shows a Begin Exam button (not empty).
+	•	iFlash Review shows a due stack (≥10).
+	•	Practice Quiz shows Start Quiz and runs end-to-end with remediation + iFlash handoff.
+
+If anything still renders empty after this, send me the exact on-screen text and I’ll give you a micro-patch targeted at that route’s data selector (no refactor—just the minimum to make it live).

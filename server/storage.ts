@@ -93,6 +93,7 @@ export interface IStorage {
 
   // Flashcards
   getUserFlashcards(userId: string): Promise<Flashcard[]>;
+  getFlashcard(id: string): Promise<Flashcard | undefined>;
   getFlashcardsForReview(userId: string): Promise<Flashcard[]>;
   createFlashcard(card: InsertFlashcard): Promise<Flashcard>;
   updateFlashcard(id: string, card: Partial<Flashcard>): Promise<Flashcard>;
@@ -363,6 +364,11 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(flashcards).where(eq(flashcards.userId, userId));
   }
 
+  async getFlashcard(id: string): Promise<Flashcard | undefined> {
+    const [card] = await db.select().from(flashcards).where(eq(flashcards.id, id));
+    return card;
+  }
+
   async getFlashcardsForReview(userId: string): Promise<Flashcard[]> {
     return await db
       .select()
@@ -382,6 +388,9 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateFlashcard(id: string, card: Partial<Flashcard>): Promise<Flashcard> {
+    if (Object.keys(card).length === 0) {
+      throw new Error('No fields to update');
+    }
     const [updatedCard] = await db
       .update(flashcards)
       .set(card)

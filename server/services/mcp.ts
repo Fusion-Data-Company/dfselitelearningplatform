@@ -47,6 +47,9 @@ export class MCPServer {
   async getContext(viewId: string): Promise<MCPContext> {
     // Parse viewId to extract context information
     // Format: route:userId:lessonId?:additional_params
+    if (!viewId || typeof viewId !== 'string') {
+      throw new Error('Invalid viewId provided to getContext');
+    }
     const parts = viewId.split(':');
     const route = parts[0] || '';
     const userId = parts[1] || '';

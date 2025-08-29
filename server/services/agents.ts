@@ -37,11 +37,13 @@ export class AgentService {
       throw new Error(`Agent profile not found: ${agentId}`);
     }
 
+    console.log('processAgentRequest params:', { agentId, userMessage: userMessage?.substring(0, 30), viewId, userId });
+
     // Get context for the current view
     const context = await mcpServer.getContext(viewId);
     
     // Build enhanced system prompt with context
-    const enhancedPrompt = this.buildSystemPrompt(profile.systemPrompt, context, agentId);
+    const enhancedPrompt = this.buildSystemPrompt(profile.systemPrompt, context, agentId) + '\n\nPlease respond in JSON format with the structure: {"role": "assistant", "message": "your response here"}';
     
     // Log the agent interaction
     await mcpServer.logEvent({
@@ -61,7 +63,7 @@ export class AgentService {
         enhancedPrompt,
         userMessage,
         context,
-        profile.temperature ?? 0.2,
+        1, // Use default temperature for GPT-5 compatibility
         profile.maxTokens ?? 768
       );
 

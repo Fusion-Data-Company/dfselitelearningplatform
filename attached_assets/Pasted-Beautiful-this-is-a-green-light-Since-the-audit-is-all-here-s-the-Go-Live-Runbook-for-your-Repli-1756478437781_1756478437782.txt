@@ -1,0 +1,87 @@
+Beautiful—this is a green light. Since the audit is all ✅, here’s the Go-Live Runbook for your Replit builder so we ship clean and stay clean. No code—just atomic, verifiable steps.
+
+Go-Live Runbook (Production Enablement)
+
+PHASE A: Final Acceptance (Manual Smoke – 10 minutes)
+	•	□ A.1 Lesson→iFlash→Review
+Builder Action: Open a Managed Care lesson → Generate iFlash (expect ≥20 cards) → Review 5 cards (Again/Good/Easy) → verify SRS due count increments/decrements.
+	•	□ A.2 Quiz→Remediation→iFlash
+Builder Action: Miss 2 HMO items → see remediation passage → click “Generate iFlash” → verify 3 new cards linked to the same passage (no duplicates).
+	•	□ A.3 Exam (Proctor Behavior)
+Builder Action: Start timed exam → ask content question → ProctorBot refuses (policy-only) → finish exam → post-exam debrief lists top 3 weak topics with lesson links.
+	•	□ A.4 CE Law & Ethics (4-hr)
+Builder Action: Accrue 3–5 minutes seat-time → idle 90s → seat timer pauses → pass assessment → certificate (PDF) generated with serial; export CE CSV (row present).
+	•	□ A.5 MCP Security
+Builder Action: Call /api/mcp without bearer → 401; try cross-user read → 403.
+
+PHASE B: Production Config & Secrets
+	•	□ B.1 Secrets
+Builder Action: Set OPENROUTER_API_KEY, MCP_SERVER_SECRET, SUPABASE_*, and (if used) LIVEKIT_* in Replit Secrets and Vercel (server-only).
+	•	□ B.2 Feature Flags
+Builder Action: Add .env flags:
+	•	IFLASH_ENABLED=true
+	•	EXAM_STRICT_MODE=true
+	•	AGENT_RATE_LIMIT_QPM=60
+	•	□ B.3 RLS Verify
+Builder Action: Confirm RLS policies active in prod DB; run a test query as student (should see only own rows).
+
+PHASE C: Performance & A11y Gates
+	•	□ C.1 Lighthouse Budgets
+Builder Action: Report for /dashboard, one lesson, /exam/[id].
+Expected: Perf ≥85, A11y ≥90, Best Practices ≥90; LCP ≤2.5s, CLS ≤0.05.
+	•	□ C.2 Bundle Control
+Builder Action: Verify route-level code splitting; video/exam modules lazy-loaded; shadcn tree-shaken.
+	•	□ C.3 Keyboard & Focus
+Builder Action: Lesson ←/→, 1–5 answer keys, Cmd/Ctrl+Enter submit; visible focus rings.
+
+PHASE D: Observability & Backups
+	•	□ D.1 Telemetry
+Builder Action: Ensure event schema {ts,userId,route,action,meta} logging for: iFlash create/review, exam start/submit, CE cert.
+	•	□ D.2 Error Tracking
+Builder Action: Simulate MCP tool error → verify stack + traceId logged (PII redacted).
+	•	□ D.3 Backups
+Builder Action: Enable nightly Supabase backups; verify restore from last snapshot in staging.
+
+PHASE E: Admin Readiness
+	•	□ E.1 Agents Panel
+Builder Action: Edit CoachBot temperature → Save → response changes within 60s. Run canned test (HMO balance billing) → citations visible.
+	•	□ E.2 Banks Panel
+Builder Action: Open coverage heatmap; flag one low-discrimination item → rotate-out queue updated.
+	•	□ E.3 Content Versioning
+Builder Action: “Publish Draft” snapshot creates content_version (vX.Y); rollback produces identical outline in staging.
+
+⸻
+
+Post-Launch Guardrails (Week 1)
+	•	Rate-limit & Fallbacks: Confirm model fallback order working (gpt-5-mini → gpt-4.1-mini → llama-3.1-70b); keep CoachBot P50 ≤4s.
+	•	Exam Integrity: Monitor agent_events for “during-exam content request”; should remain near zero.
+	•	SRS Health: Daily check: % of learners with dueCount>0; aim ≥85% (healthy review cadence).
+	•	CE Compliance: Randomly verify 3 certificates (QR/ID opens verification endpoint).
+	•	Ops Dash: Track errors/day < 0.1% of requests; top route latencies; MCP 95th < 1.5s (cache hits).
+
+⸻
+
+“Nice-to-Add” Enhancements (non-blocking)
+	•	PWA Read-Only Mode: Cache lesson pages; block exams offline with clear messaging.
+	•	Nudges: Daily SRS reminder (email/push) when dueCount>0.
+	•	Instructor Clips: 60–120s “micro-explainer” videos attachable per lesson section.
+	•	Export APIs: Signed URLs for CE CSV and Attempts CSV; one-click email to admin.
+
+⸻
+
+Final Builder Checklist (embed verbatim)
+
+DO
+	•	Keep citations on for all teaching agents.
+	•	Enforce RLS everywhere; MCP bearer secret required.
+	•	Maintain Lighthouse/A11y budgets as go/no-go gates.
+	•	Log traceId on every MCP tool call.
+
+DON’T
+	•	Don’t allow ProctorBot to teach during exams.
+	•	Don’t store PII in raw form in agent_events.
+	•	Don’t deploy with failing budgets or missing backups.
+
+⸻
+
+If you want, I can also draft the one-page QA script (step-by-step with expected screens and values) you can hand a tester who’s never seen the system—so they can verify the platform in under 15 minutes.

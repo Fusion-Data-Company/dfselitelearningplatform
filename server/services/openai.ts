@@ -27,7 +27,7 @@ export async function callAgent(
   systemPrompt: string,
   userMessage: string,
   context?: any,
-  temperature = 0.2,
+  temperature = 1,
   maxTokens = 768
 ): Promise<AgentResponse> {
   try {
@@ -43,8 +43,7 @@ export async function callAgent(
           content: userMessage
         }
       ],
-      temperature,
-      max_tokens: maxTokens,
+      max_completion_tokens: maxTokens,
       response_format: { type: "json_object" }
     });
 
@@ -78,7 +77,7 @@ export async function generateFlashcards(
     const systemPrompt = `You are an expert flashcard generator for insurance education. Create ${count} flashcards from the provided content in ${style} style. Focus on key terms, concepts, regulations, and practical applications. Return JSON with this format: {"cards": [{"id": "uuid", "type": "term|mcq|cloze", "front": "question/term", "back": "answer/definition", "sourceId": "optional"}], "count": number}`;
 
     const response = await getOpenAI().chat.completions.create({
-      model: "gpt-5",
+      model: "gpt-4o",
       messages: [
         {
           role: "system",
@@ -90,7 +89,7 @@ export async function generateFlashcards(
         }
       ],
       temperature: 0.3,
-      max_tokens: 2000,
+      max_completion_tokens: 2000,
       response_format: { type: "json_object" }
     });
 
@@ -135,7 +134,7 @@ export async function analyzeQuizPerformance(
         }
       ],
       temperature: 0.1,
-      max_tokens: 512,
+      max_completion_tokens: 512,
       response_format: { type: "json_object" }
     });
 

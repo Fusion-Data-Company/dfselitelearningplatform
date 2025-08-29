@@ -124,7 +124,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = 'guest'; // Use guest user for now
       const { agentId } = req.params;
-      const { message, viewId } = req.body;
+      const { message, context } = req.body;
+      
+      // Build viewId from context if provided, or default
+      const viewId = context ? `${context.route || 'unknown'}:${userId}${context.lessonId ? ':' + context.lessonId : ''}` : `unknown:${userId}`;
+      
+      console.log('Agent request:', { agentId, message: message?.substring(0, 50), context, viewId });
 
       const response = await agentService.processAgentRequest(
         agentId,
