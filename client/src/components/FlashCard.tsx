@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Book, RotateCcw, CheckCircle, XCircle } from "lucide-react";
+import { Book, RotateCcw, CheckCircle, XCircle, Layers3 } from "lucide-react";
 
 interface FlashCardProps {
   card: {
@@ -350,20 +350,51 @@ export default function FlashCard({ card, onReview, cardNumber, totalCards }: Fl
   return (
     <div className="min-h-screen education-bg floating-orbs fading-shapes background-shapes">
       <div className="max-w-4xl mx-auto p-8 space-y-8">
-        {/* Header */}
-        <div className="text-center space-y-4">
-          <h1 className="cinzel text-4xl font-bold text-shimmer">
-            iFlash Review Session
-          </h1>
-          <div className="flex items-center justify-center space-x-6 text-sm text-muted-foreground">
-            <span className="flex items-center space-x-2">
-              <div className="w-2 h-2 rounded-full bg-primary"></div>
-              <span>Card {cardNumber} of {totalCards}</span>
-            </span>
-            <span className="flex items-center space-x-2">
-              <div className="w-2 h-2 rounded-full bg-secondary"></div>
-              <span>{card.reviewCount === 0 ? 'New card' : `Reviewed ${card.reviewCount} times`}</span>
-            </span>
+        {/* Apple x Skool Header */}
+        <div className="relative">
+          {/* Top Navigation Bar */}
+          <div className="flex items-center justify-between mb-8 p-6 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10">
+            <div className="flex items-center space-x-4">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+                <Layers3 className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h1 className="text-xl font-semibold text-foreground">iFlash</h1>
+                <p className="text-sm text-muted-foreground">Adaptive Learning System</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center space-x-6">
+              <div className="hidden md:flex items-center space-x-4 text-sm">
+                <div className="flex items-center space-x-2 px-3 py-1.5 bg-primary/10 rounded-lg">
+                  <div className="w-2 h-2 rounded-full bg-primary"></div>
+                  <span className="text-primary font-medium">{cardNumber} / {totalCards}</span>
+                </div>
+                <div className="flex items-center space-x-2 px-3 py-1.5 bg-muted/20 rounded-lg">
+                  <span className="text-muted-foreground">
+                    {card.reviewCount === 0 ? 'New' : `${card.reviewCount}x reviewed`}
+                  </span>
+                </div>
+              </div>
+              
+              <Button variant="ghost" size="sm" className="w-8 h-8 p-0">
+                <RotateCcw className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+
+          {/* Session Progress */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-lg font-medium text-foreground">Review Progress</h2>
+              <span className="text-sm text-muted-foreground">{Math.round((cardNumber / totalCards) * 100)}% complete</span>
+            </div>
+            <div className="w-full bg-muted/20 rounded-full h-2">
+              <div 
+                className="h-2 bg-gradient-to-r from-primary to-secondary rounded-full transition-all duration-300"
+                style={{ width: `${(cardNumber / totalCards) * 100}%` }}
+              ></div>
+            </div>
           </div>
         </div>
 
