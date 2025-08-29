@@ -108,15 +108,15 @@ export default function IFlashPage() {
 
   if (cardsLoading || statsLoading) {
     return (
-      <div className="min-h-screen education-bg">
+      <div className="min-h-screen education-bg particle-field">
         <Navigation />
         <Sidebar />
         <main className="ml-64 pt-16 min-h-screen">
           <div className="p-8">
             <div className="max-w-5xl mx-auto">
               <div className="animate-pulse space-y-6">
-                <div className="h-32 bg-muted rounded-2xl"></div>
-                <div className="h-96 bg-muted rounded-2xl"></div>
+                <div className="h-32 ultra-glass rounded-2xl micro-glow"></div>
+                <div className="h-96 ultra-glass rounded-2xl micro-glow"></div>
               </div>
             </div>
           </div>
@@ -127,15 +127,15 @@ export default function IFlashPage() {
 
   if (!flashcards.length && !sessionActive) {
     return (
-      <div className="min-h-screen education-bg">
+      <div className="min-h-screen education-bg particle-field">
         <Navigation />
         <Sidebar />
         <main className="ml-64 pt-16 min-h-screen">
           <div className="p-8">
             <div className="max-w-5xl mx-auto text-center">
               <div className="mb-8">
-                <Layers3 className="w-20 h-20 mx-auto mb-4 text-muted-foreground" />
-                <h2 className="cinzel text-3xl font-bold mb-2">No Flashcards Available</h2>
+                <Layers3 className="w-20 h-20 mx-auto mb-4 text-muted-foreground animate-divine" />
+                <h2 className="cinzel text-3xl font-bold mb-2 holographic-text" data-text="No Flashcards Available">No Flashcards Available</h2>
                 <p className="text-muted-foreground">
                   Generate flashcards from lesson content to start your spaced repetition learning.
                 </p>
@@ -144,14 +144,15 @@ export default function IFlashPage() {
               <div className="space-y-4">
                 <Button 
                   onClick={() => window.location.href = '/lesson/hmo-balance-billing'}
-                  className="bg-primary text-primary-foreground hover:bg-primary/90"
+                  className="divine-button text-white font-bold micro-tilt"
                 >
-                  <BookOpen className="w-4 h-4 mr-2" />
+                  <BookOpen className="w-4 h-4 mr-2 animate-cosmic" />
                   Go to Lessons
                 </Button>
                 <Button 
                   variant="outline"
                   onClick={() => window.location.href = '/'}
+                  className="ultra-glass micro-glow micro-bounce"
                 >
                   Return to Dashboard
                 </Button>
@@ -164,7 +165,7 @@ export default function IFlashPage() {
   }
 
   return (
-    <div className="min-h-screen education-bg">
+    <div className="min-h-screen education-bg particle-field">
       <Navigation />
       <Sidebar />
       
@@ -175,84 +176,84 @@ export default function IFlashPage() {
             {!sessionActive ? (
               // Study Session Overview
               <>
-                <div className="glassmorphism-card rounded-2xl p-8 mb-8">
+                <div className="ultra-glass rounded-2xl p-8 mb-8 micro-glow animate-quantum">
                   <div className="flex items-center space-x-4 mb-6">
-                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-chart-2 to-chart-2/80 flex items-center justify-center">
-                      <Layers3 className="w-8 h-8 text-white" />
+                    <div className="w-16 h-16 rounded-2xl morphing-bg flex items-center justify-center animate-divine micro-bounce">
+                      <Layers3 className="w-8 h-8 text-white animate-cosmic" />
                     </div>
                     <div className="text-left">
-                      <h1 className="cinzel text-4xl font-bold text-shimmer mb-2">
+                      <h1 className="cinzel text-4xl font-bold holographic-text mb-2" data-text="iFlash Learning System">
                         iFlash Learning System
                       </h1>
-                      <p className="text-lg text-muted-foreground">
+                      <p className="text-lg text-muted-foreground animate-particle">
                         Adaptive flashcard review • {stats?.dueToday || 0} cards due today
                       </p>
                     </div>
                   </div>
                   
                   <div className="flex items-center justify-center space-x-6 text-sm text-muted-foreground">
-                    <div className="flex items-center space-x-2">
-                      <Target className="w-4 h-4 text-chart-2" />
-                      <span>Adaptive Learning</span>
+                    <div className="flex items-center space-x-2 micro-glow">
+                      <Target className="w-4 h-4 text-chart-2 animate-divine" />
+                      <span className="animate-particle">Adaptive Learning</span>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <TrendingUp className="w-4 h-4 text-chart-2" />
-                      <span>Progress Tracking</span>
+                    <div className="flex items-center space-x-2 micro-glow">
+                      <TrendingUp className="w-4 h-4 text-chart-2 animate-cosmic" />
+                      <span className="animate-particle">Progress Tracking</span>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <Flame className="w-4 h-4 text-chart-2" />
-                      <span>Streak Building</span>
+                    <div className="flex items-center space-x-2 micro-glow">
+                      <Flame className="w-4 h-4 text-chart-2 animate-quantum" />
+                      <span className="animate-particle">Streak Building</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Study Stats */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                  <Card className="glassmorphism border-border text-center">
+                  <Card className="ultra-glass micro-glow micro-tilt animate-quantum text-center">
                     <CardContent className="p-4">
                       <div className="flex items-center justify-center mb-2">
-                        <Target className="w-6 h-6 text-primary mr-2" />
+                        <Target className="w-6 h-6 text-primary mr-2 animate-divine" />
                       </div>
-                      <p className="text-2xl font-bold text-primary">{stats?.dueToday || 0}</p>
-                      <p className="text-sm text-muted-foreground">Due Today</p>
+                      <p className="text-2xl font-bold text-primary holographic-text" data-text="{stats?.dueToday || 0}">{stats?.dueToday || 0}</p>
+                      <p className="text-sm text-muted-foreground animate-particle">Due Today</p>
                     </CardContent>
                   </Card>
                   
-                  <Card className="glassmorphism border-border text-center">
+                  <Card className="ultra-glass micro-glow micro-tilt animate-cosmic text-center">
                     <CardContent className="p-4">
                       <div className="flex items-center justify-center mb-2">
-                        <Layers3 className="w-6 h-6 text-secondary mr-2" />
+                        <Layers3 className="w-6 h-6 text-secondary mr-2 animate-holographic" />
                       </div>
-                      <p className="text-2xl font-bold text-secondary">{stats?.totalCards || 0}</p>
-                      <p className="text-sm text-muted-foreground">Total Cards</p>
+                      <p className="text-2xl font-bold text-secondary holographic-text" data-text="{stats?.totalCards || 0}">{stats?.totalCards || 0}</p>
+                      <p className="text-sm text-muted-foreground animate-particle">Total Cards</p>
                     </CardContent>
                   </Card>
                   
-                  <Card className="glassmorphism border-border text-center">
+                  <Card className="ultra-glass micro-glow micro-tilt animate-divine text-center">
                     <CardContent className="p-4">
                       <div className="flex items-center justify-center mb-2">
-                        <Flame className="w-6 h-6 text-accent mr-2" />
+                        <Flame className="w-6 h-6 text-accent mr-2 animate-morphing" />
                       </div>
-                      <p className="text-2xl font-bold text-accent">{stats?.reviewStreak || 0}</p>
-                      <p className="text-sm text-muted-foreground">Study Streak</p>
+                      <p className="text-2xl font-bold text-accent holographic-text" data-text="{stats?.reviewStreak || 0}">{stats?.reviewStreak || 0}</p>
+                      <p className="text-sm text-muted-foreground animate-particle">Study Streak</p>
                     </CardContent>
                   </Card>
                   
-                  <Card className="glassmorphism border-border text-center">
+                  <Card className="ultra-glass micro-glow micro-tilt animate-holographic text-center">
                     <CardContent className="p-4">
                       <div className="flex items-center justify-center mb-2">
-                        <TrendingUp className="w-6 h-6 text-chart-4 mr-2" />
+                        <TrendingUp className="w-6 h-6 text-chart-4 mr-2 animate-quantum" />
                       </div>
-                      <p className="text-2xl font-bold text-chart-4">{stats?.accuracy || 0}%</p>
-                      <p className="text-sm text-muted-foreground">Accuracy</p>
+                      <p className="text-2xl font-bold text-chart-4 holographic-text" data-text="{stats?.accuracy || 0}%">{stats?.accuracy || 0}%</p>
+                      <p className="text-sm text-muted-foreground animate-particle">Accuracy</p>
                     </CardContent>
                   </Card>
                 </div>
 
                 {/* Start Session */}
-                <Card className="glassmorphism border-border text-center">
+                <Card className="ultra-glass text-center micro-glow animate-quantum">
                   <CardContent className="p-8">
-                    <h3 className="cinzel text-xl font-bold mb-4">Ready to Review?</h3>
+                    <h3 className="cinzel text-xl font-bold mb-4 holographic-text" data-text="Ready to Review?">Ready to Review?</h3>
                     <p className="text-muted-foreground mb-6">
                       You have {flashcards.length} cards ready for review. 
                       Let's strengthen your knowledge with spaced repetition.
@@ -262,10 +263,10 @@ export default function IFlashPage() {
                       <Button
                         onClick={handleStartSession}
                         size="lg"
-                        className="bg-primary text-primary-foreground hover:bg-primary/90"
+                        className="divine-button text-white font-bold micro-tilt"
                         data-testid="button-start-review"
                       >
-                        <Play className="w-5 h-5 mr-2" />
+                        <Play className="w-5 h-5 mr-2 animate-cosmic" />
                         Start Review Session
                       </Button>
                       
@@ -333,10 +334,10 @@ export default function IFlashPage() {
                 )}
 
                 {/* Session Stats */}
-                <Card className="glassmorphism border-border mt-6">
+                <Card className="ultra-glass mt-6 micro-glow animate-cosmic">
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between mb-4">
-                      <h3 className="cinzel font-bold">Session Progress</h3>
+                      <h3 className="cinzel font-bold holographic-text" data-text="Session Progress">Session Progress</h3>
                       <span className="text-sm text-muted-foreground">
                         {reviewedCount} / {flashcards.length} completed
                       </span>

@@ -19,23 +19,23 @@ import {
 
 export default function Landing() {
   return (
-    <div className="min-h-screen education-bg">
+    <div className="min-h-screen education-bg particle-field">
       {/* Header */}
-      <nav className="fixed top-0 left-0 right-0 z-50 glassmorphism-card border-b border-border/50">
+      <nav className="fixed top-0 left-0 right-0 z-50 ultra-glass border-b border-border/50 micro-shimmer">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center">
-              <BookOpen className="w-6 h-6 text-primary-foreground" />
+            <div className="w-10 h-10 morphing-bg rounded-xl flex items-center justify-center animate-divine micro-bounce">
+              <BookOpen className="w-6 h-6 text-primary-foreground animate-cosmic" />
             </div>
             <div>
-              <h1 className="cinzel text-xl font-bold text-foreground">DFS-215 Elite</h1>
-              <p className="text-xs text-muted-foreground">Learning Platform</p>
+              <h1 className="cinzel text-xl font-bold holographic-text" data-text="DFS-215 Elite">DFS-215 Elite</h1>
+              <p className="text-xs text-muted-foreground animate-particle">Learning Platform</p>
             </div>
           </div>
           
           <Button 
             onClick={() => window.location.href = '/api/login'}
-            className="px-6 py-2 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+            className="divine-button px-6 py-3 text-white font-bold micro-tilt"
             data-testid="button-login"
           >
             Sign In
@@ -49,13 +49,13 @@ export default function Landing() {
           {/* Hero */}
           <div className="text-center py-20">
             <div className="mb-8">
-              <div className="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-2xl mx-auto mb-6 flex items-center justify-center animate-float">
-                <BookOpen className="w-10 h-10 text-primary-foreground" />
+              <div className="w-20 h-20 morphing-bg rounded-2xl mx-auto mb-6 flex items-center justify-center animate-divine micro-bounce">
+                <BookOpen className="w-10 h-10 text-primary-foreground animate-cosmic" />
               </div>
-              <h1 className="cinzel text-5xl md:text-6xl font-bold text-foreground mb-6 animate-fadeIn">
+              <h1 className="cinzel text-5xl md:text-6xl font-bold holographic-text mb-6 animate-fadeIn" data-text="DFS-215 Elite Learning">
                 DFS-215 Elite Learning
               </h1>
-              <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+              <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed animate-particle">
                 Master Florida insurance law with AI-powered coaching, adaptive learning, and comprehensive exam preparation for your DFS-215 certification.
               </p>
             </div>
@@ -64,7 +64,7 @@ export default function Landing() {
               <Button 
                 size="lg"
                 onClick={() => window.location.href = '/api/login'}
-                className="px-8 py-4 bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 transform hover:scale-105"
+                className="divine-button px-8 py-4 text-white font-bold micro-tilt"
                 data-testid="button-get-started"
               >
                 Get Started
@@ -72,7 +72,7 @@ export default function Landing() {
               <Button 
                 size="lg" 
                 variant="outline"
-                className="px-8 py-4 border-border hover:bg-muted/50 transition-colors"
+                className="ultra-glass px-8 py-4 micro-glow micro-bounce"
                 data-testid="button-learn-more"
               >
                 Learn More
@@ -82,49 +82,49 @@ export default function Landing() {
 
           {/* Features */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
-            <Card className="education-card group hover:scale-105 transition-transform duration-300">
+            <Card className="ultra-glass group micro-glow micro-tilt animate-quantum">
               <CardContent className="p-6 text-center">
-                <div className="w-14 h-14 bg-gradient-to-br from-primary to-secondary rounded-xl mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Brain className="w-7 h-7 text-white" />
+                <div className="w-14 h-14 morphing-bg rounded-xl mx-auto mb-4 flex items-center justify-center animate-divine micro-bounce">
+                  <Brain className="w-7 h-7 text-white animate-cosmic" />
                 </div>
-                <h3 className="cinzel text-xl font-bold mb-3 text-foreground">AI Coaching</h3>
-                <p className="text-sm text-muted-foreground">
+                <h3 className="cinzel text-xl font-bold mb-3 holographic-text" data-text="AI Coaching">AI Coaching</h3>
+                <p className="text-sm text-muted-foreground animate-particle">
                   Personal AI tutors guide your learning with CoachBot, StudyBuddy, and ProctorBot
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="glow-card glassmorphism border-border group hover:scale-105 transition-transform duration-300">
+            <Card className="ultra-glass group micro-glow micro-tilt animate-cosmic">
               <CardContent className="p-6 text-center">
-                <div className="w-12 h-12 bg-secondary/20 rounded-xl mx-auto mb-4 flex items-center justify-center group-hover:bg-secondary/30 transition-colors">
+                <div className="w-12 h-12 morphing-bg rounded-xl mx-auto mb-4 flex items-center justify-center animate-holographic micro-bounce">
                   <Trophy className="w-6 h-6 text-secondary" />
                 </div>
-                <h3 className="cinzel text-lg font-semibold mb-2">Adaptive Learning</h3>
-                <p className="text-sm text-muted-foreground">
+                <h3 className="cinzel text-lg font-semibold mb-2 holographic-text" data-text="Adaptive Learning">Adaptive Learning</h3>
+                <p className="text-sm text-muted-foreground animate-particle">
                   Spaced repetition flashcards and personalized study plans optimize retention
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="glow-card glassmorphism border-border group hover:scale-105 transition-transform duration-300">
+            <Card className="ultra-glass group micro-glow micro-tilt animate-divine">
               <CardContent className="p-6 text-center">
-                <div className="w-12 h-12 bg-accent/20 rounded-xl mx-auto mb-4 flex items-center justify-center group-hover:bg-accent/30 transition-colors">
+                <div className="w-12 h-12 morphing-bg rounded-xl mx-auto mb-4 flex items-center justify-center animate-morphing micro-bounce">
                   <Shield className="w-6 h-6 text-accent" />
                 </div>
-                <h3 className="cinzel text-lg font-semibold mb-2">Exam Preparation</h3>
-                <p className="text-sm text-muted-foreground">
+                <h3 className="cinzel text-lg font-semibold mb-2 holographic-text" data-text="Exam Preparation">Exam Preparation</h3>
+                <p className="text-sm text-muted-foreground animate-particle">
                   Comprehensive practice tests with proctored exam simulation
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="glow-card glassmorphism border-border group hover:scale-105 transition-transform duration-300">
+            <Card className="ultra-glass group micro-glow micro-tilt animate-holographic">
               <CardContent className="p-6 text-center">
-                <div className="w-12 h-12 bg-chart-4/20 rounded-xl mx-auto mb-4 flex items-center justify-center group-hover:bg-chart-4/30 transition-colors">
+                <div className="w-12 h-12 morphing-bg rounded-xl mx-auto mb-4 flex items-center justify-center animate-quantum micro-bounce">
                   <BookOpen className="w-6 h-6 text-chart-4" />
                 </div>
-                <h3 className="cinzel text-lg font-semibold mb-2">CE Tracking</h3>
-                <p className="text-sm text-muted-foreground">
+                <h3 className="cinzel text-lg font-semibold mb-2 holographic-text" data-text="CE Tracking">CE Tracking</h3>
+                <p className="text-sm text-muted-foreground animate-particle">
                   Automatic continuing education hour tracking with certificate generation
                 </p>
               </CardContent>
@@ -191,21 +191,21 @@ export default function Landing() {
 
           {/* Student Testimonials */}
           <div className="mb-20">
-            <h2 className="cinzel text-3xl font-bold text-center mb-8">Student Success Stories</h2>
+            <h2 className="cinzel text-3xl font-bold text-center mb-8 holographic-text" data-text="Student Success Stories">Student Success Stories</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <Card className="glassmorphism border-border">
+              <Card className="ultra-glass micro-glow micro-tilt animate-quantum">
                 <CardContent className="p-6">
                   <div className="flex items-center space-x-3 mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center">
-                      <Quote className="w-6 h-6 text-white" />
+                    <div className="w-12 h-12 morphing-bg rounded-full flex items-center justify-center animate-divine micro-bounce">
+                      <Quote className="w-6 h-6 text-white animate-cosmic" />
                     </div>
                     <div>
-                      <h4 className="font-bold">Sarah Martinez</h4>
-                      <p className="text-sm text-muted-foreground">Insurance Agent, Miami</p>
+                      <h4 className="font-bold holographic-text" data-text="Sarah Martinez">Sarah Martinez</h4>
+                      <p className="text-sm text-muted-foreground animate-particle">Insurance Agent, Miami</p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-1 mb-3">
-                    {[1,2,3,4,5].map(i => <Star key={i} className="w-4 h-4 fill-yellow-500 text-yellow-500" />)}
+                    {[1,2,3,4,5].map(i => <Star key={i} className="w-4 h-4 fill-yellow-500 text-yellow-500 animate-quantum" />)}
                   </div>
                   <p className="text-sm italic text-muted-foreground">
                     "The AI tutors made complex insurance concepts easy to understand. I passed my DFS-215 on the first try with a 92% score!"
@@ -367,18 +367,18 @@ export default function Landing() {
 
           {/* CTA */}
           <div className="text-center pb-20">
-            <Card className="glassmorphism border-border max-w-3xl mx-auto">
+            <Card className="ultra-glass max-w-3xl mx-auto micro-glow animate-divine">
               <CardContent className="p-8">
-                <Trophy className="w-16 h-16 mx-auto mb-6 text-primary" />
-                <h2 className="cinzel text-3xl font-bold mb-4">Ready to Excel in Your Insurance Career?</h2>
-                <p className="text-lg text-muted-foreground mb-6">
+                <Trophy className="w-16 h-16 mx-auto mb-6 text-primary animate-cosmic micro-bounce" />
+                <h2 className="cinzel text-3xl font-bold mb-4 holographic-text" data-text="Ready to Excel in Your Insurance Career?">Ready to Excel in Your Insurance Career?</h2>
+                <p className="text-lg text-muted-foreground mb-6 animate-particle">
                   Join thousands of successful insurance professionals who've mastered their DFS-215 certification with our elite platform.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Button 
                     size="lg"
                     onClick={() => window.location.href = '/api/login'}
-                    className="px-8 py-4 bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 transform hover:scale-105"
+                    className="divine-button px-8 py-4 text-white font-bold micro-tilt"
                     data-testid="button-start-learning"
                   >
                     Start Learning Today
@@ -386,13 +386,13 @@ export default function Landing() {
                   <Button 
                     size="lg" 
                     variant="outline"
-                    className="px-8 py-4 border-border hover:bg-muted/50 transition-colors"
+                    className="ultra-glass px-8 py-4 micro-glow micro-bounce"
                     data-testid="button-view-demo"
                   >
                     View Demo
                   </Button>
                 </div>
-                <p className="text-sm text-muted-foreground mt-4">
+                <p className="text-sm text-muted-foreground mt-4 animate-particle">
                   No credit card required • 94% pass rate • Florida DFS approved
                 </p>
               </CardContent>

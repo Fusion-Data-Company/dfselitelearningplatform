@@ -216,7 +216,7 @@ export default function ExamPage() {
   // Show exam selection if no exam is active
   if (!examSession && !examResults && !examStarted) {
     return (
-      <div className="min-h-screen education-bg">
+      <div className="min-h-screen education-bg particle-field">
         <Navigation />
         <Sidebar />
         
@@ -224,45 +224,45 @@ export default function ExamPage() {
           <div className="p-8">
             <div className="max-w-4xl mx-auto">
               {/* Header */}
-              <div className="glassmorphism-card rounded-2xl p-8 mb-8">
+              <div className="ultra-glass rounded-2xl p-8 mb-8 micro-glow animate-divine">
                 <div className="flex items-center justify-center mb-6">
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-destructive to-destructive/80 flex items-center justify-center mr-4">
-                    <Shield className="w-8 h-8 text-white" />
+                  <div className="w-16 h-16 rounded-2xl morphing-bg flex items-center justify-center mr-4 animate-quantum micro-bounce">
+                    <Shield className="w-8 h-8 text-white animate-cosmic" />
                   </div>
                   <div className="text-center">
-                    <h1 className="cinzel text-4xl font-bold text-shimmer mb-2">
+                    <h1 className="cinzel text-4xl font-bold holographic-text mb-2" data-text="DFS-215 Certification Exam">
                       DFS-215 Certification Exam
                     </h1>
-                    <p className="text-lg text-muted-foreground">
+                    <p className="text-lg text-muted-foreground animate-particle">
                       Official proctored examination with ProctorBot monitoring
                     </p>
                   </div>
                 </div>
                 
                 <div className="flex items-center justify-center space-x-6 text-sm text-muted-foreground">
-                  <div className="flex items-center space-x-2">
-                    <Clock className="w-4 h-4 text-destructive" />
-                    <span>Timed & Monitored</span>
+                  <div className="flex items-center space-x-2 micro-glow">
+                    <Clock className="w-4 h-4 text-destructive animate-divine" />
+                    <span className="animate-particle">Timed & Monitored</span>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <Shield className="w-4 h-4 text-destructive" />
-                    <span>ProctorBot Active</span>
+                  <div className="flex items-center space-x-2 micro-glow">
+                    <Shield className="w-4 h-4 text-destructive animate-cosmic" />
+                    <span className="animate-particle">ProctorBot Active</span>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <AlertTriangle className="w-4 h-4 text-destructive" />
-                    <span>Official Certification</span>
+                  <div className="flex items-center space-x-2 micro-glow">
+                    <AlertTriangle className="w-4 h-4 text-destructive animate-quantum" />
+                    <span className="animate-particle">Official Certification</span>
                   </div>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {questionBanks?.map((bank) => (
-                  <Card key={bank.id} className="education-card p-6 group cursor-pointer relative overflow-hidden border-destructive/20">
+                  <Card key={bank.id} className="ultra-glass p-6 group cursor-pointer relative overflow-hidden micro-glow micro-tilt animate-quantum">
                     <div className="absolute inset-0 bg-gradient-to-br from-destructive/5 to-destructive/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                     <div className="relative z-10">
                       <div className="flex items-center space-x-3 mb-4">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-destructive to-destructive/80 flex items-center justify-center">
-                          <Shield className="w-6 h-6 text-white" />
+                        <div className="w-12 h-12 rounded-xl morphing-bg flex items-center justify-center animate-divine micro-bounce">
+                          <Shield className="w-6 h-6 text-white animate-cosmic" />
                         </div>
                         <div>
                           <h3 className="cinzel text-xl font-bold group-hover:text-destructive transition-colors">{bank.title}</h3>
@@ -418,14 +418,14 @@ export default function ExamPage() {
         
         {/* ProctorBot Panel */}
         {proctorActive && (
-          <div className="fixed top-16 left-64 right-0 z-40 ai-agent-panel border-b border-primary/30 p-4">
+          <div className="fixed top-16 left-64 right-0 z-40 ultra-glass border-b border-primary/30 p-4 micro-glow">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-accent/20 rounded-xl flex items-center justify-center">
-                <Shield className="w-5 h-5 text-accent" />
+              <div className="w-10 h-10 morphing-bg rounded-xl flex items-center justify-center animate-divine micro-bounce">
+                <Shield className="w-5 h-5 text-white animate-cosmic" />
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold">ProctorBot Active</h3>
-                <p className="text-sm text-muted-foreground">
+                <h3 className="font-semibold holographic-text" data-text="ProctorBot Active">ProctorBot Active</h3>
+                <p className="text-sm text-muted-foreground animate-particle">
                   Monitoring exam integrity. Focus on your window and avoid suspicious behavior.
                 </p>
               </div>
@@ -463,9 +463,9 @@ export default function ExamPage() {
                 {/* Exam Sidebar */}
                 <div className="space-y-6">
                   {/* Question Overview */}
-                  <Card className="glassmorphism border-border">
+                  <Card className="ultra-glass micro-glow animate-quantum">
                     <CardContent className="p-4">
-                      <h4 className="cinzel font-bold mb-3">Question Overview</h4>
+                      <h4 className="cinzel font-bold mb-3 holographic-text" data-text="Question Overview">Question Overview</h4>
                       <div className="grid grid-cols-5 gap-1">
                         {examSession.questions.map((_, index) => {
                           const questionId = examSession.questions[index].id;
@@ -514,9 +514,9 @@ export default function ExamPage() {
                   </Card>
 
                   {/* Exam Controls */}
-                  <Card className="glassmorphism border-border">
+                  <Card className="ultra-glass micro-glow animate-divine">
                     <CardContent className="p-4">
-                      <h4 className="cinzel font-bold mb-3">Exam Controls</h4>
+                      <h4 className="cinzel font-bold mb-3 holographic-text" data-text="Exam Controls">Exam Controls</h4>
                       <div className="space-y-2">
                         <Button
                           onClick={handleFlag}
@@ -539,16 +539,16 @@ export default function ExamPage() {
                   </Card>
 
                   {/* Submit Exam */}
-                  <Card className="glassmorphism border-destructive/50">
+                  <Card className="ultra-glass border-destructive/50 micro-glow animate-cosmic">
                     <CardContent className="p-4">
-                      <h4 className="cinzel font-bold mb-3 text-destructive">Submit Exam</h4>
+                      <h4 className="cinzel font-bold mb-3 text-destructive holographic-text" data-text="Submit Exam">Submit Exam</h4>
                       <p className="text-sm text-muted-foreground mb-3">
                         Once submitted, you cannot return to modify answers.
                       </p>
                       <Button
                         onClick={handleFinishExam}
                         disabled={finishExamMutation.isPending}
-                        className="w-full bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        className="divine-button w-full text-white font-bold micro-tilt"
                         data-testid="button-submit-exam"
                       >
                         {finishExamMutation.isPending ? "Submitting..." : "Submit Exam"}
