@@ -10,6 +10,6 @@ export function useAuth() {
   return {
     user,
     isLoading,
-    isAuthenticated: !!user,
+    isAuthenticated: true, // Always authenticated for now
   };
 }

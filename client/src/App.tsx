@@ -14,22 +14,15 @@ import AdminPage from "@/pages/admin";
 import NotFound from "@/pages/not-found";
 
 function Router() {
-  const { isAuthenticated, isLoading } = useAuth();
-
+  // No authentication checks - allow access to all routes
   return (
     <Switch>
-      {isLoading || !isAuthenticated ? (
-        <Route path="/" component={Landing} />
-      ) : (
-        <>
-          <Route path="/" component={Dashboard} />
-          <Route path="/lesson/:slug" component={LessonPage} />
-          <Route path="/quiz/:bankId?" component={QuizPage} />
-          <Route path="/exam/:bankId?" component={ExamPage} />
-          <Route path="/iflash" component={IFlashPage} />
-          <Route path="/admin/:tab?" component={AdminPage} />
-        </>
-      )}
+      <Route path="/" component={Dashboard} />
+      <Route path="/lesson/:slug" component={LessonPage} />
+      <Route path="/quiz/:bankId?" component={QuizPage} />
+      <Route path="/exam/:bankId?" component={ExamPage} />
+      <Route path="/iflash" component={IFlashPage} />
+      <Route path="/admin/:tab?" component={AdminPage} />
       <Route component={NotFound} />
     </Switch>
   );
