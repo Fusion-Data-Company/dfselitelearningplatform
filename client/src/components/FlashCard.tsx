@@ -30,16 +30,7 @@ export default function FlashCard({ card, onReview, cardNumber, totalCards }: Fl
 
   // Normalize legacy MCQ cards on-the-fly
   const normalizedCard = useMemo(() => {
-    console.log('🔍 FlashCard Debug:', {
-      cardId: card.id,
-      type: card.type,
-      hasOptions: !!card.options,
-      hasFront: !!card.front,
-      front: card.front?.substring(0, 100) + '...'
-    });
-
     if (card.type === 'mcq' && !card.options && card.front) {
-      console.log('🔄 Attempting to normalize MCQ card:', card.front);
       try {
         const text = card.front;
         
@@ -79,64 +70,76 @@ export default function FlashCard({ card, onReview, cardNumber, totalCards }: Fl
               rationale: card.back || null
             };
             
-            console.log('✅ MCQ Normalized (line-by-line):', {
-              prompt,
-              options,
-              answerIndex,
-              rationale: normalized.rationale
-            });
-            
             return normalized;
           }
         }
         
-        // Fallback to inline format
-        const optionRegex = /\s*([ABCD])\)\s*([^A-D]*?)(?=\s*[ABCD]\)|$)/gi;
-        const matches = Array.from(text.matchAll(optionRegex));
-        
-        if (matches.length >= 2) {
-          const firstMatch = matches[0];
-          const prompt = text.substring(0, firstMatch.index || 0).trim().replace(/:?\s*$/, '');
-          const options = matches.map(match => match[2].trim());
+        // Handle inline format with comma separation: "Question: A) opt, B) opt, C) opt, D) opt"
+        if (text.includes(', A)') || text.includes(', B)') || text.includes(', C)') || text.includes(', D)')) {
+          // Comma-separated format
+          const parts = text.split(/,\s*(?=[ABCD]\))/);
+          const prompt = parts[0].trim().replace(/:?\s*$/, '');
+          const options = parts.slice(1).map(part => {
+            const match = part.match(/^[ABCD]\)\s*(.+)$/);
+            return match ? match[1].trim() : '';
+          }).filter(opt => opt.length > 0);
           
-          let answerIndex: number | null = null;
-          if (card.back) {
-            const answerMatch = card.back.match(/(?:answer|correct)[\s:]*([ABCD])/i) || 
-                               card.back.match(/\b([ABCD])\)/);
-            if (answerMatch) {
-              const letter = answerMatch[1].toUpperCase();
-              answerIndex = ['A', 'B', 'C', 'D'].indexOf(letter);
+          if (options.length >= 2) {
+            let answerIndex: number | null = null;
+            if (card.back) {
+              const answerMatch = card.back.match(/(?:answer|correct)[\s:]*([ABCD])/i) || 
+                                 card.back.match(/\b([ABCD])\)/);
+              if (answerMatch) {
+                const letter = answerMatch[1].toUpperCase();
+                answerIndex = ['A', 'B', 'C', 'D'].indexOf(letter);
+              }
             }
+            
+            const normalized = {
+              ...card,
+              prompt,
+              options,
+              answerIndex,
+              rationale: card.back || null
+            };
+            
+            return normalized;
           }
+        } else {
+          // Space-separated format fallback: "Question A) opt B) opt C) opt D) opt" 
+          const optionRegex = /([ABCD])\)\s*([^,]*?)(?=\s*[ABCD]\)|$)/gi;
+          const matches = Array.from(text.matchAll(optionRegex));
           
-          const normalized = {
-            ...card,
-            prompt,
-            options,
-            answerIndex,
-            rationale: card.back || null
-          };
-          
-          console.log('✅ MCQ Normalized (inline):', {
-            prompt,
-            options,
-            answerIndex,
-            rationale: normalized.rationale
-          });
-          
-          return normalized;
+          if (matches.length >= 2) {
+            const firstMatch = matches[0];
+            const prompt = text.substring(0, firstMatch.index || 0).trim().replace(/:?\s*$/, '');
+            const options = matches.map(match => match[2].trim());
+            
+            let answerIndex: number | null = null;
+            if (card.back) {
+              const answerMatch = card.back.match(/(?:answer|correct)[\s:]*([ABCD])/i) || 
+                                 card.back.match(/\b([ABCD])\)/);
+              if (answerMatch) {
+                const letter = answerMatch[1].toUpperCase();
+                answerIndex = ['A', 'B', 'C', 'D'].indexOf(letter);
+              }
+            }
+            
+            const normalized = {
+              ...card,
+              prompt,
+              options,
+              answerIndex,
+              rationale: card.back || null
+            };
+            
+            return normalized;
+          }
         }
       } catch (error) {
-        console.error('❌ Error normalizing MCQ:', error);
+        console.error('Error normalizing MCQ:', error);
       }
     }
-    
-    console.log('🔄 Using original card (no normalization needed):', {
-      type: card.type,
-      hasPrompt: !!card.prompt,
-      hasOptions: !!card.options
-    });
-    
     return card;
   }, [card]);
 
@@ -175,14 +178,7 @@ export default function FlashCard({ card, onReview, cardNumber, totalCards }: Fl
 
   // Premium MCQ Renderer
   const renderMCQCard = () => {
-    console.log('🎨 MCQ Renderer Check:', {
-      hasOptions: !!normalizedCard.options,
-      hasPrompt: !!normalizedCard.prompt,
-      willRenderMCQ: !!(normalizedCard.options && normalizedCard.prompt)
-    });
-    
     if (!normalizedCard.options || !normalizedCard.prompt) {
-      console.log('⚠️ Falling back to legacy card renderer');
       return renderLegacyCard();
     }
 
