@@ -25,6 +25,8 @@ interface Question {
   options: string[];
   difficulty: string;
   topic: string;
+  answerKey?: string;
+  explanation?: string;
 }
 
 interface QuizSession {
@@ -55,6 +57,12 @@ export default function QuizPage() {
   const [quizSession, setQuizSession] = useState<QuizSession | null>(null);
   const [quizResults, setQuizResults] = useState<QuizResults | null>(null);
   const [timeRemaining, setTimeRemaining] = useState<number | undefined>();
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [currentQuestionFeedback, setCurrentQuestionFeedback] = useState<{
+    isCorrect: boolean;
+    correctAnswer: string;
+    explanation?: string;
+  } | null>(null);
   const { toast } = useToast();
 
   const { data: questionBanks } = useQuery<QuestionBank[]>({
@@ -131,11 +139,31 @@ export default function QuizPage() {
     const newAnswers = { ...answers, [currentQuestion.id]: answer };
     setAnswers(newAnswers);
     
+    // Show immediate feedback in practice mode
+    const isCorrect = answer === currentQuestion.answerKey;
+    setCurrentQuestionFeedback({
+      isCorrect,
+      correctAnswer: currentQuestion.answerKey || 'A',
+      explanation: currentQuestion.explanation
+    });
+    setShowFeedback(true);
+    
     // Auto-save answer
     submitAnswerMutation.mutate({
       questionId: currentQuestion.id,
       answer
     });
+    
+    // Auto-advance to next question after 3 seconds
+    setTimeout(() => {
+      setShowFeedback(false);
+      setCurrentQuestionFeedback(null);
+      if (currentQuestionIndex < quizSession.questions.length - 1) {
+        setCurrentQuestionIndex(prev => prev + 1);
+      } else {
+        handleFinishQuiz();
+      }
+    }, 3000);
   };
 
   const handleFlag = () => {
@@ -394,6 +422,8 @@ export default function QuizPage() {
                     onNext={handleNext}
                     isFlagged={isFlagged}
                     timeRemaining={timeRemaining}
+                    showFeedback={showFeedback}
+                    correctAnswer={currentQuestionFeedback?.correctAnswer}
                   />
                 </div>
 

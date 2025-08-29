@@ -1,10 +1,8 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Flag, ArrowLeft, ArrowRight, HelpCircle, Clock, CheckCircle, XCircle, Lightbulb } from "lucide-react";
+import { Flag, ArrowLeft, ArrowRight, HelpCircle, Clock, CheckCircle, XCircle } from "lucide-react";
+import { useState } from "react";
 
 interface Question {
   id: string;
@@ -27,6 +25,8 @@ interface QuizQuestionProps {
   isFlagged: boolean;
   showNavigation?: boolean;
   timeRemaining?: number;
+  showFeedback?: boolean;
+  correctAnswer?: string;
 }
 
 export default function QuizQuestion({
@@ -40,8 +40,11 @@ export default function QuizQuestion({
   onNext,
   isFlagged,
   showNavigation = true,
-  timeRemaining
+  timeRemaining,
+  showFeedback = false,
+  correctAnswer
 }: QuizQuestionProps) {
+  const [showResult, setShowResult] = useState(false);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -129,67 +132,83 @@ export default function QuizQuestion({
               </div>
             </div>
           
-            {/* Answer Options */}
-            <div className="space-y-4" data-testid="question-options">
-              {question.type === 'mcq' || question.type === 'tf' ? (
-                <RadioGroup 
-                  value={selectedAnswer as string || ""} 
-                  onValueChange={handleSingleChoice}
-                  className="space-y-3"
-                >
-                  {question.options.map((option, index) => {
-                    const optionId = String.fromCharCode(65 + index); // A, B, C, D
-                    return (
-                      <div key={optionId} className="flex items-center space-x-3">
-                        <RadioGroupItem 
-                          value={optionId} 
-                          id={optionId}
-                          className="text-primary border-primary/50"
-                        />
-                        <Label 
-                          htmlFor={optionId}
-                          className="flex-1 cursor-pointer p-4 rounded-xl border border-border hover:border-accent/50 hover:bg-accent/5 transition-all duration-300 geist"
-                          data-testid={`option-${optionId}`}
-                        >
-                          <span className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-sm font-bold mr-3 inline-flex">
-                            {optionId}
-                          </span>
-                          {option}
-                        </Label>
+            {/* MCQ Options Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8" data-testid="question-options">
+              {question.options.map((option, index) => {
+                const optionLetter = String.fromCharCode(65 + index); // A, B, C, D
+                const isSelected = selectedAnswer === optionLetter;
+                const isCorrect = showFeedback && correctAnswer === optionLetter;
+                const isWrong = showFeedback && isSelected && correctAnswer !== optionLetter;
+                
+                let cardClass = "glassmorphism border-border bg-gradient-to-br from-card/80 to-card/60 backdrop-blur-xl transition-all duration-300 hover:border-primary/50 hover:scale-[1.02] cursor-pointer";
+                
+                if (showFeedback) {
+                  if (isCorrect) {
+                    cardClass = "glassmorphism border-green-500/70 bg-gradient-to-br from-green-50/80 to-green-100/60 backdrop-blur-xl";
+                  } else if (isWrong) {
+                    cardClass = "glassmorphism border-red-500/70 bg-gradient-to-br from-red-50/80 to-red-100/60 backdrop-blur-xl";
+                  } else {
+                    cardClass = "glassmorphism border-border/50 bg-gradient-to-br from-card/40 to-card/30 backdrop-blur-xl opacity-70";
+                  }
+                } else if (isSelected) {
+                  cardClass = "glassmorphism border-primary/70 bg-gradient-to-br from-primary/10 to-primary/5 backdrop-blur-xl";
+                }
+                
+                if (showFeedback) {
+                  cardClass = cardClass.replace("cursor-pointer", "cursor-default");
+                }
+                
+                return (
+                  <Card
+                    key={optionLetter}
+                    className={cardClass}
+                    onClick={() => !showFeedback && handleSingleChoice(optionLetter)}
+                    data-testid={`option-${optionLetter}`}
+                    style={{
+                      animationDelay: `${index * 0.1}s`,
+                      animation: 'fadeInUp 0.8s ease-out forwards'
+                    }}
+                  >
+                    <CardContent className="p-6">
+                      <div className="flex items-center space-x-4">
+                        {/* Option Letter */}
+                        <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg border-2 transition-all duration-300 ${
+                          showFeedback && isCorrect
+                            ? 'border-green-500 bg-green-500 text-white'
+                            : showFeedback && isWrong
+                            ? 'border-red-500 bg-red-500 text-white'
+                            : isSelected
+                            ? 'border-primary bg-primary text-primary-foreground'
+                            : 'border-muted-foreground bg-muted text-muted-foreground'
+                        }`}>
+                          {optionLetter}
+                        </div>
+                        
+                        {/* Option Text */}
+                        <div className="flex-1">
+                          <p className={`font-medium leading-relaxed transition-colors duration-300 ${
+                            showFeedback && (isCorrect || isWrong) ? 'text-foreground' : 'text-muted-foreground'
+                          }`}>
+                            {option}
+                          </p>
+                        </div>
+                        
+                        {/* Feedback Icons */}
+                        {showFeedback && isCorrect && (
+                          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
+                            <CheckCircle className="w-5 h-5 text-white fill-current" />
+                          </div>
+                        )}
+                        {showFeedback && isWrong && (
+                          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-red-500 flex items-center justify-center">
+                            <XCircle className="w-5 h-5 text-white fill-current" />
+                          </div>
+                        )}
                       </div>
-                    );
-                  })}
-                </RadioGroup>
-              ) : (
-                // Multiple select
-                <div className="space-y-3">
-                  {question.options.map((option, index) => {
-                    const optionId = String.fromCharCode(65 + index);
-                    const isChecked = Array.isArray(selectedAnswer) && selectedAnswer.includes(optionId);
-                    
-                    return (
-                      <div key={optionId} className="flex items-center space-x-3">
-                        <Checkbox
-                          id={optionId}
-                          checked={isChecked}
-                          onCheckedChange={(checked) => handleMultipleChoice(optionId, !!checked)}
-                          className="border-primary/50"
-                        />
-                        <Label 
-                          htmlFor={optionId}
-                          className="flex-1 cursor-pointer p-4 rounded-xl border border-border hover:border-accent/50 hover:bg-accent/5 transition-all duration-300 geist"
-                          data-testid={`option-${optionId}`}
-                        >
-                          <span className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-sm font-bold mr-3 inline-flex">
-                            {optionId}
-                          </span>
-                          {option}
-                        </Label>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
           </div>
 

@@ -40,13 +40,13 @@ export default function Navigation() {
           <div className="hidden md:flex items-center space-x-1">
             {navItems.map((item) => (
               <Link key={item.href} href={item.href}>
-                <a className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                <span className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
                   item.active 
                     ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white' 
                     : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800/50'
                 }`}>
                   {item.label}
-                </a>
+                </span>
               </Link>
             ))}
           </div>

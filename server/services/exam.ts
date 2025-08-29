@@ -8,6 +8,8 @@ export interface ExamQuestion {
   options: string[];
   difficulty: string;
   topic: string;
+  answerKey?: string;
+  explanation?: string;
 }
 
 export interface ExamSession {
@@ -73,7 +75,9 @@ export class ExamService {
       sessionId: attempt.id,
       questions: examQuestions.map(q => ({
         ...q,
-        // Don't expose correct answers
+        // Include answer key and explanation for practice mode
+        answerKey: q.answerKey,
+        explanation: q.explanation,
         options: q.options
       })),
       timeLimit: session.timeLimit,
