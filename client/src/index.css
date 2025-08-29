@@ -317,23 +317,11 @@
     position: relative;
   }
 
-  .background-shapes::before,
   .background-shapes::after {
     content: '';
     position: fixed;
     pointer-events: none;
     z-index: 0;
-  }
-
-  /* Hexagon shape */
-  .background-shapes::before {
-    top: 35%;
-    left: 5%;
-    width: 60px;
-    height: 34px;
-    background: hsla(167, 90%, 48%, 0.06);
-    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
-    animation: fade-hexagon 16s ease-in-out infinite;
   }
 
   /* Circle shape */
@@ -345,19 +333,6 @@
     background: radial-gradient(circle, hsla(195, 100%, 55%, 0.04), transparent);
     border-radius: 50%;
     animation: fade-circle 20s ease-in-out infinite reverse;
-  }
-
-  @keyframes fade-hexagon {
-    0%, 100% { 
-      opacity: 0;
-      filter: blur(15px);
-      transform: scale(0.6);
-    }
-    40% { 
-      opacity: 0.8;
-      filter: blur(3px);
-      transform: scale(1.3);
-    }
   }
 
   @keyframes fade-circle {
