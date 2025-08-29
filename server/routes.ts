@@ -7,6 +7,7 @@ import { mcpServer } from "./services/mcp";
 import { iflashService } from "./services/iflash";
 import { examService } from "./services/exam";
 import { contentService } from "./services/content";
+import { voiceQAService } from "./services/voice-qa";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -49,6 +50,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching course progress:", error);
       res.status(500).json({ message: "Failed to fetch progress" });
+    }
+  });
+
+  // Track routes
+  app.get('/api/tracks/:id', async (req, res) => {
+    try {
+      const track = await storage.getTrack(req.params.id);
+      if (!track) {
+        return res.status(404).json({ message: 'Track not found' });
+      }
+      
+      // Get modules with lessons for this track
+      const modules = await storage.getModulesByTrack(track.id);
+      const modulesWithLessons = await Promise.all(
+        modules.map(async (module) => {
+          const lessons = await storage.getLessonsByModule(module.id);
+          return { ...module, lessons };
+        })
+      );
+      
+      res.json({ ...track, modules: modulesWithLessons });
+    } catch (error) {
+      console.error("Error fetching track:", error);
+      res.status(500).json({ message: "Failed to fetch track" });
     }
   });
 
@@ -199,6 +224,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error(`Error in agent ${req.params.agentId}:`, error);
       res.status(500).json({ message: error instanceof Error ? error.message : "Agent error" });
+    }
+  });
+
+  // Voice Q&A routes
+  app.post('/api/voice-qa', async (req: any, res) => {
+    try {
+      const { question, context } = req.body;
+      const userId = 'guest'; // Use guest user for now
+      
+      if (!question || !context) {
+        return res.status(400).json({ message: 'Question and context are required' });
+      }
+
+      const response = await voiceQAService.processQuestionAndAnswer({
+        question,
+        context,
+        userId
+      });
+
+      res.json(response);
+    } catch (error) {
+      console.error("Voice Q&A error:", error);
+      res.status(500).json({ message: "Failed to process voice Q&A request" });
     }
   });
 

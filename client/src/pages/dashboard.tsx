@@ -235,12 +235,16 @@ export default function Dashboard() {
                           ))}
                         </div>
                       ) : (
-                        courseProgress?.tracks.map((track) => (
-                          <Card 
-                            key={track.id}
-                            className="education-card p-5 cursor-pointer group relative overflow-hidden"
-                            data-testid={`track-${track.id}`}
-                          >
+                        courseProgress?.tracks.map((track) => {
+                          // Create a URL for the first lesson in this track
+                          const trackUrl = `/track/${track.id}`;
+                          
+                          return (
+                            <Link key={track.id} href={trackUrl}>
+                              <Card 
+                                className="education-card p-5 cursor-pointer group relative overflow-hidden"
+                                data-testid={`track-${track.id}`}
+                              >
                             <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                             <div className="relative z-10">
                               <div className="flex items-center justify-between mb-4">
@@ -291,8 +295,10 @@ export default function Dashboard() {
                                 </Button>
                               </div>
                             </div>
-                          </Card>
-                        ))
+                              </Card>
+                            </Link>
+                          );
+                        })
                       )}
                     </div>
                   </CardContent>

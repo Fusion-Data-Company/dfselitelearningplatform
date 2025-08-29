@@ -1,8 +1,17 @@
 import { useState, useMemo } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Book, RotateCcw, CheckCircle, XCircle, Layers3 } from "lucide-react";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import { Book, RotateCcw, CheckCircle, XCircle, Layers3, Mic, Volume2 } from "lucide-react";
+
+interface VoiceQAResponse {
+  answer: string;
+  audioUrl?: string;
+  citations?: string[];
+}
 
 interface FlashCardProps {
   card: {
@@ -27,6 +36,54 @@ interface FlashCardProps {
 export default function FlashCard({ card, onReview, cardNumber, totalCards }: FlashCardProps) {
   const [isFlipped, setIsFlipped] = useState(false);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
+  const [voiceAnswer, setVoiceAnswer] = useState<string>('');
+  const [audioUrl, setAudioUrl] = useState<string>('');
+  const { toast } = useToast();
+
+  const voiceQAMutation = useMutation<VoiceQAResponse, Error, string>({
+    mutationFn: async (question: string) => {
+      const context = normalizedCard.type === 'mcq' && normalizedCard.prompt 
+        ? normalizedCard.prompt 
+        : normalizedCard.front || '';
+      
+      const response = await apiRequest("POST", "/api/voice-qa", {
+        question,
+        context: context + (normalizedCard.rationale ? ' Explanation: ' + normalizedCard.rationale : '')
+      });
+      return response as unknown as VoiceQAResponse;
+    },
+    onSuccess: (response: VoiceQAResponse) => {
+      setVoiceAnswer(response.answer);
+      if (response.audioUrl) {
+        setAudioUrl(response.audioUrl);
+        // Auto-play the audio
+        const audio = new Audio(response.audioUrl);
+        audio.play().catch(console.error);
+      }
+    },
+    onError: (error) => {
+      toast({
+        title: "Voice Q&A Error",
+        description: error instanceof Error ? error.message : "Failed to get voice answer",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleVoiceQA = () => {
+    const question = normalizedCard.type === 'mcq' && normalizedCard.prompt 
+      ? `Explain this insurance concept: ${normalizedCard.prompt}` 
+      : `Please explain: ${normalizedCard.front}`;
+    
+    voiceQAMutation.mutate(question);
+  };
+
+  const playAudio = () => {
+    if (audioUrl) {
+      const audio = new Audio(audioUrl);
+      audio.play().catch(console.error);
+    }
+  };
 
   // Normalize legacy MCQ cards on-the-fly
   const normalizedCard = useMemo(() => {
@@ -302,49 +359,137 @@ export default function FlashCard({ card, onReview, cardNumber, totalCards }: Fl
             </CardContent>
           </Card>
         )}
+
+        {/* Voice Q&A Section */}
+        <Card className="glassmorphism border-border bg-gradient-to-br from-accent/10 to-accent/5">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="font-semibold text-accent flex items-center space-x-2">
+                <Mic className="w-4 h-4" />
+                <span>Voice Q&A</span>
+              </h4>
+              <div className="flex items-center space-x-2">
+                <Button
+                  onClick={handleVoiceQA}
+                  disabled={voiceQAMutation.isPending}
+                  size="sm"
+                  className="bg-accent/20 hover:bg-accent/30 text-accent border-accent/30"
+                  data-testid="button-voice-qa"
+                >
+                  <Mic className="w-4 h-4 mr-2" />
+                  {voiceQAMutation.isPending ? 'Processing...' : 'Ask AI'}
+                </Button>
+                {audioUrl && (
+                  <Button
+                    onClick={playAudio}
+                    size="sm"
+                    variant="outline"
+                    className="border-accent/30 text-accent"
+                    data-testid="button-play-audio"
+                  >
+                    <Volume2 className="w-4 h-4" />
+                  </Button>
+                )}
+              </div>
+            </div>
+            
+            {voiceAnswer && (
+              <div className="bg-background/50 rounded-lg p-4">
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  {voiceAnswer}
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     );
   };
 
   // Legacy Term/Cloze Renderer
   const renderLegacyCard = () => (
-    <Card 
-      className={`glassmorphism border-border cursor-pointer flashcard ${isFlipped ? 'flipped' : ''} bg-gradient-to-br from-card/80 to-card/60`}
-      onClick={handleFlip}
-      data-testid="flashcard"
-    >
-      <CardContent className="p-8 h-64 relative">
-        <div className="flashcard-inner relative w-full h-full">
-          {/* Front of card */}
-          <div className="flashcard-front absolute inset-0 flex items-center justify-center text-center">
-            <div>
-              <div className="mb-4">
-                <Badge variant="outline" className="mb-2 bg-primary/10 border-primary/20 text-primary">
-                  {card.type.toUpperCase()}
-                </Badge>
+    <div className="space-y-8">
+      <Card 
+        className={`glassmorphism border-border cursor-pointer flashcard ${isFlipped ? 'flipped' : ''} bg-gradient-to-br from-card/80 to-card/60`}
+        onClick={handleFlip}
+        data-testid="flashcard"
+      >
+        <CardContent className="p-8 h-64 relative">
+          <div className="flashcard-inner relative w-full h-full">
+            {/* Front of card */}
+            <div className="flashcard-front absolute inset-0 flex items-center justify-center text-center">
+              <div>
+                <div className="mb-4">
+                  <Badge variant="outline" className="mb-2 bg-primary/10 border-primary/20 text-primary">
+                    {card.type.toUpperCase()}
+                  </Badge>
+                </div>
+                <h3 className="cinzel text-xl font-bold mb-4">{card.front}</h3>
+                {!isFlipped && (
+                  <p className="text-sm text-muted-foreground">Click to reveal answer</p>
+                )}
               </div>
-              <h3 className="cinzel text-xl font-bold mb-4">{card.front}</h3>
-              {!isFlipped && (
-                <p className="text-sm text-muted-foreground">Click to reveal answer</p>
+            </div>
+            
+            {/* Back of card */}
+            <div className="flashcard-back absolute inset-0 flex items-center justify-center text-center">
+              <div>
+                <h3 className="cinzel text-xl font-bold mb-4 text-primary">{card.back}</h3>
+                {normalizedCard.sourceId && (
+                  <div className="inline-flex items-center space-x-2 text-xs bg-card px-3 py-2 rounded-lg">
+                    <Book className="w-3 h-3 text-secondary" />
+                    <span>Source: Lesson Content</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Voice Q&A Section for Legacy Cards */}
+      <Card className="glassmorphism border-border bg-gradient-to-br from-accent/10 to-accent/5">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h4 className="font-semibold text-accent flex items-center space-x-2">
+              <Mic className="w-4 h-4" />
+              <span>Voice Q&A</span>
+            </h4>
+            <div className="flex items-center space-x-2">
+              <Button
+                onClick={handleVoiceQA}
+                disabled={voiceQAMutation.isPending}
+                size="sm"
+                className="bg-accent/20 hover:bg-accent/30 text-accent border-accent/30"
+                data-testid="button-voice-qa"
+              >
+                <Mic className="w-4 h-4 mr-2" />
+                {voiceQAMutation.isPending ? 'Processing...' : 'Ask AI'}
+              </Button>
+              {audioUrl && (
+                <Button
+                  onClick={playAudio}
+                  size="sm"
+                  variant="outline"
+                  className="border-accent/30 text-accent"
+                  data-testid="button-play-audio"
+                >
+                  <Volume2 className="w-4 h-4" />
+                </Button>
               )}
             </div>
           </div>
           
-          {/* Back of card */}
-          <div className="flashcard-back absolute inset-0 flex items-center justify-center text-center">
-            <div>
-              <h3 className="cinzel text-xl font-bold mb-4 text-primary">{card.back}</h3>
-              {normalizedCard.sourceId && (
-                <div className="inline-flex items-center space-x-2 text-xs bg-card px-3 py-2 rounded-lg">
-                  <Book className="w-3 h-3 text-secondary" />
-                  <span>Source: Lesson Content</span>
-                </div>
-              )}
+          {voiceAnswer && (
+            <div className="bg-background/50 rounded-lg p-4">
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {voiceAnswer}
+              </p>
             </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 
   return (

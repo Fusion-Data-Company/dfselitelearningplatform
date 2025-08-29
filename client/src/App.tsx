@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import Landing from "@/pages/landing";
 import Dashboard from "@/pages/dashboard";
 import LessonPage from "@/pages/lesson";
+import TrackPage from "@/pages/track";
 import QuizPage from "@/pages/quiz";
 import ExamPage from "@/pages/exam";
 import IFlashPage from "@/pages/iflash";
@@ -32,6 +33,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Dashboard} />
+      <Route path="/track/:trackId" component={TrackPage} />
       <Route path="/lesson/:slug" component={LessonPage} />
       <Route path="/quiz/:bankId?" component={QuizPage} />
       <Route path="/exam/:bankId?" component={ExamPage} />

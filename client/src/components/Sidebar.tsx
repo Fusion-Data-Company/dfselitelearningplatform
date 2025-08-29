@@ -92,19 +92,23 @@ export default function Sidebar() {
               const color = colors[index % 3];
               
               return (
-                <div key={track.id} className={`p-5 education-card border ${color.border} transition-all duration-300 group`}>
-                  <div className="flex justify-between items-center mb-4">
-                    <span className={`text-sm font-bold text-foreground geist ${color.text} transition-colors line-clamp-1`}>
-                      {track.title.length > 20 ? track.title.substring(0, 20) + '...' : track.title}
+                <div key={track.id} className={`p-4 education-card border ${color.border} transition-all duration-300 group cursor-pointer hover:shadow-lg`}>
+                  <div className="flex justify-between items-center mb-3">
+                    <span className="text-xs font-bold text-white bg-black/70 px-2 py-1 rounded transition-colors">
+                      {track.title.length > 15 ? track.title.substring(0, 15) + '...' : track.title}
                     </span>
-                    <Badge className={`elite-badge bg-gradient-to-r ${color.badge} text-xs font-semibold`}>
+                    <Badge className="bg-white/90 text-black text-xs font-bold border-0">
                       {track.progress}%
                     </Badge>
                   </div>
-                  <div className="w-full bg-muted/40 rounded-full h-3 relative overflow-hidden shadow-inner">
-                    <div className={`${color.progress} h-3 rounded-full transition-all duration-500 relative overflow-hidden`} style={{ width: `${track.progress}%` }}>
-                      <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
-                    </div>
+                  <div className="w-full bg-gray-300 rounded-full h-2 relative overflow-hidden">
+                    <div 
+                      className="bg-gradient-to-r from-cyan-400 to-cyan-600 h-2 rounded-full transition-all duration-500" 
+                      style={{ width: `${track.progress}%` }}
+                    />
+                  </div>
+                  <div className="mt-2 text-xs text-white bg-black/50 px-2 py-1 rounded">
+                    {track.completedLessons}/{track.totalLessons} lessons
                   </div>
                 </div>
               );
