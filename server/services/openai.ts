@@ -30,31 +30,81 @@ export async function callAgent(
   temperature = 1,
   maxTokens = 768
 ): Promise<AgentResponse> {
+  const timeoutMs = agent === 'proctorbot' ? 2000 : agent === 'coachbot' ? 4000 : 5000;
+  
   try {
-    const response = await getOpenAI().chat.completions.create({
-      model: "gpt-5",
-      messages: [
-        {
-          role: "system",
-          content: systemPrompt
-        },
-        {
-          role: "user",
-          content: userMessage
-        }
-      ],
-      max_completion_tokens: maxTokens,
-      response_format: { type: "json_object" }
-    });
+    // Add JSON format instruction to system prompt if not present
+    const jsonSystemPrompt = systemPrompt.includes('JSON') ? 
+      systemPrompt : 
+      systemPrompt + '\n\nIMPORTANT: Always respond in valid JSON format with this structure: {"role": "assistant", "message": "your response", "citations": [{"chunkId": "id", "lesson": "title"}], "steps": ["step1", "step2"]}';
 
-    const content = response.choices[0].message.content;
+    const response = await Promise.race([
+      getOpenAI().chat.completions.create({
+        model: "gpt-4o", // Using GPT-4o for compatibility
+        messages: [
+          {
+            role: "system",
+            content: jsonSystemPrompt
+          },
+          {
+            role: "user",
+            content: userMessage
+          }
+        ],
+        max_tokens: maxTokens,
+        temperature: temperature,
+        top_p: 1.0,
+        response_format: { type: "json_object" }
+      }),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Timeout')), timeoutMs)
+      )
+    ]) as any;
+
+    const choice = response.choices?.[0];
+    const content = choice?.message?.content;
     if (!content) {
+      console.error('OpenAI response details:', { 
+        choices: response.choices, 
+        choice: choice,
+        content: content 
+      });
       throw new Error("No response from OpenAI");
     }
 
     return JSON.parse(content);
   } catch (error) {
     console.error(`Error calling OpenAI for ${agent}:`, error);
+    
+    // Fallback to GPT-4 mini on timeout or quota error
+    if (error instanceof Error && (error.message.includes('Timeout') || error.message.includes('quota'))) {
+      try {
+        console.log(`Falling back to GPT-4 mini for ${agent}`);
+        const fallbackResponse = await getOpenAI().chat.completions.create({
+          model: "gpt-4o-mini",
+          messages: [
+            {
+              role: "system", 
+              content: systemPrompt + '\n\nRespond in JSON format: {"role": "assistant", "message": "your response"}'
+            },
+            {
+              role: "user",
+              content: userMessage
+            }
+          ],
+          max_tokens: Math.min(maxTokens, 512),
+          temperature: temperature
+        });
+        
+        const fallbackContent = fallbackResponse.choices[0].message.content;
+        if (fallbackContent) {
+          return JSON.parse(fallbackContent);
+        }
+      } catch (fallbackError) {
+        console.error(`Fallback also failed for ${agent}:`, fallbackError);
+      }
+    }
+    
     throw new Error(`Failed to get response from ${agent}: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }

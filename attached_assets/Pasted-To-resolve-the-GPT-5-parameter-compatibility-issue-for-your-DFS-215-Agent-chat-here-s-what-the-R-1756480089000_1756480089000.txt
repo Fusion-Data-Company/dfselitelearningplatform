@@ -1,0 +1,67 @@
+To resolve the ⚠️ GPT-5 parameter compatibility issue for your DFS-215 Agent chat, here’s what the Replit builder needs to implement:
+
+⸻
+
+Compatibility Fix Blueprint
+
+1. LLM Wiring
+	•	Model Target: gpt-5 (explicit in OpenRouter / OpenAI endpoints).
+	•	Params to enforce:
+	•	temperature (CoachBot 0.2, StudyBuddy 0.35, ProctorBot 0.0)
+	•	max_tokens (CoachBot 768, StudyBuddy 700, ProctorBot 320)
+	•	top_p = 1.0
+	•	Validation: All agents respond; ProctorBot never exceeds 320 tokens.
+
+⸻
+
+2. MCP Protocol Alignment
+	•	Transport: JSON-RPC 2.0 over SSE/WebSocket.
+	•	Tools exposed: get_context, retrieve_content, iflash_generate, log_event.
+	•	Auth: Require MCP_SERVER_SECRET header; reject otherwise.
+
+Validation: Curl test with/without secret; unauthorized → 401.
+
+⸻
+
+3. Response Contract Enforcement
+	•	CoachBot & StudyBuddy: Must include citations[{chunkId, lesson}] in every instructional output.
+	•	ProctorBot: Phase = pre|during|post; exam mode disables content help.
+	•	Schema enforcement: Validate JSON against Zod before returning.
+
+Validation: Run sample HMO balance billing query; check citations exist.
+
+⸻
+
+4. Token Budgets & Speed
+	•	CoachBot median response: ≤ 4s, ≤ 768 tokens.
+	•	StudyBuddy median response: ≤ 5s, ≤ 700 tokens.
+	•	ProctorBot median response: ≤ 2s, ≤ 320 tokens.
+
+Validation: Measure P50/P95 latencies; set timeout guards.
+
+⸻
+
+5. Error Handling
+	•	On GPT-5 timeout: fall back to gpt-4.1-mini.
+	•	On quota error: return MCP event {error:'LLM quota exceeded'} with remediation CTA.
+
+Validation: Simulate quota cap; fallback triggers.
+
+⸻
+
+Builder “DO / DON’T” Checklist
+
+DO
+	•	Wire all agents to GPT-5 by default.
+	•	Enforce JSON-RPC contracts with citations in responses.
+	•	Respect token limits per agent.
+	•	Require MCP_SERVER_SECRET for tool access.
+
+DON’T
+	•	Don’t allow ProctorBot to produce exam content answers.
+	•	Don’t skip citations in teaching bots.
+	•	Don’t exceed token caps (CoachBot 768, StudyBuddy 700, ProctorBot 320).
+
+⸻
+
+👉 Do you want me to draft the exact Replit builder patch prompt (cut-paste ready) so it can hot-fix the GPT-5 wiring and JSON-RPC contracts in one shot?

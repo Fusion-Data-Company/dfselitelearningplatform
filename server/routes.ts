@@ -97,8 +97,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // MCP/Agent routes
-  app.post('/api/mcp/get-context', async (req: any, res) => {
+  // MCP/Agent routes with authentication
+  const mcpAuth = (req: any, res: any, next: any) => {
+    const mcpSecret = req.headers['mcp-server-secret'];
+    const expectedSecret = process.env.MCP_SERVER_SECRET || 'dev-secret-key';
+    
+    if (!mcpSecret || mcpSecret !== expectedSecret) {
+      return res.status(401).json({ error: 'Unauthorized: MCP_SERVER_SECRET required' });
+    }
+    next();
+  };
+
+  app.post('/api/mcp/get-context', mcpAuth, async (req: any, res) => {
     try {
       const { viewId } = req.body;
       const context = await mcpServer.getContext(viewId);
@@ -109,7 +119,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/mcp/retrieve-content', async (req: any, res) => {
+  app.post('/api/mcp/retrieve-content', mcpAuth, async (req: any, res) => {
     try {
       const { query, ids, k } = req.body;
       const result = await mcpServer.retrieveContent({ query, ids, k });
