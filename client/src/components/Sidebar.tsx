@@ -27,6 +27,25 @@ interface CourseProgress {
 }
 
 export default function Sidebar() {
+  // Helper function to get color hex values for glows
+  const getColorForGlow = (colorClass: string): string => {
+    const colorMap: { [key: string]: string } = {
+      'text-primary': '#6366f1',
+      'text-secondary': '#f59e0b', 
+      'text-accent': '#10b981',
+      'text-destructive': '#ef4444',
+      'text-chart-2': '#8b5cf6',
+      'text-chart-3': '#06b6d4',
+      'text-chart-4': '#f97316',
+      'text-chart-5': '#84cc16'
+    };
+    return colorMap[colorClass] || '#6366f1';
+  };
+
+  const getColorForIndex = (index: number): string => {
+    const colors = ['text-primary', 'text-secondary', 'text-accent'];
+    return colors[index % 3];
+  };
   const [location] = useLocation();
   
   const { data: courseProgress } = useQuery<CourseProgress>({
@@ -62,12 +81,29 @@ export default function Sidebar() {
                 <Link key={item.href} href={item.href}>
                   <Button
                     variant="ghost"
-                    className={`sidebar-nav w-full justify-start h-auto p-4 geist font-medium ${
-                      isActive ? 'bg-gradient-to-r from-primary/20 to-secondary/15 text-primary border border-primary/30 shadow-lg' : 'hover:bg-gradient-to-r hover:from-primary/10 hover:to-secondary/8'
+                    className={`sidebar-nav w-full justify-start h-auto p-4 geist font-medium relative group ${
+                      isActive 
+                        ? 'bg-gradient-to-r from-primary/20 to-secondary/15 text-primary border border-primary/30 shadow-lg shadow-primary/20' 
+                        : 'hover:bg-gradient-to-r hover:from-primary/10 hover:to-secondary/8 hover:shadow-md hover:shadow-primary/10'
                     }`}
                     data-testid={`nav-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
+                    style={{
+                      boxShadow: isActive 
+                        ? `0 0 20px ${getColorForGlow(item.color)}20, 0 0 40px ${getColorForGlow(item.color)}10`
+                        : undefined
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isActive) {
+                        e.currentTarget.style.boxShadow = `0 0 15px ${getColorForGlow(item.color)}15, 0 0 30px ${getColorForGlow(item.color)}08`;
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isActive) {
+                        e.currentTarget.style.boxShadow = '';
+                      }
+                    }}
                   >
-                    <Icon className={`w-5 h-5 mr-4 ${isActive ? 'text-primary animate-pulse' : item.color} transition-all duration-300`} />
+                    <Icon className={`w-5 h-5 mr-4 ${isActive ? 'text-primary animate-pulse' : item.color} transition-all duration-300 drop-shadow-lg`} />
                     <span className="text-sm">{item.label}</span>
                     {isActive && <ChevronRight className="w-4 h-4 ml-auto text-primary animate-pulse" />}
                   </Button>
@@ -92,7 +128,21 @@ export default function Sidebar() {
               const color = colors[index % 3];
               
               return (
-                <div key={track.id} className={`p-4 education-card border ${color.border} transition-all duration-300 group cursor-pointer hover:shadow-lg`}>
+                <div 
+                  key={track.id} 
+                  className={`p-4 education-card border ${color.border} transition-all duration-300 group cursor-pointer hover:shadow-lg`}
+                  style={{
+                    boxShadow: `0 0 15px ${getColorForGlow(getColorForIndex(index))}15, 0 0 25px ${getColorForGlow(getColorForIndex(index))}08`
+                  }}
+                  onMouseEnter={(e) => {
+                    const color = getColorForGlow(getColorForIndex(index));
+                    e.currentTarget.style.boxShadow = `0 0 20px ${color}25, 0 0 35px ${color}15`;
+                  }}
+                  onMouseLeave={(e) => {
+                    const color = getColorForGlow(getColorForIndex(index));
+                    e.currentTarget.style.boxShadow = `0 0 15px ${color}15, 0 0 25px ${color}08`;
+                  }}
+                >
                   <div className="flex justify-between items-center mb-3">
                     <span className="text-xs font-bold text-white bg-black/70 px-2 py-1 rounded transition-colors">
                       {track.title.length > 15 ? track.title.substring(0, 15) + '...' : track.title}
