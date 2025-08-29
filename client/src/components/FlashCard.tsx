@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -27,6 +27,86 @@ interface FlashCardProps {
 export default function FlashCard({ card, onReview, cardNumber, totalCards }: FlashCardProps) {
   const [isFlipped, setIsFlipped] = useState(false);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
+
+  // Normalize legacy MCQ cards on-the-fly
+  const normalizedCard = useMemo(() => {
+    if (card.type === 'mcq' && !card.options && card.front) {
+      // Apply normalizer logic for legacy MCQ format
+      try {
+        const text = card.front;
+        
+        // Try line-by-line format first: "Question:\nA) Option A\nB) Option B..."
+        const multilineMatches = text.match(/^(.*?)(?:\r?\n|\r)\s*[ABCD]\)/m);
+        
+        if (multilineMatches) {
+          // Line-by-line format
+          const lines = text.split(/\r?\n/).map(line => line.trim()).filter(line => line.length > 0);
+          const prompt = lines[0].replace(/:?\s*$/, ':');
+          
+          const options: string[] = [];
+          const optionRegex = /^([ABCD])\)\s*(.+)$/;
+          
+          for (let i = 1; i < lines.length; i++) {
+            const match = lines[i].match(optionRegex);
+            if (match) {
+              options.push(match[2].trim());
+            }
+          }
+          
+          if (options.length >= 2) {
+            let answerIndex: number | null = null;
+            if (card.back) {
+              const answerMatch = card.back.match(/(?:answer|correct)[\s:]*([ABCD])/i) || 
+                                 card.back.match(/\b([ABCD])\)/);
+              if (answerMatch) {
+                const letter = answerMatch[1].toUpperCase();
+                answerIndex = ['A', 'B', 'C', 'D'].indexOf(letter);
+              }
+            }
+            
+            return {
+              ...card,
+              prompt,
+              options,
+              answerIndex,
+              rationale: card.back || null
+            };
+          }
+        }
+        
+        // Fallback to inline format: "Question stem A) Option A B) Option B..."
+        const optionRegex = /\s*([ABCD])\)\s*([^A-D]*?)(?=\s*[ABCD]\)|$)/gi;
+        const matches = Array.from(text.matchAll(optionRegex));
+        
+        if (matches.length >= 2) {
+          const firstMatch = matches[0];
+          const prompt = text.substring(0, firstMatch.index || 0).trim().replace(/:?\s*$/, ':');
+          const options = matches.map(match => match[2].trim());
+          
+          let answerIndex: number | null = null;
+          if (card.back) {
+            const answerMatch = card.back.match(/(?:answer|correct)[\s:]*([ABCD])/i) || 
+                               card.back.match(/\b([ABCD])\)/);
+            if (answerMatch) {
+              const letter = answerMatch[1].toUpperCase();
+              answerIndex = ['A', 'B', 'C', 'D'].indexOf(letter);
+            }
+          }
+          
+          return {
+            ...card,
+            prompt,
+            options,
+            answerIndex,
+            rationale: card.back || null
+          };
+        }
+      } catch (error) {
+        console.error('Error normalizing MCQ:', error);
+      }
+    }
+    return card;
+  }, [card]);
 
   const handleFlip = () => {
     if (card.type === 'mcq' && card.options && !selectedOption !== null) {
@@ -63,7 +143,7 @@ export default function FlashCard({ card, onReview, cardNumber, totalCards }: Fl
 
   // MCQ Renderer
   const renderMCQCard = () => {
-    if (!card.options || !card.prompt) {
+    if (!normalizedCard.options || !normalizedCard.prompt) {
       // Fallback to legacy format
       return renderLegacyCard();
     }
@@ -80,14 +160,14 @@ export default function FlashCard({ card, onReview, cardNumber, totalCards }: Fl
               <Badge variant="outline" className="mb-4">
                 {card.type.toUpperCase()}
               </Badge>
-              <h3 className="cinzel text-xl font-bold mb-6">{card.prompt}</h3>
+              <h3 className="cinzel text-xl font-bold mb-6">{normalizedCard.prompt}</h3>
             </div>
 
             {/* Options */}
             <div className="space-y-3">
-              {card.options.map((option, index) => {
+              {normalizedCard.options!.map((option, index) => {
                 const isSelected = selectedOption === index;
-                const isCorrect = card.answerIndex === index;
+                const isCorrect = normalizedCard.answerIndex === index;
                 const showResult = isFlipped;
                 
                 let buttonClass = "w-full text-left p-4 transition-all duration-200 ";
@@ -129,15 +209,15 @@ export default function FlashCard({ card, onReview, cardNumber, totalCards }: Fl
             </div>
 
             {/* Rationale (shown after selection) */}
-            {isFlipped && card.rationale && (
+            {isFlipped && normalizedCard.rationale && (
               <div className="mt-6 p-4 bg-muted/50 rounded-lg border">
                 <h4 className="font-semibold mb-2 text-primary">Explanation:</h4>
-                <p className="text-sm">{card.rationale}</p>
+                <p className="text-sm">{normalizedCard.rationale}</p>
               </div>
             )}
 
             {/* Source info */}
-            {card.sourceId && (
+            {normalizedCard.sourceId && (
               <div className="flex justify-center">
                 <div className="inline-flex items-center space-x-2 text-xs bg-card px-3 py-2 rounded-lg">
                   <Book className="w-3 h-3 text-secondary" />
@@ -204,7 +284,7 @@ export default function FlashCard({ card, onReview, cardNumber, totalCards }: Fl
       </div>
 
       {/* Flashcard - MCQ or Legacy */}
-      {card.type === 'mcq' && card.options ? renderMCQCard() : renderLegacyCard()}
+      {normalizedCard.type === 'mcq' && normalizedCard.options ? renderMCQCard() : renderLegacyCard()}
 
       {/* Card Stats */}
       <div className="flex items-center justify-between text-sm text-muted-foreground glassmorphism p-4 rounded-xl">
@@ -212,7 +292,7 @@ export default function FlashCard({ card, onReview, cardNumber, totalCards }: Fl
           <p>Ease Factor: {card.difficulty.toFixed(1)}</p>
           <p>Current Interval: {card.interval} days</p>
         </div>
-        {card.type !== 'mcq' && (
+        {normalizedCard.type !== 'mcq' && (
           <Button
             variant="ghost"
             size="sm"
