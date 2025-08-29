@@ -173,7 +173,7 @@ export default function Sidebar() {
                     className={`sidebar-nav w-full justify-start h-auto p-4 geist font-medium relative group overflow-hidden transition-all duration-300 border backdrop-blur-md ${
                       isActive 
                         ? `bg-gradient-to-r ${colorScheme.activeGradient} ${colorScheme.textColor} ${colorScheme.borderColor} shadow-lg before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/8 before:to-transparent before:translate-x-[-100%] before:animate-[shimmer_2s_ease-in-out_infinite]` 
-                        : `hover:bg-gradient-to-r hover:${colorScheme.hoverGradient} hover:shadow-md hover:backdrop-blur-sm border-border/20 hover:${colorScheme.borderColor}`
+                        : `border-border/20`
                     }`}
                     data-testid={`nav-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
                     style={{
@@ -222,7 +222,7 @@ export default function Sidebar() {
                           }
                         }}
                       />
-                      <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      {/* Removed overlay that blocks individual color glows */}
                     </div>
                     <div className="flex-1 min-w-0">
                       <span className={`text-base font-medium leading-tight ${isActive ? colorScheme.textColor : 'text-foreground group-hover:text-foreground/90'} transition-colors duration-300 block`}>
