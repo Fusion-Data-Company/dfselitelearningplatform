@@ -1,0 +1,430 @@
+{
+  "tracks": [
+    {
+      "title": "Law & Ethics",
+      "description": "Professional responsibility, misappropriation, fiduciary duties, and 4-hour CE compliance",
+      "orderIndex": 1,
+      "ceHours": 4,
+      "isActive": true,
+      "modules": [
+        {
+          "title": "Professional Responsibility",
+          "description": "Agent duties, fiduciary obligations, ethical standards",
+          "orderIndex": 1,
+          "lessons": [
+            {
+              "title": "Fiduciary Duties and Client Relations",
+              "slug": "fiduciary-duties-client-relations",
+              "objectives": [
+                "Define the fiduciary relationship between agent and client",
+                "Identify situations requiring disclosure of conflicts of interest",
+                "Explain the duty of care and loyalty requirements"
+              ],
+              "orderIndex": 1,
+              "duration": 45,
+              "ceHours": 0.75
+            },
+            {
+              "title": "Professional Ethics in Insurance Sales",
+              "slug": "professional-ethics-sales",
+              "objectives": [
+                "Apply ethical principles to insurance sales scenarios",
+                "Recognize improper sales practices and their consequences",
+                "Demonstrate appropriate client communication techniques"
+              ],
+              "orderIndex": 2,
+              "duration": 60,
+              "ceHours": 1.0
+            }
+          ]
+        },
+        {
+          "title": "Misappropriation & Penalties",
+          "description": "Premium handling, trust accounts, criminal penalties",
+          "orderIndex": 2,
+          "lessons": [
+            {
+              "title": "Premium Fund Handling Requirements",
+              "slug": "premium-fund-handling",
+              "objectives": [
+                "Explain proper procedures for handling client premiums",
+                "Identify trust account requirements and regulations",
+                "Describe consequences of misappropriation"
+              ],
+              "orderIndex": 1,
+              "duration": 45,
+              "ceHours": 0.75
+            },
+            {
+              "title": "Criminal and Civil Penalties",
+              "slug": "criminal-civil-penalties",
+              "objectives": [
+                "Distinguish between criminal and civil violations",
+                "Explain felony charges for misappropriation",
+                "Identify restitution and penalty requirements"
+              ],
+              "orderIndex": 2,
+              "duration": 30,
+              "ceHours": 0.5
+            }
+          ]
+        },
+        {
+          "title": "Continuing Education Compliance",
+          "description": "CE requirements, record keeping, audit procedures",
+          "orderIndex": 3,
+          "lessons": [
+            {
+              "title": "Florida CE Requirements",
+              "slug": "florida-ce-requirements",
+              "objectives": [
+                "Specify required CE hours for license renewal",
+                "Identify approved CE providers and courses",
+                "Explain consequences of non-compliance"
+              ],
+              "orderIndex": 1,
+              "duration": 30,
+              "ceHours": 0.5
+            },
+            {
+              "title": "Record Keeping and Audit Procedures",
+              "slug": "record-keeping-audit",
+              "objectives": [
+                "Describe proper CE record maintenance",
+                "Explain audit procedures and requirements",
+                "Identify acceptable documentation formats"
+              ],
+              "orderIndex": 2,
+              "duration": 30,
+              "ceHours": 0.5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Health Insurance & Managed Care",
+      "description": "HMO/PPO/EPO/POS models, balance billing, buyer's guide analysis",
+      "orderIndex": 2,
+      "ceHours": 0,
+      "isActive": true,
+      "modules": [
+        {
+          "title": "Traditional vs Managed Care",
+          "description": "Fee-for-service vs managed care fundamentals",
+          "orderIndex": 1,
+          "lessons": [
+            {
+              "title": "Evolution of Health Insurance Models",
+              "slug": "evolution-health-insurance",
+              "objectives": [
+                "Compare traditional indemnity plans with managed care",
+                "Explain cost control mechanisms in managed care",
+                "Identify key stakeholders in each model"
+              ],
+              "orderIndex": 1,
+              "duration": 30,
+              "ceHours": 0
+            }
+          ]
+        },
+        {
+          "title": "HMO/PPO/EPO/POS Models",
+          "description": "Network structures, referral requirements, cost-sharing",
+          "orderIndex": 2,
+          "lessons": [
+            {
+              "title": "HMO Balance Billing Restrictions",
+              "slug": "hmo-balance-billing",
+              "objectives": [
+                "Explain why balance billing is prohibited for HMO in-network providers",
+                "Identify the pre-negotiated rate structure in managed care networks",
+                "Describe PCP referral requirements and cost-sharing implications"
+              ],
+              "orderIndex": 1,
+              "duration": 45,
+              "ceHours": 0,
+              "content": "# HMO Balance Billing Restrictions\n\n## Learning Objectives\n- Explain why balance billing is prohibited for HMO in-network providers\n- Identify the pre-negotiated rate structure in managed care networks\n- Describe PCP referral requirements and cost-sharing implications\n\n## Key Concept: Balance Billing Restrictions\n\nIn Health Maintenance Organizations (HMOs), network providers are contractually prohibited from balance billing subscribers. This restriction is fundamental to the managed care model and directly impacts both provider compensation and subscriber cost exposure.\n\n**Balance Billing:** The practice of billing a patient for the difference between the provider's charged amount and the amount paid by the insurance plan. This practice is prohibited for in-network HMO providers.\n\nHMO providers agree to accept the plan's pre-negotiated rates as payment in full for covered services. Subscribers are only responsible for their designated cost-sharing amounts (copayments, coinsurance, or deductibles) as specified in their benefit structure.\n\n## Primary Care Physician (PCP) Role\n\nThe PCP serves as the gatekeeper in the HMO model, coordinating care and managing referrals to specialists. This systematic approach helps control costs while ensuring appropriate utilization of healthcare services."
+            },
+            {
+              "title": "PPO Network Flexibility",
+              "slug": "ppo-network-flexibility",
+              "objectives": [
+                "Compare in-network vs out-of-network benefits in PPOs",
+                "Explain balance billing possibilities with out-of-network providers",
+                "Calculate cost-sharing differences between network tiers"
+              ],
+              "orderIndex": 2,
+              "duration": 45,
+              "ceHours": 0
+            },
+            {
+              "title": "EPO and POS Hybrid Models",
+              "slug": "epo-pos-hybrid-models",
+              "objectives": [
+                "Distinguish EPO features from HMO and PPO models",
+                "Explain POS plan referral and out-of-network options",
+                "Compare cost-sharing structures across all managed care types"
+              ],
+              "orderIndex": 3,
+              "duration": 45,
+              "ceHours": 0
+            }
+          ]
+        },
+        {
+          "title": "Buyer's Guide Analysis",
+          "description": "Policy comparison tools, disclosure requirements",
+          "orderIndex": 3,
+          "lessons": [
+            {
+              "title": "Health Insurance Buyer's Guide Requirements",
+              "slug": "health-buyers-guide",
+              "objectives": [
+                "Identify mandatory buyer's guide disclosure elements",
+                "Explain comparative analysis requirements",
+                "Describe agent responsibilities for buyer's guide delivery"
+              ],
+              "orderIndex": 1,
+              "duration": 30,
+              "ceHours": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Social Insurance (OASDI)",
+      "description": "OASDI elimination period, Medicare A/B/C/D, dual eligibility",
+      "orderIndex": 3,
+      "ceHours": 0,
+      "isActive": true,
+      "modules": [
+        {
+          "title": "OASDI Overview",
+          "description": "Social Security disability benefits, eligibility",
+          "orderIndex": 1,
+          "lessons": [
+            {
+              "title": "OASDI Elimination Period Requirements",
+              "slug": "oasdi-elimination-period",
+              "objectives": [
+                "Specify the 5-month OASDI elimination period",
+                "Explain elimination period calculation methods",
+                "Identify when elimination periods begin and end"
+              ],
+              "orderIndex": 1,
+              "duration": 30,
+              "ceHours": 0
+            },
+            {
+              "title": "OASDI Eligibility and Benefits",
+              "slug": "oasdi-eligibility-benefits",
+              "objectives": [
+                "Determine OASDI eligibility requirements",
+                "Calculate benefit amounts based on earnings history",
+                "Explain family benefit provisions"
+              ],
+              "orderIndex": 2,
+              "duration": 45,
+              "ceHours": 0
+            }
+          ]
+        },
+        {
+          "title": "Medicare Parts A/B/C/D",
+          "description": "Medicare coverage options, supplements, advantages",
+          "orderIndex": 2,
+          "lessons": [
+            {
+              "title": "Medicare Part A Hospital Coverage",
+              "slug": "medicare-part-a",
+              "objectives": [
+                "Explain Medicare Part A automatic enrollment",
+                "Describe hospital and skilled nursing coverage",
+                "Calculate Part A deductibles and coinsurance"
+              ],
+              "orderIndex": 1,
+              "duration": 30,
+              "ceHours": 0
+            },
+            {
+              "title": "Medicare Part B Medical Coverage",
+              "slug": "medicare-part-b",
+              "objectives": [
+                "Identify Part B covered services and exclusions",
+                "Explain Part B premium and deductible structure",
+                "Describe enrollment periods and late penalties"
+              ],
+              "orderIndex": 2,
+              "duration": 30,
+              "ceHours": 0
+            },
+            {
+              "title": "Medicare Advantage and Part D",
+              "slug": "medicare-advantage-part-d",
+              "objectives": [
+                "Compare Medicare Advantage to traditional Medicare",
+                "Explain Part D prescription drug coverage",
+                "Identify enrollment rules and special circumstances"
+              ],
+              "orderIndex": 3,
+              "duration": 45,
+              "ceHours": 0
+            }
+          ]
+        },
+        {
+          "title": "Dual Eligibility & Medicaid",
+          "description": "Medicare-Medicaid coordination, special needs plans",
+          "orderIndex": 3,
+          "lessons": [
+            {
+              "title": "Dual Eligible Special Needs Plans",
+              "slug": "dual-eligible-snp",
+              "objectives": [
+                "Define dual eligibility for Medicare and Medicaid",
+                "Explain D-SNP coordination of benefits",
+                "Identify enrollment and disenrollment rules"
+              ],
+              "orderIndex": 1,
+              "duration": 30,
+              "ceHours": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Disability Income Insurance",
+      "description": "Individual and group disability, elimination periods, benefit structures",
+      "orderIndex": 4,
+      "ceHours": 0,
+      "isActive": true,
+      "modules": [
+        {
+          "title": "Individual Disability Income",
+          "description": "Personal DI coverage, definitions, benefits",
+          "orderIndex": 1,
+          "lessons": [
+            {
+              "title": "Disability Definitions and Classifications",
+              "slug": "disability-definitions",
+              "objectives": [
+                "Compare own occupation vs any occupation definitions",
+                "Explain partial and residual disability benefits",
+                "Identify elimination period options and impacts"
+              ],
+              "orderIndex": 1,
+              "duration": 45,
+              "ceHours": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Life Insurance",
+      "description": "Term, whole life, universal life, riders, replacement regulations",
+      "orderIndex": 5,
+      "ceHours": 0,
+      "isActive": true,
+      "modules": [
+        {
+          "title": "Term Life Insurance",
+          "description": "Level term, decreasing term, renewable options",
+          "orderIndex": 1,
+          "lessons": [
+            {
+              "title": "Return of Premium Riders",
+              "slug": "return-premium-riders",
+              "objectives": [
+                "Explain ROP rider mechanics and testing treatment",
+                "Calculate increasing term equivalent coverage",
+                "Compare ROP costs with traditional term alternatives"
+              ],
+              "orderIndex": 1,
+              "duration": 30,
+              "ceHours": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Annuities & Variable Products",
+      "description": "Fixed and variable annuities, prospectus requirements, separate accounts",
+      "orderIndex": 6,
+      "ceHours": 0,
+      "isActive": true,
+      "modules": [
+        {
+          "title": "Variable Annuity Fundamentals",
+          "description": "Separate accounts, prospectus requirements, suitability",
+          "orderIndex": 1,
+          "lessons": [
+            {
+              "title": "Variable Annuity Prospectus Requirements",
+              "slug": "variable-annuity-prospectus",
+              "objectives": [
+                "Identify mandatory prospectus delivery requirements",
+                "Explain separate account structure and management",
+                "Describe suitability determination processes"
+              ],
+              "orderIndex": 1,
+              "duration": 45,
+              "ceHours": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "FIGA/DFS/CFO",
+      "description": "Florida Insurance Guaranty Association, Department of Financial Services",
+      "orderIndex": 7,
+      "ceHours": 0,
+      "isActive": true,
+      "modules": [
+        {
+          "title": "FIGA Coverage and Exclusions",
+          "description": "Guaranty fund protections, coverage limits, exclusions",
+          "orderIndex": 1,
+          "lessons": [
+            {
+              "title": "FIGA Coverage Scope and Exclusions",
+              "slug": "figa-coverage-exclusions",
+              "objectives": [
+                "Identify types of coverage protected by FIGA",
+                "Explain coverage limits and claim procedures",
+                "List major exclusions from FIGA protection"
+              ],
+              "orderIndex": 1,
+              "duration": 30,
+              "ceHours": 0
+            }
+          ]
+        },
+        {
+          "title": "DFS Regulatory Authority",
+          "description": "Department oversight, enforcement, compliance",
+          "orderIndex": 2,
+          "lessons": [
+            {
+              "title": "DFS Enforcement Powers",
+              "slug": "dfs-enforcement-powers",
+              "objectives": [
+                "Explain DFS regulatory authority over insurers",
+                "Identify enforcement actions and penalties",
+                "Describe compliance monitoring procedures"
+              ],
+              "orderIndex": 1,
+              "duration": 30,
+              "ceHours": 0
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

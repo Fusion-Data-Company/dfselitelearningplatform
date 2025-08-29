@@ -1,0 +1,211 @@
+{
+  "banks": [
+    {
+      "title": "DFS-215 Pre-Licensing Master Quiz",
+      "description": "Comprehensive 50-question exam covering all DFS-215 curriculum topics",
+      "topics": ["Law & Ethics", "Health Insurance", "Disability Income", "Social Insurance", "Life Insurance", "Annuities", "FIGA/DFS"],
+      "blueprint": {
+        "topicCounts": {
+          "Law & Ethics": 8,
+          "Health Insurance": 12,
+          "Disability Income": 6,
+          "Social Insurance": 8,
+          "Life Insurance": 10,
+          "Annuities": 4,
+          "FIGA/DFS": 2
+        },
+        "difficultyDistribution": {
+          "easy": 15,
+          "medium": 25,
+          "hard": 10
+        }
+      },
+      "timeLimitSec": 5400,
+      "attemptPolicy": "unlimited",
+      "shuffleQuestions": true
+    },
+    {
+      "title": "Law & Ethics - 4-Hour CE Unit",
+      "description": "Required continuing education unit covering professional responsibility and ethics",
+      "topics": ["Professional Responsibility", "Fiduciary Duties", "Misappropriation", "CE Compliance"],
+      "blueprint": {
+        "topicCounts": {
+          "Professional Responsibility": 8,
+          "Fiduciary Duties": 6,
+          "Misappropriation": 4,
+          "CE Compliance": 2
+        },
+        "difficultyDistribution": {
+          "easy": 6,
+          "medium": 10,
+          "hard": 4
+        }
+      },
+      "timeLimitSec": 3600,
+      "attemptPolicy": "unlimited",
+      "shuffleQuestions": true
+    },
+    {
+      "title": "Health Insurance & Managed Care",
+      "description": "Comprehensive quiz on HMO/PPO/EPO/POS models and buyer's guides",
+      "topics": ["HMO", "PPO", "EPO", "POS", "Balance Billing", "Buyer's Guide"],
+      "blueprint": {
+        "topicCounts": {
+          "HMO": 5,
+          "PPO": 4,
+          "EPO": 3,
+          "POS": 3,
+          "Balance Billing": 3,
+          "Buyer's Guide": 2
+        },
+        "difficultyDistribution": {
+          "easy": 6,
+          "medium": 10,
+          "hard": 4
+        }
+      },
+      "timeLimitSec": 2400,
+      "attemptPolicy": "unlimited",
+      "shuffleQuestions": true
+    },
+    {
+      "title": "Social Insurance (OASDI & Medicare)",
+      "description": "Coverage of OASDI elimination periods and Medicare A/B/C/D",
+      "topics": ["OASDI", "Medicare Part A", "Medicare Part B", "Medicare Part C", "Medicare Part D", "Dual Eligibility"],
+      "blueprint": {
+        "topicCounts": {
+          "OASDI": 5,
+          "Medicare Part A": 3,
+          "Medicare Part B": 3,
+          "Medicare Part C": 2,
+          "Medicare Part D": 2,
+          "Dual Eligibility": 3
+        },
+        "difficultyDistribution": {
+          "easy": 5,
+          "medium": 9,
+          "hard": 4
+        }
+      },
+      "timeLimitSec": 2160,
+      "attemptPolicy": "unlimited",
+      "shuffleQuestions": true
+    },
+    {
+      "title": "Life Insurance & Annuities",
+      "description": "Term, whole life, universal life, riders, and variable products",
+      "topics": ["Term Life", "Whole Life", "Universal Life", "Riders", "Fixed Annuities", "Variable Annuities"],
+      "blueprint": {
+        "topicCounts": {
+          "Term Life": 4,
+          "Whole Life": 4,
+          "Universal Life": 3,
+          "Riders": 3,
+          "Fixed Annuities": 3,
+          "Variable Annuities": 3
+        },
+        "difficultyDistribution": {
+          "easy": 6,
+          "medium": 10,
+          "hard": 4
+        }
+      },
+      "timeLimitSec": 2400,
+      "attemptPolicy": "unlimited",
+      "shuffleQuestions": true
+    },
+    {
+      "title": "FIGA & DFS Regulations",
+      "description": "Florida Insurance Guaranty Association and Department of Financial Services",
+      "topics": ["FIGA Coverage", "FIGA Exclusions", "DFS Oversight", "CFO Authority"],
+      "blueprint": {
+        "topicCounts": {
+          "FIGA Coverage": 4,
+          "FIGA Exclusions": 3,
+          "DFS Oversight": 3,
+          "CFO Authority": 2
+        },
+        "difficultyDistribution": {
+          "easy": 4,
+          "medium": 6,
+          "hard": 2
+        }
+      },
+      "timeLimitSec": 1440,
+      "attemptPolicy": "unlimited",
+      "shuffleQuestions": true
+    }
+  ],
+  "sampleQuestions": [
+    {
+      "type": "mcq",
+      "stem": "Under Florida insurance law, an agent who misappropriates premium funds intended for an insurance company faces which of the following consequences?",
+      "options": [
+        "Administrative penalty only, limited to license suspension",
+        "Felony charges with potential imprisonment and restitution requirements",
+        "Automatic license revocation with no possibility of reinstatement",
+        "Civil monetary penalty equal to twice the misappropriated amount"
+      ],
+      "answerKey": "B",
+      "explanation": "Misappropriation of premium funds is treated as a felony under Florida law, with criminal penalties including potential imprisonment and mandatory restitution to affected parties.",
+      "loTags": ["LE-MISAPP-PENALTY"],
+      "difficulty": "M",
+      "topic": "Law & Ethics"
+    },
+    {
+      "type": "mcq",
+      "stem": "In an HMO network, when a provider is prohibited from balance billing, this means:",
+      "options": [
+        "The provider cannot charge the patient anything beyond their copayment",
+        "The provider must accept the pre-negotiated rate as payment in full for covered services",
+        "The HMO pays 100% of all medical expenses with no patient responsibility",
+        "The provider can only bill the HMO and cannot bill the patient directly"
+      ],
+      "answerKey": "B",
+      "explanation": "Balance billing prohibition means HMO providers must accept the pre-negotiated rate as full payment for covered services, protecting subscribers from unexpected charges beyond their designated cost-sharing.",
+      "loTags": ["HC-HMO-BAL"],
+      "difficulty": "M",
+      "topic": "Health Insurance"
+    },
+    {
+      "type": "mcq",
+      "stem": "The OASDI elimination period for Social Security Disability benefits is:",
+      "options": [
+        "3 months from the date of application",
+        "5 months from the onset of disability",
+        "6 months from the date of medical evidence",
+        "12 months from the initial diagnosis"
+      ],
+      "answerKey": "B",
+      "explanation": "Social Security Disability Insurance (SSDI) has a mandatory 5-month elimination period calculated from the established onset date of the disabling condition.",
+      "loTags": ["SI-OASDI-ELIM5"],
+      "difficulty": "E",
+      "topic": "Social Insurance"
+    },
+    {
+      "type": "tf",
+      "stem": "FIGA coverage extends to all types of insurance policies issued by insolvent Florida insurers.",
+      "options": ["True", "False"],
+      "answerKey": "False",
+      "explanation": "FIGA has specific exclusions and does not cover all types of insurance. Notable exclusions include certain commercial lines, reinsurance, and policies above statutory limits.",
+      "loTags": ["FIGA-EXCL"],
+      "difficulty": "H",
+      "topic": "FIGA"
+    },
+    {
+      "type": "mcq",
+      "stem": "A Return of Premium (ROP) rider on a term life policy is functionally equivalent to:",
+      "options": [
+        "Decreasing term insurance with cash value",
+        "Increasing term insurance with premium return benefit",
+        "Whole life insurance with reduced face amount",
+        "Universal life insurance with flexible premiums"
+      ],
+      "answerKey": "B",
+      "explanation": "ROP riders are tested as increasing term insurance because the death benefit effectively increases each year by the amount of premiums returned, requiring additional coverage.",
+      "loTags": ["LIFE-ROP-RIDER"],
+      "difficulty": "H",
+      "topic": "Life Insurance"
+    }
+  ]
+}
