@@ -30,7 +30,16 @@ export default function FlashCard({ card, onReview, cardNumber, totalCards }: Fl
 
   // Normalize legacy MCQ cards on-the-fly
   const normalizedCard = useMemo(() => {
+    console.log('🔍 FlashCard Debug:', {
+      cardId: card.id,
+      type: card.type,
+      hasOptions: !!card.options,
+      hasFront: !!card.front,
+      front: card.front?.substring(0, 100) + '...'
+    });
+
     if (card.type === 'mcq' && !card.options && card.front) {
+      console.log('🔄 Attempting to normalize MCQ card:', card.front);
       try {
         const text = card.front;
         
@@ -62,13 +71,22 @@ export default function FlashCard({ card, onReview, cardNumber, totalCards }: Fl
               }
             }
             
-            return {
+            const normalized = {
               ...card,
               prompt,
               options,
               answerIndex,
               rationale: card.back || null
             };
+            
+            console.log('✅ MCQ Normalized (line-by-line):', {
+              prompt,
+              options,
+              answerIndex,
+              rationale: normalized.rationale
+            });
+            
+            return normalized;
           }
         }
         
@@ -91,18 +109,34 @@ export default function FlashCard({ card, onReview, cardNumber, totalCards }: Fl
             }
           }
           
-          return {
+          const normalized = {
             ...card,
             prompt,
             options,
             answerIndex,
             rationale: card.back || null
           };
+          
+          console.log('✅ MCQ Normalized (inline):', {
+            prompt,
+            options,
+            answerIndex,
+            rationale: normalized.rationale
+          });
+          
+          return normalized;
         }
       } catch (error) {
-        console.error('Error normalizing MCQ:', error);
+        console.error('❌ Error normalizing MCQ:', error);
       }
     }
+    
+    console.log('🔄 Using original card (no normalization needed):', {
+      type: card.type,
+      hasPrompt: !!card.prompt,
+      hasOptions: !!card.options
+    });
+    
     return card;
   }, [card]);
 
@@ -141,7 +175,14 @@ export default function FlashCard({ card, onReview, cardNumber, totalCards }: Fl
 
   // Premium MCQ Renderer
   const renderMCQCard = () => {
+    console.log('🎨 MCQ Renderer Check:', {
+      hasOptions: !!normalizedCard.options,
+      hasPrompt: !!normalizedCard.prompt,
+      willRenderMCQ: !!(normalizedCard.options && normalizedCard.prompt)
+    });
+    
     if (!normalizedCard.options || !normalizedCard.prompt) {
+      console.log('⚠️ Falling back to legacy card renderer');
       return renderLegacyCard();
     }
 
