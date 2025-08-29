@@ -185,7 +185,7 @@ export default function FlashCard({ card, onReview, cardNumber, totalCards }: Fl
     return (
       <div className="space-y-8">
         {/* Question Card */}
-        <Card className="glassmorphism border-border bg-gradient-to-br from-card/80 to-card/60 backdrop-blur-xl card-ambient">
+        <Card className="glassmorphism border-border bg-gradient-to-br from-card/80 to-card/60 backdrop-blur-xl">
           <CardContent className="p-8">
             <div className="text-center space-y-6">
               <Badge variant="outline" className="bg-primary/10 border-primary/20 text-primary font-medium px-4 py-2">
@@ -236,7 +236,7 @@ export default function FlashCard({ card, onReview, cardNumber, totalCards }: Fl
             return (
               <Card
                 key={index}
-                className={`${cardClass} card-ambient`}
+                className={cardClass}
                 onClick={() => !showResult && handleOptionSelect(index)}
                 data-testid={`mcq-option-${index}`}
                 style={{
@@ -348,7 +348,7 @@ export default function FlashCard({ card, onReview, cardNumber, totalCards }: Fl
   );
 
   return (
-    <div className="min-h-screen education-bg floating-orbs">
+    <div className="min-h-screen education-bg floating-orbs fading-shapes background-shapes">
       <div className="max-w-4xl mx-auto p-8 space-y-8">
         {/* Header */}
         <div className="text-center space-y-4">
