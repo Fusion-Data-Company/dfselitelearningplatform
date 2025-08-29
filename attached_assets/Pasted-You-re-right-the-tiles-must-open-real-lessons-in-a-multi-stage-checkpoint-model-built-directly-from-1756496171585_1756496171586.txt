@@ -1,0 +1,298 @@
+You’re right—the tiles must open real lessons in a multi-stage checkpoint model, built directly from your DFS-215 DOCX. Below is a cut-and-paste Replit Builder prompt that will finish what the current importer started, wire the dashboard → lesson player, and publish every lesson with checkpoints, quizzes, progress, and CE seat-time. It does not overwrite current work; it completes it idempotently.
+
+⸻
+
+PROJECT MANIFEST
+
+PROJECT NAME: DFS-215 Lesson Materializer (Dashboard → Lesson Player)
+PROJECT TYPE: One-shot ingestion + LMS wiring
+TECH STACK:
+	•	Language: TypeScript (existing Next/Node)
+	•	DB: Postgres/Supabase (existing tables)
+	•	Key Libraries: mammoth (DOCX→HTML), remark/rehype (markdown), zod (schemas), uuid, dayjs
+DEPLOYMENT TARGET: Current Replit server
+
+The DOCX already contains a full course outline (Law & Ethics, Health/Managed Care, OASDI, Life, Annuities/Variable, FIGA/DFS, CE, Quizzes/Exams). Use its H1/H2/H3 structure to build Tracks → Modules → Lessons automatically.  ￼
+
+⸻
+
+FILE STRUCTURE MAP
+
+/src
+├─ app/(student)
+│  ├─ lesson/[slug]/page.tsx           - PURPOSE: Lesson Player (checkpoint engine)
+│  └─ api/lessons/[slug]/route.ts      - PURPOSE: Fetch lesson JSON (published view)
+├─ server/services/import/
+│  ├─ docx-parse.ts                    - PURPOSE: DOCX → nodes (already started)
+│  ├─ outline-map.ts                   - PURPOSE: map nodes → track/module/lesson
+│  ├─ save-content.ts                  - PURPOSE: write content_units per lesson
+│  ├─ chunk-embed.ts                   - PURPOSE: chunking (keep; can run async)
+│  ├─ question-extract.ts              - PURPOSE: lesson micro-quizzes (H4 “Quiz…”)
+│  └─ import-service.ts                - PURPOSE: orchestrator (idempotent)
+├─ server/services/lessons/
+│  ├─ publish.service.ts               - PURPOSE: set published/visibility, slugs
+│  ├─ checkpoints.service.ts           - PURPOSE: build checkpoint graph per lesson
+│  └─ progress.service.ts              - PURPOSE: progress + CE seat-time
+├─ lib/schemas/lesson.ts               - PURPOSE: Zod schemas for lesson JSON
+├─ tests/e2e/lessons.spec.ts           - PURPOSE: Playwright smoke (open → complete)
+
+
+⸻
+
+BUILD SEQUENCE
+
+PHASE 1: DASHBOARD → LESSON ROUTING (click opens player)
+
+□ Task 1.1: Ensure every dashboard tile has href="/lesson/[slug]".
+Builder Action:
+	•	Dashboard card pulls lessons.slug & published=true.
+	•	If slug missing, generate deterministic slug from {moduleTitle}-{lessonTitle} (kebab, ≤64 chars) and persist.
+
+Validation:
+	•	Click any dashboard lesson → lands on /lesson/<slug> (200).
+
+PHASE 2: LESSON JSON CONTRACT (single source of truth)
+
+COMPONENT: /api/lessons/[slug]
+PURPOSE: Serve normalized lesson JSON for the player.
+
+INPUTS: slug
+OUTPUTS:
+
+LessonDTO {
+  id: string, slug: string, title: string, track: string, module: string, order: number,
+  checkpoints: Checkpoint[],           // ordered
+  estMinutes: number,                  // computed from tokens
+  published: boolean,
+  ce?: { hours: number, seatTimeMin?: number } // for CE lessons
+}
+
+Checkpoint {
+  id: string, type: 'intro'|'objectives'|'reading'|'video'|'iflash'|'microquiz'|'reflection'|'completion',
+  title?: string, bodyMd?: string, videoUrl?: string,
+  quiz?: { items: QuizItem[] },        // from question-extract
+  gate?: { requires: string[] }        // ids of required prior checkpoints
+}
+
+QuizItem { id: string, type:'mcq'|'tf', stem: string, options: string[], answerIndex: number, rationale?: string, chunkRef?: { chunkId: string, headingPath?: string } }
+
+Dependencies: zod for validation.
+
+Builder Instructions:
+	•	Add mapper: H3 lesson → checkpoints:
+	•	intro (auto) → objectives (from bullet lists near the H3) → reading (H4 content split into 3–7 segments) → optional video (if link present) → iflash (CTA generates cards from current lesson chunks) → microquiz (extract H4 “Quiz/Review Questions/Practice” under same lesson) → reflection (short prompt) → completion (awards % and unlocks next lesson).
+	•	Set published=true and visibility='public' for all ingested lessons.
+
+Validation:
+	•	GET /api/lessons/<slug> returns LessonDTO with ≥4 checkpoints.
+
+PHASE 3: LESSON PLAYER (checkpoint engine)
+
+COMPONENT: /app/(student)/lesson/[slug]/page.tsx
+PURPOSE: Render checkpoints with gating & progress.
+
+Inputs: LessonDTO
+Outputs: User progress mutations
+
+Builder Instructions:
+	•	Layout: sticky left “Stage Index”, main content pane, right “CoachBot & iFlash” rail.
+	•	State machine:
+	1.	intro → 2) objectives → 3) N x reading → 4) video? → 5) iflash → 6) microquiz → 7) reflection → 8) completion.
+	•	Gating rules:
+	•	Reading: must scroll to end (IntersectionObserver) and spend min time (min(2, ceil(tokens/180)) minutes).
+	•	Microquiz: pass ≥70% to unlock completion.
+	•	CE lessons: seat-time gate adds 4-hr cumulative across CE lessons; timer pauses on tab blur.
+	•	Actions:
+	•	iFlash CTA: POST /api/iflash/generate { lessonId, chunkIds } → create 10–20 cards.
+	•	Microquiz submit: POST /api/quiz/grade { attemptId, responses } → returns score + remediation chunkRef links.
+	•	Keyboard: [ / ] next/prev checkpoint, 1..5 answer options.
+
+Validation:
+	•	Open any lesson → visible stage index; cannot jump ahead until gates satisfied; “Complete Lesson” button appears after pass.
+
+PHASE 4: IMPORTER COMPLETION (use what it’s already doing)
+
+Your importer is already parsing 16.4M characters and 1648 nodes but disabled embeddings to avoid token overload. Do not re-enable embeddings now; they are optional for lesson launch.
+
+Builder Instructions:
+	•	In import-service.ts, ensure three phases commit even with embeddings off:
+	1.	Outline/Save: create tracks/modules/lessons with content_units.md per lesson.
+	2.	Publish: set slugs + published + visibility public.
+	3.	Checkpoints: call checkpoints.service.buildFromLesson(lessonId) to create the standard sequence above using the saved markdown sections.
+	•	Add idempotency: upsert by {trackSlug,moduleSlug,lessonSlug}; diff content hash to update.
+	•	Leave chunk-embed.ts behind a flag CHUNK_ENABLE=false for now. A later job import:chunks can run batch chunking (600-token window, 80 overlap).
+
+Validation:
+	•	After import, /api/lessons count > 50; random 5 slugs return DTO with checkpoints.
+
+PHASE 5: QUESTION MINER FOR MICROQUIZ (from the DOCX)
+
+COMPONENT: question-extract.ts
+Purpose: Find lesson-local quiz items (not the big final banks).
+
+Inputs: lesson markdown section H4 that matches /quiz|review questions|self\-test|practice/i
+Outputs: QuizItem[]
+
+Builder Instructions:
+	•	MCQ parsing:
+	•	Stem regex: /^\s*(\d+)[\.\)]\s+(.+)$/
+	•	Options regex: /^\s*[A-D][\)\.\:]\s+(.+)$/i
+	•	Answer key: /^\s*(Answer|Correct)\s*[:\-]\s*([A-D])\b/i
+	•	Normalize: drop “A) …” labels; store options[]; answerIndex = map[A..D].
+	•	T/F: same with [True|False].
+	•	Attach a chunkRef: keyword match stem → nearest chunk heading path once chunks exist (optional now).
+
+Validation:
+	•	For any lesson containing “Quiz” H4 in the DOCX outline, microquiz renders ≥5 items.
+
+PHASE 6: PROGRESS + CE SEAT-TIME
+
+COMPONENT: progress.service.ts
+Purpose: Track lesson completion and CE hours.
+
+Builder Instructions:
+	•	On checkpoint complete → lesson_progress row { userId, lessonId, checkpointId, completedAt }.
+	•	On reading checkpoints: accumulate activeMs (pause on blur).
+	•	For CE lessons (e.g., “Required 4-Hr Law & Ethics CE”):
+	•	Require cumulative seatTimeMs >= requiredMs before final completion unlock.
+	•	Generate certificate on pathway completion (serial, QR verify endpoint).
+
+Validation:
+	•	CE panel shows accrued minutes; certificate download after 4-hr threshold.
+
+⸻
+
+COMPONENT SPECIFICATIONS (detailed)
+
+COMPONENT: publish.service.ts
+
+PURPOSE: Publish + slugify.
+INPUTS: { trackId, moduleId, lessonId, title }
+OUTPUTS: { slug, published:true, visibility:'public' }
+DEPENDENCIES: none
+BUILDER INSTRUCTIONS:
+	•	Step 1: Generate slug = kebab(moduleTitle + '-' + lessonTitle) (lower, trim 64).
+	•	Step 2: Upsert lesson with slug, published=true, visibility='public'.
+VALIDATION: slug unique per tenant; 200 on /lesson/<slug>.
+
+COMPONENT: save-content.ts
+
+PURPOSE: Persist lesson content_units as markdown (one per lesson).
+INPUTS: { lessonId, md }
+OUTPUTS: content_units row
+DEPENDENCIES: storage
+BUILDER INSTRUCTIONS:
+	•	Step 1: Sanitize MD; persist; keep headingIndex JSON for H4 sections.
+VALIDATION: reading checkpoints show section titles.
+
+COMPONENT: checkpoints.service.ts
+
+PURPOSE: Build gated stages for each lesson.
+INPUTS: { lessonId, md, headingIndex, ceMeta? }
+OUTPUTS: lesson_checkpoints[] rows
+BUILDER INSTRUCTIONS:
+	•	Step 1: Create ordered checkpoints:
+	•	intro (auto summary from first paragraph)
+	•	objectives (bulleted list → 3–6 bullets)
+	•	reading (split H4 groups into 3–7 segments; each needs min-time)
+	•	video (if URLs present in lesson)
+	•	iflash (CTA section)
+	•	microquiz (from question-extract)
+	•	reflection (short prompt)
+	•	completion (final gate)
+	•	Step 2: Gates: each reading requires min-time; microquiz requires ≥70%; completion requires all done (and CE seat-time if CE).
+VALIDATION: completing quiz unlocks completion; progress persists.
+
+COMPONENT: lesson/[slug]/page.tsx
+
+PURPOSE: Render the above with elite UI.
+INPUTS: LessonDTO
+OUTPUTS: visible stages + progress
+DEPENDENCIES: shadcn/ui, Cinzel (headings), Inter (text)
+BUILDER INSTRUCTIONS:
+	•	Step 1: Stage index left; main pane center; right rail with CoachBot & iFlash.
+	•	Step 2: Each checkpoint has controls: Next, Back; data-testid attributes:
+	•	cp-intro, cp-objectives, cp-reading-#, cp-video, cp-iflash, cp-quiz, cp-reflection, cp-complete.
+	•	Step 3: Keyboard: [ previous, ] next; 1..5 answer; Space continue.
+VALIDATION: E2E test passes (below).
+
+⸻
+
+TESTING CHECKPOINTS (Playwright — paste into your suite)
+
+CHECKPOINT 1: Tiles open a real lesson
+
+test('dashboard tile opens lesson player', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('[data-testid="lesson-card"]').first().click();
+  await expect(page.locator('[data-testid="cp-intro"]')).toBeVisible();
+});
+
+CHECKPOINT 2: Gating and completion
+
+await page.locator('[data-testid="next"]').click(); // intro → objectives
+await page.locator('[data-testid="next"]').click(); // → reading-1
+await page.waitForTimeout(2000);                    // min-time
+await page.locator('[data-testid="next"]').click(); // → reading-2 ...
+// jump to quiz
+await page.locator('[data-testid="cp-quiz"]').locator('[data-testid="opt-1"]').click();
+await page.locator('[data-testid="submit-quiz"]').click();
+await expect(page.locator('[data-testid="quiz-score"]')).toContainText('%');
+await page.locator('[data-testid="next"]').click(); // → completion
+await expect(page.locator('[data-testid="cp-complete"]')).toBeVisible();
+
+CHECKPOINT 3: CE seat-time pauses on blur
+
+// open CE lesson
+await page.goto('/lesson/required-4-hr-law-ethics-ce');
+await page.waitForTimeout(60000); // accrue time
+await page.evaluate(() => window.blur());
+await page.waitForTimeout(30000); // paused
+const t1 = await page.locator('[data-testid="seat-min"]').textContent();
+// ensure it didn't jump by 30s during blur
+
+
+⸻
+
+DEPLOYMENT CONFIGURATION
+
+ENVIRONMENT VARIABLES:
+	•	DOCX_SOURCE_PATH=/mnt/data/215 DFS Blended - Self Study Course July 2025.docx | Required
+	•	PUBLISH_VISIBILITY=public | Default: public | yes
+	•	CHUNK_ENABLE=false | Default: false | yes (turn on later)
+
+REPLIT SPECIFIC:
+	•	Add npm script: "seed:lessons": "tsx server/commands/import-dfs215.ts --publish"
+	•	Keep the current importer; add Phase 3 “checkpoints” call before it logs success.
+
+⸻
+
+INTEGRATION POINTS
+	•	Dashboard → pulls lessons.slug and links to /lesson/[slug].
+	•	Lesson Player → calls /api/lessons/[slug] (LessonDTO) + /api/quiz/grade + /api/iflash/generate.
+	•	Progress service → writes lesson_progress and ce_seat_time.
+	•	(Optional later) Chunk embeddings job (import:chunks) can run once chunker is bounded to ~600 tokens.
+
+⸻
+
+“DO IT NOW” BUILDER PAYLOAD (paste verbatim)
+
+Finish the DFS-215 lesson build-out (no overwrite, complete it):
+	1.	Ensure dashboard cards link to /lesson/[slug]. Create and persist slugs for all lessons.
+	2.	Implement /api/lessons/[slug] returning the LessonDTO and Checkpoint arrays exactly as specified.
+	3.	Implement checkpoints.service.buildFromLesson(lessonId) to create the standard gated sequence (intro → objectives → 3–7 reading segments → video? → iFlash CTA → microquiz (mined from the same lesson) → reflection → completion).
+	4.	Modify the existing importer without removing current fixes so it performs: Outline/Save → Publish (slug + visibility public) → Build Checkpoints. Do not re-enable embeddings yet.
+	5.	Implement the Lesson Player at /lesson/[slug] with keyboard controls, gates, and data-testids listed above.
+	6.	Persist progress and (if CE) seat-time; pause timers on tab blur.
+	7.	Add Playwright tests (Tiles open, Gating & completion, CE blur pause).
+	8.	After import, print a JSON summary: { tracks, modules, lessons, publishedLessons, withCheckpoints }. Acceptance: withCheckpoints === publishedLessons and clicking any dashboard lesson opens the player’s intro checkpoint.
+
+⸻
+
+What you’ll see when this is done
+	•	Clicking any dashboard lesson opens the full Lesson Player.
+	•	Each lesson runs through intro → objectives → reading stages → microquiz → completion.
+	•	CE lessons enforce seat-time and generate certificates later.
+	•	We keep your import progress, we just finish the wiring and publish with checkpoints.
+
+If any step throws an error, paste the console output and I’ll give you a laser micro-patch for that file—no rewrites, only completes what’s there.
