@@ -7,6 +7,8 @@ import { ChunkEmbedder } from './chunk-embed';
 import { QuestionExtractor } from './question-extract';
 import { ExamBlueprintBuilder } from './exam-blueprint';
 import { storage } from '../../storage';
+import { checkpointsService } from '../lessons/checkpoints.service';
+import { microquizService } from '../lessons/microquiz.service';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -90,8 +92,26 @@ export class DFS215ImportService {
       console.log('  Note: Full lesson content has been imported and is available');
       result.chunks = 0;
       
-      // Phase 4: Extract questions
-      console.log('\nPhase 4: Extracting questions from assessments...');
+      // Phase 4: Create lesson checkpoints
+      console.log('\nPhase 4: Creating lesson checkpoints...');
+      const allLessons = await storage.getLessons();
+      let checkpointsCreated = 0;
+      
+      for (const lesson of allLessons) {
+        try {
+          await checkpointsService.buildFromLesson(lesson.id, lesson.content);
+          await microquizService.processLessonMicroquiz(lesson.id);
+          checkpointsCreated++;
+          console.log(`  ✓ Created checkpoints for: ${lesson.title}`);
+        } catch (error) {
+          console.warn(`  ⚠ Failed to create checkpoints for: ${lesson.title}`, error);
+          result.errors.push(`Checkpoint creation failed for ${lesson.title}: ${error}`);
+        }
+      }
+      console.log(`  ✓ Created checkpoints for ${checkpointsCreated} lessons`);
+      
+      // Phase 5: Extract questions
+      console.log('\nPhase 5: Extracting questions from assessments...');
       const assessmentNodes = nodes.filter(node => 
         node.type === 'assessment' || 
         (node.metadata && node.metadata.isAssessment === true)
@@ -104,8 +124,8 @@ export class DFS215ImportService {
       result.questions = bankSaveResult.questionsCreated;
       console.log(`  ✓ Created ${result.banks} question banks with ${result.questions} questions`);
       
-      // Phase 5: Build exam configurations
-      console.log('\nPhase 5: Building exam configurations...');
+      // Phase 6: Build exam configurations
+      console.log('\nPhase 6: Building exam configurations...');
       
       // Build main DFS-215 exam
       const mainExam = await this.examBuilder.buildExamForm();

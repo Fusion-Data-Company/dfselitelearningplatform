@@ -9,6 +9,9 @@ import { examService } from "./services/exam";
 import { contentService } from "./services/content";
 import { voiceQAService } from "./services/voice-qa";
 import { z } from "zod";
+import { checkpointsService } from "./services/lessons/checkpoints.service";
+import { progressService } from "./services/lessons/progress.service";
+import { lessonDTOSchema } from "../shared/schemas/lesson";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware - disabled
@@ -144,7 +147,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!lesson) {
         return res.status(404).json({ message: 'Lesson not found' });
       }
-      res.json(lesson);
+
+      // Check if lesson is published
+      if (!lesson.published || lesson.visibility !== 'public') {
+        return res.status(404).json({ message: 'Lesson not found' });
+      }
+
+      // Get module and track information
+      const module = await storage.getModule(lesson.moduleId!);
+      if (!module) {
+        return res.status(500).json({ message: 'Module not found for lesson' });
+      }
+
+      const track = await storage.getTrack(module.trackId!);
+      if (!track) {
+        return res.status(500).json({ message: 'Track not found for lesson' });
+      }
+
+      // Get checkpoints for this lesson
+      const checkpoints = await checkpointsService.getCheckpointsByLesson(lesson.id);
+
+      // Calculate estimated minutes based on content length and checkpoints
+      const contentLength = lesson.content?.length || 0;
+      const baseMinutes = Math.max(5, Math.ceil(contentLength / 1000)); // ~1 minute per 1000 chars
+      const checkpointMinutes = checkpoints.length * 2; // ~2 minutes per checkpoint
+      const estMinutes = baseMinutes + checkpointMinutes;
+
+      // Build CE metadata if applicable
+      const ce = lesson.ceHours && lesson.ceHours > 0 ? {
+        hours: lesson.ceHours,
+        seatTimeMin: lesson.ceHours * 60 // Convert hours to minutes
+      } : undefined;
+
+      // Build LessonDTO response
+      const lessonDTO = {
+        id: lesson.id,
+        slug: lesson.slug,
+        title: lesson.title,
+        track: track.title,
+        module: module.title,
+        order: lesson.orderIndex,
+        checkpoints: checkpoints.map(cp => ({
+          id: cp.id,
+          type: cp.type,
+          title: cp.title || undefined,
+          bodyMd: cp.bodyMd || undefined,
+          videoUrl: cp.videoUrl || undefined,
+          quiz: cp.quiz || undefined,
+          gate: cp.gate || undefined,
+          orderIndex: cp.orderIndex
+        })),
+        estMinutes,
+        published: lesson.published,
+        ce
+      };
+
+      // Validate the response structure
+      const validatedDTO = lessonDTOSchema.parse(lessonDTO);
+
+      res.json(validatedDTO);
     } catch (error) {
       console.error("Error fetching lesson:", error);
       res.status(500).json({ message: "Failed to fetch lesson" });
@@ -166,6 +227,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error updating progress:", error);
       res.status(500).json({ message: "Failed to update progress" });
+    }
+  });
+
+  app.post('/api/lessons/:id/checkpoint-progress', async (req: any, res) => {
+    try {
+      const userId = 'guest'; // Use guest user for now
+      const { 
+        checkpointId, 
+        completed, 
+        timeSpent, 
+        quizScore, 
+        quizPassed, 
+        reflection 
+      } = req.body;
+      
+      await progressService.updateCheckpointProgress(userId, req.params.id, {
+        checkpointId,
+        completed,
+        timeSpent,
+        quizScore,
+        quizPassed,
+        reflection
+      });
+      
+      res.json({ success: true, message: "Checkpoint progress updated successfully" });
+    } catch (error) {
+      console.error("Error updating checkpoint progress:", error);
+      res.status(500).json({ message: "Failed to update checkpoint progress" });
     }
   });
 

@@ -73,8 +73,57 @@ export const lessons = pgTable("lessons", {
   duration: integer("duration"), // in minutes
   ceHours: real("ce_hours").default(0),
   isActive: boolean("is_active").default(true),
+  published: boolean("published").default(false),
+  visibility: varchar("visibility").default("draft"), // "draft", "public", "private"
   createdAt: timestamp("created_at").defaultNow(),
 });
+
+// Content units for lesson structure
+export const contentUnits = pgTable("content_units", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  lessonId: varchar("lesson_id").references(() => lessons.id, { onDelete: "cascade" }),
+  type: varchar("type").notNull(), // "markdown", "html", "video"
+  content: text("content").notNull(),
+  headingIndex: jsonb("heading_index"), // H4 sections for reading splits
+  orderIndex: integer("order_index").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Lesson checkpoints for guided learning
+export const checkpointTypeEnum = pgEnum("checkpoint_type", ["intro", "objectives", "reading", "video", "iflash", "microquiz", "reflection", "completion"]);
+
+export const lessonCheckpoints = pgTable("lesson_checkpoints", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  lessonId: varchar("lesson_id").references(() => lessons.id, { onDelete: "cascade" }),
+  type: checkpointTypeEnum("type").notNull(),
+  title: text("title"),
+  bodyMd: text("body_md"),
+  videoUrl: text("video_url"),
+  quiz: jsonb("quiz"), // QuizItem[] for microquizzes
+  gate: jsonb("gate"), // { requires: string[] } for prerequisite checkpoints
+  orderIndex: integer("order_index").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Individual checkpoint progress tracking
+export const lessonProgress = pgTable("lesson_progress", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }),
+  lessonId: varchar("lesson_id").references(() => lessons.id, { onDelete: "cascade" }),
+  checkpointId: varchar("checkpoint_id").references(() => lessonCheckpoints.id, { onDelete: "cascade" }),
+  completed: boolean("completed").default(false),
+  timeSpent: integer("time_spent").default(0), // in seconds
+  seatTimeMs: integer("seat_time_ms").default(0), // actual engaged time
+  attemptData: jsonb("attempt_data"), // quiz responses, scroll position, etc.
+  completedAt: timestamp("completed_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  userLessonCheckpointUnique: uniqueIndex("idx_lesson_progress_user_lesson_checkpoint").on(
+    table.userId, 
+    table.lessonId, 
+    table.checkpointId
+  ),
+}));
 
 // Content chunks for retrieval
 export const contentChunks = pgTable("content_chunks", {
@@ -233,6 +282,9 @@ export type User = typeof users.$inferSelect;
 export type Track = typeof tracks.$inferSelect;
 export type Module = typeof modules.$inferSelect;
 export type Lesson = typeof lessons.$inferSelect;
+export type ContentUnit = typeof contentUnits.$inferSelect;
+export type LessonCheckpoint = typeof lessonCheckpoints.$inferSelect;
+export type LessonProgress = typeof lessonProgress.$inferSelect;
 export type ContentChunk = typeof contentChunks.$inferSelect;
 export type QuestionBank = typeof questionBanks.$inferSelect;
 export type Question = typeof questions.$inferSelect;
@@ -250,6 +302,9 @@ export const insertUserSchema = createInsertSchema(users).omit({ id: true, creat
 export const insertTrackSchema = createInsertSchema(tracks).omit({ id: true, createdAt: true });
 export const insertModuleSchema = createInsertSchema(modules).omit({ id: true, createdAt: true });
 export const insertLessonSchema = createInsertSchema(lessons).omit({ id: true, createdAt: true });
+export const insertContentUnitSchema = createInsertSchema(contentUnits).omit({ id: true, createdAt: true });
+export const insertLessonCheckpointSchema = createInsertSchema(lessonCheckpoints).omit({ id: true, createdAt: true });
+export const insertLessonProgressSchema = createInsertSchema(lessonProgress).omit({ id: true, createdAt: true });
 export const insertQuestionBankSchema = createInsertSchema(questionBanks).omit({ id: true, createdAt: true });
 export const insertQuestionSchema = createInsertSchema(questions).omit({ id: true, createdAt: true });
 export const insertQuizAttemptSchema = createInsertSchema(quizAttempts).omit({ id: true, startedAt: true });
@@ -260,6 +315,9 @@ export type InsertUser = z.infer<typeof insertUserSchema>;
 export type InsertTrack = z.infer<typeof insertTrackSchema>;
 export type InsertModule = z.infer<typeof insertModuleSchema>;
 export type InsertLesson = z.infer<typeof insertLessonSchema>;
+export type InsertContentUnit = z.infer<typeof insertContentUnitSchema>;
+export type InsertLessonCheckpoint = z.infer<typeof insertLessonCheckpointSchema>;
+export type InsertLessonProgress = z.infer<typeof insertLessonProgressSchema>;
 export type InsertQuestionBank = z.infer<typeof insertQuestionBankSchema>;
 export type InsertQuestion = z.infer<typeof insertQuestionSchema>;
 export type InsertQuizAttempt = z.infer<typeof insertQuizAttemptSchema>;
