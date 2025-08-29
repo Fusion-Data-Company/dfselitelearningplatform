@@ -13,11 +13,12 @@ export default function Navigation() {
     return `${firstName?.[0] || ""}${lastName?.[0] || ""}`.toUpperCase();
   };
 
-  const navItems = [
-    { href: "/", label: "Dashboard", active: location === "/" },
-    { href: "/iflash", label: "iFlash", active: location === "/iflash" },
-    { href: "/agents", label: "AI Tutors", active: location === "/agents" },
-    { href: "/ce-tracking", label: "CE Tracking", active: location === "/ce-tracking" }
+  const functionalTabs = [
+    { href: "/", label: "Learning", active: location === "/" || location.startsWith("/lesson") },
+    { href: "/quiz", label: "Practice", active: location.startsWith("/quiz") || location === "/iflash" },
+    { href: "/agents", label: "Tutoring", active: location === "/agents" },
+    { href: "/ce-tracking", label: "Progress", active: location === "/ce-tracking" },
+    { href: "/admin", label: "Resources", active: location.startsWith("/admin") }
   ];
 
   return (
@@ -36,56 +37,63 @@ export default function Navigation() {
             </div>
           </div>
 
-          {/* Navigation Links */}
-          <div className="hidden md:flex items-center space-x-1">
-            {navItems.map((item) => (
-              <Link key={item.href} href={item.href}>
-                <span className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
-                  item.active 
-                    ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white' 
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800/50'
+          {/* Functional Navigation Tabs */}
+          <div className="flex items-center">
+            {functionalTabs.map((tab) => (
+              <Link key={tab.href} href={tab.href}>
+                <span className={`px-6 py-3 text-sm font-medium transition-colors cursor-pointer border-b-2 ${
+                  tab.active 
+                    ? 'border-primary text-primary' 
+                    : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:border-gray-200 dark:hover:border-gray-700'
                 }`}>
-                  {item.label}
+                  {tab.label}
                 </span>
               </Link>
             ))}
           </div>
 
-          {/* Right Section */}
-          <div className="flex items-center space-x-3">
+          {/* Right Section - Functional Elements */}
+          <div className="flex items-center space-x-4">
             
-            {/* Notifications */}
-            <Button variant="ghost" size="sm" className="w-9 h-9 p-0 hover:bg-gray-100 dark:hover:bg-gray-800">
-              <Bell className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+            {/* Search */}
+            <Button variant="ghost" size="sm" className="hidden md:flex items-center space-x-2 px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
+              <span className="text-sm text-gray-500">Search...</span>
             </Button>
 
-            {/* Settings */}
-            <Button variant="ghost" size="sm" className="w-9 h-9 p-0 hover:bg-gray-100 dark:hover:bg-gray-800">
-              <Settings className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-            </Button>
+            {/* Notifications with Badge */}
+            <div className="relative">
+              <Button variant="ghost" size="sm" className="w-9 h-9 p-0 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
+                <Bell className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+              </Button>
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full text-[10px] text-white flex items-center justify-center">
+                3
+              </div>
+            </div>
 
-            {/* User Profile */}
-            <div className="flex items-center space-x-3 px-3 py-2 bg-gray-50 dark:bg-gray-800/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer transition-colors">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white text-xs font-medium">
-                {getInitials(user?.firstName ?? undefined, user?.lastName ?? undefined)}
+            {/* User Profile with Status */}
+            <div className="flex items-center space-x-3 px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg cursor-pointer transition-colors">
+              <div className="relative">
+                <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white text-xs font-medium">
+                  {getInitials(user?.firstName ?? undefined, user?.lastName ?? undefined)}
+                </div>
+                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-white dark:border-gray-900 rounded-full"></div>
               </div>
               <div className="hidden sm:block">
                 <div className="text-sm font-medium text-gray-900 dark:text-white" data-testid="text-username">
                   {user?.firstName || "Student"}
                 </div>
+                <div className="text-xs text-gray-500">Online</div>
               </div>
-              <ChevronDown className="w-4 h-4 text-gray-400" />
+              <ChevronDown className="w-3 h-3 text-gray-400" />
             </div>
 
-            {/* Sign Out */}
+            {/* Settings Dropdown */}
             <Button 
               variant="ghost"
               size="sm"
-              onClick={() => window.location.href = '/api/logout'}
-              className="text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400"
-              data-testid="button-logout"
+              className="w-9 h-9 p-0 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
             >
-              Sign Out
+              <Settings className="w-4 h-4 text-gray-600 dark:text-gray-400" />
             </Button>
           </div>
         </div>
