@@ -1,6 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useQuery } from "@tanstack/react-query";
 import { 
   BarChart3, 
   BookOpen, 
@@ -13,8 +14,24 @@ import {
   ChevronRight 
 } from "lucide-react";
 
+interface CourseProgress {
+  tracks: Array<{
+    id: string;
+    title: string;
+    progress: number;
+    ceHours: number;
+    completedLessons: number;
+    totalLessons: number;
+  }>;
+  overallProgress: number;
+}
+
 export default function Sidebar() {
   const [location] = useLocation();
+  
+  const { data: courseProgress } = useQuery<CourseProgress>({
+    queryKey: ['/api/courses/progress'],
+  });
 
   const navItems = [
     { href: "/", icon: BarChart3, label: "Dashboard", color: "text-primary" },
@@ -66,45 +83,48 @@ export default function Sidebar() {
             Course Progress
           </h3>
           <div className="space-y-3">
-            <div className="p-5 education-card border border-primary/30 hover:border-primary/50 transition-all duration-300 group">
-              <div className="flex justify-between items-center mb-4">
-                <span className="text-sm font-bold text-foreground geist group-hover:text-primary transition-colors">Law & Ethics</span>
-                <Badge className="elite-badge bg-gradient-to-r from-primary/30 to-primary/20 text-primary border-primary/40 text-xs font-semibold">
-                  85%
-                </Badge>
-              </div>
-              <div className="w-full bg-muted/40 rounded-full h-3 relative overflow-hidden shadow-inner">
-                <div className="lesson-progress h-3 rounded-full" style={{ width: "85%" }}></div>
-              </div>
-            </div>
-            
-            <div className="p-5 education-card border border-secondary/30 hover:border-secondary/50 transition-all duration-300 group">
-              <div className="flex justify-between items-center mb-4">
-                <span className="text-sm font-bold text-foreground geist group-hover:text-secondary transition-colors">Health Insurance</span>
-                <Badge className="elite-badge bg-gradient-to-r from-secondary/30 to-secondary/20 text-secondary border-secondary/40 text-xs font-semibold">
-                  65%
-                </Badge>
-              </div>
-              <div className="w-full bg-muted/40 rounded-full h-3 relative overflow-hidden shadow-inner">
-                <div className="bg-gradient-to-r from-secondary via-secondary/90 to-secondary/80 h-3 rounded-full transition-all duration-500 relative overflow-hidden" style={{ width: "65%" }}>
-                  <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
+            {courseProgress?.tracks.slice(0, 3).map((track, index) => {
+              const colors = [
+                { border: 'border-primary/30 hover:border-primary/50', badge: 'from-primary/30 to-primary/20 text-primary border-primary/40', text: 'group-hover:text-primary', progress: 'lesson-progress' },
+                { border: 'border-secondary/30 hover:border-secondary/50', badge: 'from-secondary/30 to-secondary/20 text-secondary border-secondary/40', text: 'group-hover:text-secondary', progress: 'bg-gradient-to-r from-secondary via-secondary/90 to-secondary/80' },
+                { border: 'border-accent/30 hover:border-accent/50', badge: 'from-accent/30 to-accent/20 text-accent border-accent/40', text: 'group-hover:text-accent', progress: 'bg-gradient-to-r from-accent via-accent/90 to-accent/80' }
+              ];
+              const color = colors[index % 3];
+              
+              return (
+                <div key={track.id} className={`p-5 education-card border ${color.border} transition-all duration-300 group`}>
+                  <div className="flex justify-between items-center mb-4">
+                    <span className={`text-sm font-bold text-foreground geist ${color.text} transition-colors line-clamp-1`}>
+                      {track.title.length > 20 ? track.title.substring(0, 20) + '...' : track.title}
+                    </span>
+                    <Badge className={`elite-badge bg-gradient-to-r ${color.badge} text-xs font-semibold`}>
+                      {track.progress}%
+                    </Badge>
+                  </div>
+                  <div className="w-full bg-muted/40 rounded-full h-3 relative overflow-hidden shadow-inner">
+                    <div className={`${color.progress} h-3 rounded-full transition-all duration-500 relative overflow-hidden`} style={{ width: `${track.progress}%` }}>
+                      <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
+              );
+            })}
             
-            <div className="p-5 education-card border border-accent/30 hover:border-accent/50 transition-all duration-300 group">
-              <div className="flex justify-between items-center mb-4">
-                <span className="text-sm font-bold text-foreground geist group-hover:text-accent transition-colors">OASDI & Medicare</span>
-                <Badge className="elite-badge bg-gradient-to-r from-accent/30 to-accent/20 text-accent border-accent/40 text-xs font-semibold">
-                  40%
-                </Badge>
-              </div>
-              <div className="w-full bg-muted/40 rounded-full h-3 relative overflow-hidden shadow-inner">
-                <div className="bg-gradient-to-r from-accent via-accent/90 to-accent/80 h-3 rounded-full transition-all duration-500 relative overflow-hidden" style={{ width: "40%" }}>
-                  <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
+            {(!courseProgress || courseProgress.tracks.length === 0) && (
+              <>
+                <div className="p-5 education-card border border-primary/30 hover:border-primary/50 transition-all duration-300 group">
+                  <div className="flex justify-between items-center mb-4">
+                    <span className="text-sm font-bold text-foreground geist group-hover:text-primary transition-colors">Loading Progress...</span>
+                    <Badge className="elite-badge bg-gradient-to-r from-primary/30 to-primary/20 text-primary border-primary/40 text-xs font-semibold">
+                      --%
+                    </Badge>
+                  </div>
+                  <div className="w-full bg-muted/40 rounded-full h-3 relative overflow-hidden shadow-inner">
+                    <div className="lesson-progress h-3 rounded-full" style={{ width: "0%" }}></div>
+                  </div>
                 </div>
-              </div>
-            </div>
+              </>
+            )}
           </div>
         </div>
       </div>

@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
+import { Link } from "wouter";
 import { 
   BookOpen, 
   Brain, 
@@ -39,11 +40,39 @@ interface CourseProgress {
   overallProgress: number;
 }
 
+interface Lesson {
+  id: string;
+  title: string;
+  slug: string;
+  content: string;
+  description: string;
+  duration: number;
+  ceHours: number;
+}
+
 export default function Dashboard() {
   const { user } = useAuth();
   
   const { data: courseProgress, isLoading: progressLoading } = useQuery<CourseProgress>({
     queryKey: ['/api/courses/progress'],
+  });
+  
+  const { data: recentLessons, isLoading: lessonsLoading } = useQuery<Lesson[]>({
+    queryKey: ['/api/lessons/recent'],
+    queryFn: async () => {
+      // Get recent lessons with content
+      const response = await fetch('/api/lessons/recent');
+      if (!response.ok) {
+        // Fallback to getting all lessons if recent endpoint doesn't exist
+        const allResponse = await fetch('/api/lessons');
+        if (allResponse.ok) {
+          const lessons = await allResponse.json();
+          return lessons.slice(0, 5); // Get first 5 lessons
+        }
+        return [];
+      }
+      return response.json();
+    },
   });
 
   return (
@@ -310,58 +339,134 @@ export default function Dashboard() {
                   </CardContent>
                 </Card>
 
-                {/* AI Agents Quick Access */}
+                {/* Recent Lessons with Content Preview */}
+                <Card className="education-card border-accent/20 hover:border-accent/40 transition-all duration-300">
+                  <CardContent className="p-8">
+                    <h3 className="cinzel text-2xl font-bold mb-6 text-elite">Recent Lessons</h3>
+                    <div className="space-y-4">
+                      {lessonsLoading ? (
+                        <div className="space-y-3">
+                          {[1, 2, 3].map((i) => (
+                            <div key={i} className="elite-skeleton h-20 rounded-xl"></div>
+                          ))}
+                        </div>
+                      ) : recentLessons && recentLessons.length > 0 ? (
+                        recentLessons.map((lesson) => {
+                          // Extract first 3 lines of content for preview
+                          const contentLines = lesson.content ? 
+                            lesson.content.split('\n').filter(line => line.trim().length > 0).slice(0, 3) : 
+                            [lesson.description || 'No content available'];
+                          const preview = contentLines.join(' ').substring(0, 200) + '...';
+                          
+                          return (
+                            <Link key={lesson.id} href={`/lesson/${lesson.slug}`}>
+                              <Card className="education-card p-4 cursor-pointer group hover:border-accent/40 transition-all duration-300">
+                                <div className="space-y-2">
+                                  <div className="flex items-center justify-between">
+                                    <h4 className="font-bold text-sm group-hover:text-accent transition-colors line-clamp-1">
+                                      {lesson.title}
+                                    </h4>
+                                    {lesson.ceHours > 0 && (
+                                      <Badge className="bg-accent/20 text-accent border-accent/30 text-xs">
+                                        {lesson.ceHours} CE
+                                      </Badge>
+                                    )}
+                                  </div>
+                                  <p className="text-xs text-muted-foreground line-clamp-3">
+                                    {preview}
+                                  </p>
+                                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                    <span>{lesson.duration} min</span>
+                                    <ChevronRight className="w-3 h-3 group-hover:text-accent transition-colors" />
+                                  </div>
+                                </div>
+                              </Card>
+                            </Link>
+                          );
+                        })
+                      ) : (
+                        <p className="text-sm text-muted-foreground">No lessons available</p>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Quick Actions - Functional */}
                 <Card className="ai-agent-panel border-primary/30">
                   <CardContent className="p-6">
-                    <h3 className="cinzel text-xl font-bold mb-4">AI Study Assistants</h3>
+                    <h3 className="cinzel text-xl font-bold mb-4">Quick Actions</h3>
                     <div className="grid grid-cols-1 gap-3">
-                      <Button 
-                        variant="ghost"
-                        className="p-3 h-auto bg-card/50 hover:bg-card justify-start"
-                        data-testid="button-coachbot"
-                      >
-                        <div className="flex items-center space-x-3">
-                          <div className="w-8 h-8 bg-primary/20 rounded-lg flex items-center justify-center">
-                            <Brain className="w-4 h-4 text-primary" />
+                      <Link href="/agents">
+                        <Button 
+                          variant="ghost"
+                          className="w-full p-3 h-auto bg-card/50 hover:bg-card justify-start"
+                          data-testid="button-ai-assistants"
+                        >
+                          <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 bg-primary/20 rounded-lg flex items-center justify-center">
+                              <Brain className="w-4 h-4 text-primary" />
+                            </div>
+                            <div className="text-left">
+                              <p className="font-medium">AI Study Assistants</p>
+                              <p className="text-xs text-muted-foreground">Chat with your AI tutors</p>
+                            </div>
                           </div>
-                          <div className="text-left">
-                            <p className="font-medium">CoachBot</p>
-                            <p className="text-xs text-muted-foreground">Ask questions, get explanations</p>
-                          </div>
-                        </div>
-                      </Button>
+                        </Button>
+                      </Link>
                       
-                      <Button 
-                        variant="ghost"
-                        className="p-3 h-auto bg-card/50 hover:bg-card justify-start"
-                        data-testid="button-studybuddy"
-                      >
-                        <div className="flex items-center space-x-3">
-                          <div className="w-8 h-8 bg-secondary/20 rounded-lg flex items-center justify-center">
-                            <Play className="w-4 h-4 text-secondary" />
+                      <Link href="/iflash">
+                        <Button 
+                          variant="ghost"
+                          className="w-full p-3 h-auto bg-card/50 hover:bg-card justify-start"
+                          data-testid="button-flashcards"
+                        >
+                          <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 bg-secondary/20 rounded-lg flex items-center justify-center">
+                              <Layers3 className="w-4 h-4 text-secondary" />
+                            </div>
+                            <div className="text-left">
+                              <p className="font-medium">iFlash Study Cards</p>
+                              <p className="text-xs text-muted-foreground">Review flashcards & concepts</p>
+                            </div>
                           </div>
-                          <div className="text-left">
-                            <p className="font-medium">StudyBuddy</p>
-                            <p className="text-xs text-muted-foreground">Plan your study schedule</p>
-                          </div>
-                        </div>
-                      </Button>
+                        </Button>
+                      </Link>
                       
-                      <Button 
-                        variant="ghost"
-                        className="p-3 h-auto bg-card/50 hover:bg-card justify-start"
-                        data-testid="button-proctorbot"
-                      >
-                        <div className="flex items-center space-x-3">
-                          <div className="w-8 h-8 bg-accent/20 rounded-lg flex items-center justify-center">
-                            <Shield className="w-4 h-4 text-accent" />
+                      <Link href="/exam">
+                        <Button 
+                          variant="ghost"
+                          className="w-full p-3 h-auto bg-card/50 hover:bg-card justify-start"
+                          data-testid="button-practice-exam"
+                        >
+                          <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 bg-accent/20 rounded-lg flex items-center justify-center">
+                              <Shield className="w-4 h-4 text-accent" />
+                            </div>
+                            <div className="text-left">
+                              <p className="font-medium">Practice Exam</p>
+                              <p className="text-xs text-muted-foreground">Test your knowledge</p>
+                            </div>
                           </div>
-                          <div className="text-left">
-                            <p className="font-medium">ProctorBot</p>
-                            <p className="text-xs text-muted-foreground">Exam guidance and support</p>
+                        </Button>
+                      </Link>
+                      
+                      <Link href="/ce-tracking">
+                        <Button 
+                          variant="ghost"
+                          className="w-full p-3 h-auto bg-card/50 hover:bg-card justify-start"
+                          data-testid="button-ce-hours"
+                        >
+                          <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 bg-chart-4/20 rounded-lg flex items-center justify-center">
+                              <Award className="w-4 h-4 text-chart-4" />
+                            </div>
+                            <div className="text-left">
+                              <p className="font-medium">CE Hour Tracking</p>
+                              <p className="text-xs text-muted-foreground">Monitor your progress</p>
+                            </div>
                           </div>
-                        </div>
-                      </Button>
+                        </Button>
+                      </Link>
                     </div>
                   </CardContent>
                 </Card>

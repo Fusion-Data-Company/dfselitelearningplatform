@@ -53,6 +53,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Lesson routes
+  app.get('/api/lessons', async (req, res) => {
+    try {
+      // Get all lessons from all modules
+      const tracks = await storage.getTracks();
+      const allLessons: any[] = [];
+      
+      for (const track of tracks) {
+        const modules = await storage.getModulesByTrack(track.id);
+        for (const module of modules) {
+          const lessons = await storage.getLessonsByModule(module.id);
+          allLessons.push(...lessons);
+        }
+      }
+      
+      res.json(allLessons);
+    } catch (error) {
+      console.error("Error fetching lessons:", error);
+      res.status(500).json({ message: "Failed to fetch lessons" });
+    }
+  });
+
+  app.get('/api/lessons/recent', async (req, res) => {
+    try {
+      // Get recent lessons with content
+      const tracks = await storage.getTracks();
+      const allLessons: any[] = [];
+      
+      for (const track of tracks) {
+        const modules = await storage.getModulesByTrack(track.id);
+        for (const module of modules) {
+          const lessons = await storage.getLessonsByModule(module.id);
+          allLessons.push(...lessons);
+        }
+      }
+      
+      // Sort by id (newest first) and return top 5 with content
+      const recentLessons = allLessons
+        .filter(lesson => lesson.content && lesson.content.length > 0)
+        .slice(0, 5);
+      
+      res.json(recentLessons);
+    } catch (error) {
+      console.error("Error fetching recent lessons:", error);
+      res.status(500).json({ message: "Failed to fetch recent lessons" });
+    }
+  });
+
   app.get('/api/lessons/:id', async (req, res) => {
     try {
       const lesson = await storage.getLesson(req.params.id);

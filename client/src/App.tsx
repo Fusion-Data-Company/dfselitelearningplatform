@@ -14,6 +14,18 @@ import AgentsPage from "@/pages/agents";
 import CETrackingPage from "@/pages/ce-tracking";
 import AdminPage from "@/pages/admin";
 import NotFound from "@/pages/not-found";
+import { useEffect } from "react";
+
+// Declare the custom element for TypeScript
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      'elevenlabs-convai': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement> & {
+        'agent-id'?: string;
+      }, HTMLElement>;
+    }
+  }
+}
 
 function Router() {
   // No authentication checks - allow access to all routes
@@ -33,12 +45,33 @@ function Router() {
 }
 
 function App() {
+  useEffect(() => {
+    // Load the ElevenLabs widget script
+    const script = document.createElement('script');
+    script.src = 'https://unpkg.com/@elevenlabs/convai-widget-embed';
+    script.async = true;
+    script.type = 'text/javascript';
+    document.body.appendChild(script);
+    
+    return () => {
+      // Clean up script on unmount
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
+    };
+  }, []);
+  
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <div className="min-h-screen bg-background text-foreground">
           <Toaster />
           <Router />
+          {/* ElevenLabs ConvAI Widget - positioned in bottom corner */}
+          <elevenlabs-convai 
+            agent-id="agent_6001k3vhprpbef7vt69kzsrvygdj"
+            style={{ position: 'fixed', bottom: '20px', right: '20px', zIndex: 9999 }}
+          />
         </div>
       </TooltipProvider>
     </QueryClientProvider>
