@@ -68,7 +68,7 @@ export class DFS215ImportService {
       
       // Phase 1: Parse DOCX
       console.log('Phase 1: Parsing DOCX document...');
-      const nodes = await this.parser.parseDocx(filePath);
+      const nodes = await this.parser.parseToNodes(filePath);
       console.log(`  ✓ Parsed ${nodes.length} nodes`);
       
       if (nodes.length === 0) {
@@ -108,7 +108,10 @@ export class DFS215ImportService {
       
       // Phase 4: Extract questions
       console.log('\nPhase 4: Extracting questions from assessments...');
-      const assessmentNodes = this.parser.detectAssessments(nodes);
+      const assessmentNodes = nodes.filter(node => 
+        node.type === 'assessment' || 
+        (node.metadata && node.metadata.isAssessment === true)
+      );
       console.log(`  Found ${assessmentNodes.length} assessment sections`);
       
       const { banks, totalQuestions } = await this.questionExtractor.extractQuestions(nodes);
