@@ -226,7 +226,7 @@ export default function Dashboard() {
               <div className="space-y-6">
                 <Card className="education-card border-primary/20 hover:border-primary/40 transition-all duration-300">
                   <CardContent className="p-8">
-                    <h3 className="cinzel text-2xl font-bold mb-6 text-elite">Course Tracks</h3>
+                    <h3 className="text-2xl font-bold mb-6 text-elite" style={{fontFamily: 'Cinzel, serif'}}>Course Tracks</h3>
                     <div className="space-y-4">
                       {progressLoading ? (
                         <div className="space-y-4">
@@ -239,10 +239,43 @@ export default function Dashboard() {
                           // Create a URL for the first lesson in this track
                           const trackUrl = `/track/${track.id}`;
                           
+                          // Parse messy track title into clean academic format
+                          const parseTrackTitle = (messyTitle: string) => {
+                            const cleanPatterns = {
+                              'iPower|Instructor.*Seminar|LIVE.*Day': 'Professional Sales Training Seminar',
+                              'Law.*Ethics|Ethics.*Law|Professional.*Responsibility': 'Professional Ethics & Law',
+                              'Health.*Insurance.*Content|DFS.*Health': 'Health Insurance Fundamentals',
+                              'Managed.*Care|HMO|PPO|EPO': 'Managed Care Organizations',
+                              'Social.*Insurance|OASDI|Medicare': 'Social Insurance & Medicare',
+                              'Disability.*Income|Income.*Insurance': 'Disability Income Insurance',
+                              'Life.*Insurance|Term.*Life|Whole.*Life': 'Life Insurance Products',
+                              'Annuities|Variable.*Products': 'Annuities & Variable Products',
+                              'FIGA|DFS|CFO|Florida.*Guaranty': 'Florida Insurance Regulation'
+                            };
+                            
+                            for (const [pattern, cleanTitle] of Object.entries(cleanPatterns)) {
+                              if (new RegExp(pattern, 'i').test(messyTitle)) {
+                                return cleanTitle;
+                              }
+                            }
+                            
+                            // Fallback: extract first meaningful part
+                            if (messyTitle.length > 50) {
+                              let clean = messyTitle.split(/[|,\d+]/)[0]?.trim();
+                              if (clean && clean.length > 10 && clean.length < 60) {
+                                return clean.replace(/BEGIN|NEXT|LIVE/gi, '').trim();
+                              }
+                            }
+                            
+                            return messyTitle.length > 40 ? 'Professional Development Course' : messyTitle;
+                          };
+                          
+                          const cleanTitle = parseTrackTitle(track.title);
+
                           return (
                             <Link key={track.id} href={trackUrl}>
                               <Card 
-                                className="education-card p-5 cursor-pointer group relative overflow-hidden"
+                                className="education-card p-5 cursor-pointer group relative overflow-hidden academic-course-card"
                                 data-testid={`track-${track.id}`}
                               >
                             <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -253,17 +286,17 @@ export default function Dashboard() {
                                     <BookOpen className="w-6 h-6 text-white" />
                                   </div>
                                   <div>
-                                    <h4 className="font-bold text-lg group-hover:text-primary transition-colors">
-                                      {track.title}
+                                    <h4 className="font-bold text-lg group-hover:text-primary transition-colors" style={{fontFamily: 'Cinzel, serif'}}>
+                                      {cleanTitle}
                                     </h4>
-                                    <p className="text-sm text-muted-foreground">
+                                    <p className="text-sm text-muted-foreground" style={{fontFamily: 'Cinzel, serif'}}>
                                       {track.completedLessons} of {track.totalLessons} lessons
                                     </p>
                                   </div>
                                 </div>
                                 <div className="flex items-center space-x-2">
                                   {track.ceHours > 0 && (
-                                    <Badge className="bg-primary/20 text-primary border-primary/30">
+                                    <Badge className="bg-primary/20 text-primary border-primary/30" style={{fontFamily: 'Cinzel, serif'}}>
                                       {track.ceHours}-Hr CE
                                     </Badge>
                                   )}
@@ -273,10 +306,10 @@ export default function Dashboard() {
                               
                               <div className="mb-4">
                                 <div className="flex justify-between items-center mb-2">
-                                  <span className="text-sm font-medium text-muted-foreground">
+                                  <span className="text-sm font-medium text-muted-foreground" style={{fontFamily: 'Cinzel, serif'}}>
                                     Progress
                                   </span>
-                                  <span className="text-sm font-bold text-primary">{track.progress}%</span>
+                                  <span className="text-sm font-bold text-primary" style={{fontFamily: 'Cinzel, serif'}}>{track.progress}%</span>
                                 </div>
                                 <div className="w-full bg-muted/30 rounded-full h-3 relative overflow-hidden">
                                   <div 
@@ -289,8 +322,8 @@ export default function Dashboard() {
                               </div>
                               
                               <div className="flex items-center justify-between">
-                                <span className="text-xs text-muted-foreground">Next: {track.progress < 100 ? 'Continue Learning' : 'Review Complete'}</span>
-                                <Button size="sm" className="bg-primary/10 hover:bg-primary/20 text-primary border-primary/30">
+                                <span className="text-xs text-muted-foreground" style={{fontFamily: 'Cinzel, serif'}}>Next: {track.progress < 100 ? 'Continue Learning' : 'Review Complete'}</span>
+                                <Button size="sm" className="bg-primary/10 hover:bg-primary/20 text-primary border-primary/30" style={{fontFamily: 'Cinzel, serif'}}>
                                   {track.progress < 100 ? 'Continue' : 'Review'}
                                 </Button>
                               </div>
@@ -310,7 +343,7 @@ export default function Dashboard() {
                 {/* Recent Activity */}
                 <Card className="education-card border-secondary/20 hover:border-secondary/40 transition-all duration-300">
                   <CardContent className="p-8">
-                    <h3 className="cinzel text-2xl font-bold mb-6 text-elite">Recent Activity</h3>
+                    <h3 className="text-2xl font-bold mb-6 text-elite" style={{fontFamily: 'Cinzel, serif'}}>Recent Activity</h3>
                     <div className="space-y-4">
                       <div className="flex items-center space-x-4 p-4 glassmorphism-card rounded-2xl border border-primary/20 hover:border-primary/40 transition-all duration-300 group">
                         <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">

@@ -700,7 +700,7 @@
 
   /* Academic Course Cards */
   .academic-course-card {
-    font-family: 'Cinzel', serif;
+    font-family: 'Cinzel', serif !important;
     position: relative;
     background: linear-gradient(135deg, 
       hsla(var(--card), 0.95) 0%, 
@@ -711,7 +711,14 @@
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
   
-  .academic-course-card * {
+  .academic-course-card *,
+  .academic-course-card h1,
+  .academic-course-card h2,
+  .academic-course-card h3,
+  .academic-course-card h4,
+  .academic-course-card p,
+  .academic-course-card span,
+  .academic-course-card button {
     font-family: 'Cinzel', serif !important;
   }
 
