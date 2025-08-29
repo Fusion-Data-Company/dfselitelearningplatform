@@ -81,20 +81,20 @@ export default function Sidebar() {
                 <Link key={item.href} href={item.href}>
                   <Button
                     variant="ghost"
-                    className={`sidebar-nav w-full justify-start h-auto p-4 geist font-medium relative group ${
+                    className={`sidebar-nav w-full justify-start h-auto p-4 geist font-medium relative group overflow-hidden ${
                       isActive 
-                        ? 'bg-gradient-to-r from-primary/20 to-secondary/15 text-primary border border-primary/30 shadow-lg shadow-primary/20' 
-                        : 'hover:bg-gradient-to-r hover:from-primary/10 hover:to-secondary/8 hover:shadow-md hover:shadow-primary/10'
+                        ? 'bg-gradient-to-r from-cyan-500/25 via-black/30 to-cyan-700/20 text-cyan-300 border border-cyan-400/40 shadow-lg shadow-cyan-500/30 before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/10 before:to-transparent before:translate-x-[-100%] before:animate-[shimmer_2s_ease-in-out_infinite] backdrop-blur-md' 
+                        : 'hover:bg-gradient-to-r hover:from-cyan-500/15 hover:via-black/20 hover:to-cyan-700/10 hover:shadow-md hover:shadow-cyan-500/20 hover:backdrop-blur-sm'
                     }`}
                     data-testid={`nav-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
                     style={{
                       boxShadow: isActive 
-                        ? `0 0 20px ${getColorForGlow(item.color)}20, 0 0 40px ${getColorForGlow(item.color)}10`
+                        ? `0 0 25px #06b6d430, 0 0 45px #06b6d415, inset 0 1px 0 rgba(255,255,255,0.1)`
                         : undefined
                     }}
                     onMouseEnter={(e) => {
                       if (!isActive) {
-                        e.currentTarget.style.boxShadow = `0 0 15px ${getColorForGlow(item.color)}15, 0 0 30px ${getColorForGlow(item.color)}08`;
+                        e.currentTarget.style.boxShadow = `0 0 20px #06b6d425, 0 0 35px #06b6d412, inset 0 1px 0 rgba(255,255,255,0.05)`;
                       }
                     }}
                     onMouseLeave={(e) => {
@@ -103,9 +103,15 @@ export default function Sidebar() {
                       }
                     }}
                   >
-                    <Icon className={`w-5 h-5 mr-4 ${isActive ? 'text-primary animate-pulse' : item.color} transition-all duration-300 drop-shadow-lg`} />
-                    <span className="text-sm">{item.label}</span>
-                    {isActive && <ChevronRight className="w-4 h-4 ml-auto text-primary animate-pulse" />}
+                    <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500/20 to-black/40 mr-3 flex-shrink-0 border border-cyan-500/30">
+                      <Icon className={`w-5 h-5 ${isActive ? 'text-cyan-300 animate-pulse drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]' : item.color} transition-all duration-300`} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <span className={`text-sm font-medium leading-tight ${isActive ? 'text-cyan-200' : 'text-foreground'} transition-colors duration-300 block`}>
+                        {item.label}
+                      </span>
+                    </div>
+                    {isActive && <ChevronRight className="w-4 h-4 ml-2 text-cyan-300 animate-pulse drop-shadow-[0_0_6px_rgba(6,182,212,0.8)] flex-shrink-0" />}
                   </Button>
                 </Link>
               );
@@ -128,39 +134,51 @@ export default function Sidebar() {
               const color = colors[index % 3];
               
               return (
-                <div 
-                  key={track.id} 
-                  className={`p-4 education-card border ${color.border} transition-all duration-300 group cursor-pointer hover:shadow-lg`}
-                  style={{
-                    boxShadow: `0 0 15px ${getColorForGlow(getColorForIndex(index))}15, 0 0 25px ${getColorForGlow(getColorForIndex(index))}08`
-                  }}
-                  onMouseEnter={(e) => {
-                    const color = getColorForGlow(getColorForIndex(index));
-                    e.currentTarget.style.boxShadow = `0 0 20px ${color}25, 0 0 35px ${color}15`;
-                  }}
-                  onMouseLeave={(e) => {
-                    const color = getColorForGlow(getColorForIndex(index));
-                    e.currentTarget.style.boxShadow = `0 0 15px ${color}15, 0 0 25px ${color}08`;
-                  }}
-                >
-                  <div className="flex justify-between items-center mb-3">
-                    <span className="text-xs font-bold text-white bg-black/70 px-2 py-1 rounded transition-colors">
-                      {track.title.length > 15 ? track.title.substring(0, 15) + '...' : track.title}
-                    </span>
-                    <Badge className="bg-white/90 text-black text-xs font-bold border-0">
-                      {track.progress}%
-                    </Badge>
+                <Link key={track.id} href="/lesson/HMO-balance-billing">
+                  <div 
+                    className={`p-4 education-card border ${color.border} transition-all duration-300 group cursor-pointer hover:shadow-lg relative overflow-hidden`}
+                    style={{
+                      boxShadow: `0 0 15px #06b6d415, 0 0 25px #06b6d408, inset 0 1px 0 rgba(255,255,255,0.05)`
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.boxShadow = `0 0 25px #06b6d425, 0 0 40px #06b6d415, inset 0 1px 0 rgba(255,255,255,0.1)`;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.boxShadow = `0 0 15px #06b6d415, 0 0 25px #06b6d408, inset 0 1px 0 rgba(255,255,255,0.05)`;
+                    }}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-500/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                    <div className="relative z-10">
+                      <div className="flex justify-between items-center mb-3">
+                        <div className="flex items-center space-x-2">
+                          <div className="w-2 h-2 rounded-full bg-gradient-to-r from-cyan-400 to-cyan-600 animate-pulse"></div>
+                          <span className="text-sm font-bold text-cyan-100 cinzel tracking-wide">
+                            {track.title.length > 18 ? track.title.substring(0, 18) + '...' : track.title}
+                          </span>
+                        </div>
+                        <Badge className="bg-gradient-to-r from-cyan-500/30 to-cyan-700/30 text-cyan-200 text-xs font-bold border border-cyan-500/50 backdrop-blur-sm">
+                          {track.progress}%
+                        </Badge>
+                      </div>
+                      <div className="w-full bg-gradient-to-r from-black/60 via-gray-800/40 to-black/60 rounded-full h-3 relative overflow-hidden border border-cyan-500/20">
+                        <div 
+                          className="bg-gradient-to-r from-cyan-400 via-cyan-500 to-cyan-600 h-3 rounded-full transition-all duration-700 relative overflow-hidden" 
+                          style={{ width: `${track.progress}%` }}
+                        >
+                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
+                        </div>
+                      </div>
+                      <div className="mt-3 flex justify-between items-center">
+                        <span className="text-xs text-cyan-300 bg-gradient-to-r from-black/70 to-black/50 px-2 py-1 rounded border border-cyan-500/30 geist font-medium">
+                          {track.completedLessons}/{track.totalLessons} lessons
+                        </span>
+                        <span className="text-xs text-cyan-400 cinzel font-semibold">
+                          Click to Start →
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="w-full bg-gray-300 rounded-full h-2 relative overflow-hidden">
-                    <div 
-                      className="bg-gradient-to-r from-cyan-400 to-cyan-600 h-2 rounded-full transition-all duration-500" 
-                      style={{ width: `${track.progress}%` }}
-                    />
-                  </div>
-                  <div className="mt-2 text-xs text-white bg-black/50 px-2 py-1 rounded">
-                    {track.completedLessons}/{track.totalLessons} lessons
-                  </div>
-                </div>
+                </Link>
               );
             })}
             

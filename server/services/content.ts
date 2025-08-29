@@ -199,24 +199,110 @@ export class ContentService {
         moduleId: module.id,
         title: "HMO Balance Billing Restrictions",
         slug: "hmo-balance-billing",
-        content: `# HMO Balance Billing Restrictions
+        content: `# HMO Balance Billing Restrictions: A Comprehensive Guide
 
 ## Learning Objectives
-- Explain why balance billing is prohibited for HMO in-network providers
-- Identify the pre-negotiated rate structure in managed care networks
-- Describe PCP referral requirements and cost-sharing implications
+By the end of this lesson, you will be able to:
+- **Explain** the legal and contractual basis for balance billing prohibitions in HMO networks
+- **Identify** the key components of pre-negotiated rate structures and their impact on provider compensation
+- **Describe** the PCP's role as gatekeeper and its effect on cost control and care coordination
+- **Analyze** real-world scenarios involving HMO billing compliance and member cost-sharing
+- **Apply** Florida DFS-215 regulations to practical billing situations
+
+## Introduction: Understanding Managed Care Fundamentals
+
+Health Maintenance Organizations (HMOs) represent a cornerstone of managed care delivery in Florida's insurance landscape. Unlike traditional fee-for-service models, HMOs operate on a prepaid, capitated system that fundamentally changes the financial relationship between providers, plans, and members.
 
 ## Key Concept: Balance Billing Restrictions
 
-In Health Maintenance Organizations (HMOs), network providers are contractually prohibited from balance billing subscribers. This restriction is fundamental to the managed care model and directly impacts both provider compensation and subscriber cost exposure.
+### Definition and Legal Framework
+**Balance Billing** is the practice of billing a patient for the difference between a provider's charged amount and the amount paid by the insurance plan. For HMO in-network providers, this practice is:
+- **Contractually prohibited** under provider network agreements
+- **Legally restricted** under Florida insurance regulations
+- **Subject to penalties** including network termination and regulatory action
 
-**Balance Billing:** The practice of billing a patient for the difference between the provider's charged amount and the amount paid by the insurance plan. This practice is prohibited for in-network HMO providers.
+### The Pre-Negotiated Rate Structure
 
-HMO providers agree to accept the plan's pre-negotiated rates as payment in full for covered services. Subscribers are only responsible for their designated cost-sharing amounts (copayments, coinsurance, or deductibles) as specified in their benefit structure.
+HMO providers enter into comprehensive network agreements that establish:
 
-## Primary Care Physician (PCP) Role
+#### 1. **Fee Schedules**
+- Predetermined rates for specific procedures and services
+- Annual adjustment mechanisms based on medical inflation
+- Specialty-specific pricing tiers
 
-The PCP serves as the gatekeeper in the HMO model, coordinating care and managing referrals to specialists. This systematic approach helps control costs while ensuring appropriate utilization of healthcare services.`,
+#### 2. **Capitation Arrangements**
+- Monthly per-member payments for primary care services
+- Risk-sharing models for specialist referrals
+- Performance-based incentive structures
+
+#### 3. **Cost-Sharing Parameters**
+- Member copayment amounts for office visits
+- Prescription drug tier structures
+- Emergency services cost-sharing rules
+
+## Primary Care Physician (PCP) Gatekeeper Model
+
+### Core Functions
+The PCP serves multiple critical roles in the HMO structure:
+
+#### **Care Coordination**
+- Initial patient assessment and diagnosis
+- Treatment plan development and management
+- Coordination with specialists and ancillary providers
+
+#### **Referral Management**
+- Authorization for specialist consultations
+- Prior approval for non-emergency procedures
+- Monitoring of specialist treatment plans
+
+#### **Cost Control**
+- Prevention-focused care delivery
+- Appropriate utilization management
+- Member education on cost-effective care options
+
+### Real-World Application: Case Study
+
+**Scenario:** Maria visits her HMO primary care physician for persistent headaches. The PCP recommends an MRI, which requires prior authorization.
+
+**Compliance Requirements:**
+1. **PCP Responsibility:** Obtain prior authorization before ordering MRI
+2. **Member Cost-Sharing:** $25 copayment for PCP visit, no additional charge for approved MRI
+3. **Provider Billing:** PCP cannot balance bill Maria for any amount beyond the copayment
+4. **Network Obligations:** All providers must accept HMO's contracted rates as payment in full
+
+## Regulatory Compliance and Enforcement
+
+### Florida DFS-215 Requirements
+Licensed insurance professionals must understand:
+- Network adequacy standards for HMO providers
+- Member grievance and appeals processes
+- Provider credentialing and re-credentialing requirements
+- Quality assurance and utilization review mandates
+
+### Penalties for Non-Compliance
+- **Administrative fines** up to $50,000 per violation
+- **License suspension** for repeat offenders
+- **Criminal charges** for fraudulent billing practices
+- **Civil liability** for member harm resulting from improper billing
+
+## Knowledge Check Questions
+
+### Self-Assessment
+1. A network specialist charges $500 for a procedure. The HMO's contracted rate is $300, and the member's coinsurance is 20%. How much can the specialist bill the member?
+
+2. Under what circumstances, if any, can an HMO provider balance bill a member for covered services?
+
+3. What are the potential consequences for a provider who repeatedly balance bills HMO members?
+
+## Summary and Key Takeaways
+
+- **Zero Balance Billing:** HMO in-network providers cannot balance bill members under any circumstances for covered services
+- **Contractual Foundation:** Provider agreements explicitly prohibit balance billing and establish payment-in-full arrangements
+- **Regulatory Oversight:** Florida DFS actively monitors and enforces balance billing prohibitions
+- **Member Protection:** HMO structure provides predictable, limited out-of-pocket costs for members
+- **Professional Responsibility:** Insurance professionals must ensure compliance and protect member interests
+
+**Remember:** Balance billing violations not only breach contractual obligations but also undermine the fundamental consumer protections that make HMO coverage affordable and predictable for Florida residents.`,
         objectives: [
           "Explain why balance billing is prohibited for HMO in-network providers",
           "Identify the pre-negotiated rate structure in managed care networks", 
@@ -228,29 +314,9 @@ The PCP serves as the gatekeeper in the HMO model, coordinating care and managin
       });
     }
 
-    // Create additional sample lessons
-    for (let i = lessons.length; i < 3; i++) {
-      lessons.push({
-        moduleId: module.id,
-        title: `${module.title} - Lesson ${i + 1}`,
-        slug: `${module.title.toLowerCase().replace(/\s+/g, '-')}-lesson-${i + 1}`,
-        content: `# ${module.title} - Lesson ${i + 1}
-
-This lesson covers important concepts related to ${module.title.toLowerCase()}.
-
-## Learning Objectives
-- Understand key principles
-- Apply concepts to real-world scenarios
-- Identify compliance requirements
-
-## Content
-Detailed lesson content would be populated from actual curriculum materials.`,
-        objectives: ["Understand key principles", "Apply concepts to real-world scenarios"],
-        orderIndex: i + 1,
-        duration: 30,
-        ceHours: 0.5
-      });
-    }
+    // Create additional comprehensive lessons based on module content
+    const additionalLessons = this.generateModuleSpecificLessons(module, lessons.length);
+    lessons.push(...additionalLessons);
 
     // Create lessons in database
     for (const lesson of lessons) {
@@ -287,6 +353,293 @@ Detailed lesson content would be populated from actual curriculum materials.`,
     }
 
     return { tracks: result };
+  }
+
+  private generateModuleSpecificLessons(module: Module, startIndex: number): InsertLesson[] {
+    const lessons: InsertLesson[] = [];
+    const moduleTitle = module.title.toLowerCase();
+    
+    // Generate context-aware lessons based on module topic
+    if (moduleTitle.includes('provider') || moduleTitle.includes('network')) {
+      lessons.push({
+        moduleId: module.id,
+        title: "Provider Network Standards and Credentialing",
+        slug: "provider-network-standards",
+        content: `# Provider Network Standards and Credentialing Requirements
+
+## Learning Objectives
+- **Evaluate** provider credentialing requirements and quality standards
+- **Explain** network adequacy requirements and geographic accessibility
+- **Identify** credentialing documentation and verification processes
+- **Apply** regulatory standards to provider network management
+
+## Network Adequacy Standards
+
+### Geographic Accessibility Requirements
+Florida regulations mandate specific accessibility standards:
+
+#### **Primary Care Access**
+- Within 15 miles of member residence in urban areas
+- Within 25 miles in suburban areas  
+- Within 60 miles in rural counties
+- Appointment availability within 14 days for routine care
+
+#### **Specialist Access**
+- Cardiology: Within 30 miles, 30-day appointment availability
+- Mental Health: Within 25 miles, 10-day availability for urgent needs
+- Emergency Care: 24/7 access within reasonable distance
+
+### Provider Credentialing Process
+
+#### **Initial Credentialing Requirements**
+1. **Medical License Verification**
+   - Current Florida medical license
+   - No disciplinary actions or restrictions
+   - Board certification in relevant specialty
+
+2. **Education and Training**
+   - Medical school graduation verification
+   - Residency and fellowship completion
+   - Continuing education compliance
+
+3. **Professional History**
+   - Hospital privileges and affiliations
+   - Malpractice insurance coverage
+   - Previous network participation
+
+#### **Ongoing Monitoring**
+- Annual license renewal verification
+- Continuing education compliance review
+- Quality metrics and patient satisfaction tracking
+- Peer review and outcomes analysis
+
+## Quality Assurance Programs
+
+### Performance Metrics
+Networks must monitor:
+- **Clinical Outcomes:** Patient health improvements and preventive care rates
+- **Patient Satisfaction:** Survey scores and complaint resolution
+- **Access Standards:** Appointment availability and wait times
+- **Cost Effectiveness:** Resource utilization and cost per episode
+
+### Corrective Action Protocols
+- Performance improvement plans for underperforming providers
+- Additional training and mentoring programs
+- Network contract modification or termination procedures
+
+## Compliance and Regulatory Oversight
+
+### Florida Department of Financial Services Requirements
+- Annual network adequacy reporting
+- Provider credentialing file maintenance
+- Member grievance tracking and resolution
+- Quality assurance program documentation
+
+**Key Takeaway:** Provider network management requires continuous oversight to ensure quality care delivery while maintaining regulatory compliance and member satisfaction.`,
+        objectives: [
+          "Evaluate provider credentialing requirements and quality standards",
+          "Explain network adequacy requirements and geographic accessibility",
+          "Apply regulatory standards to provider network management"
+        ],
+        orderIndex: startIndex + 1,
+        duration: 40,
+        ceHours: 0.75
+      });
+    }
+    
+    if (moduleTitle.includes('managed') || moduleTitle.includes('care')) {
+      lessons.push({
+        moduleId: module.id,
+        title: "Managed Care Authorization and Utilization Review",
+        slug: "managed-care-authorization",
+        content: `# Managed Care Authorization and Utilization Review
+
+## Learning Objectives
+- **Analyze** prior authorization requirements and approval processes
+- **Distinguish** between medical necessity criteria and administrative requirements
+- **Evaluate** utilization review programs and their impact on care delivery
+- **Apply** appeals processes for authorization denials
+
+## Prior Authorization Framework
+
+### Services Requiring Authorization
+Managed care plans typically require prior authorization for:
+
+#### **High-Cost Services**
+- Inpatient hospital admissions (non-emergency)
+- Advanced imaging (MRI, CT, PET scans)
+- Specialty pharmaceuticals and biologics
+- Durable medical equipment over $1,000
+
+#### **Specialty Care Services**
+- Physical therapy beyond initial evaluation
+- Mental health and substance abuse treatment
+- Home healthcare services
+- Transplant procedures and evaluations
+
+### Authorization Process Timeline
+
+#### **Standard Authorization**
+- **Submission Deadline:** 72 hours before service
+- **Review Period:** 14 calendar days maximum
+- **Notification:** Written decision within 2 business days of determination
+
+#### **Urgent Authorization**
+- **Clinical Urgency:** When delay could jeopardize health
+- **Review Period:** 72 hours maximum
+- **Verbal Approval:** Permitted with written follow-up
+
+## Medical Necessity Criteria
+
+### Clinical Guidelines
+Plans must base authorization decisions on:
+- Evidence-based medical guidelines
+- Professional society recommendations  
+- FDA-approved indications and protocols
+- Clinical outcomes research
+
+### Documentation Requirements
+- Relevant medical history and examination findings
+- Previous treatment attempts and outcomes
+- Clinical rationale for proposed intervention
+- Expected treatment goals and success measures
+
+## Utilization Review Programs
+
+### Concurrent Review
+- Daily monitoring of inpatient stays
+- Assessment of continued medical necessity
+- Discharge planning coordination
+- Length of stay optimization
+
+### Retrospective Review
+- Post-service medical necessity evaluation
+- Claims payment determination
+- Provider education and feedback
+- Pattern analysis for future authorizations
+
+## Appeals and Grievance Process
+
+### Internal Appeals
+1. **First-Level Review:** Clinical staff review within 30 days
+2. **Second-Level Review:** Medical director or physician panel review
+3. **Expedited Appeals:** 72-hour review for urgent situations
+
+### External Review
+- Independent medical review organization
+- Binding decision on medical necessity
+- Available after internal appeals exhaustion
+- Required for certain high-cost or experimental treatments
+
+**Critical Point:** Authorization requirements must balance cost control with patient access to medically necessary care, always prioritizing member health and safety.`,
+        objectives: [
+          "Analyze prior authorization requirements and approval processes",
+          "Distinguish between medical necessity criteria and administrative requirements",
+          "Apply appeals processes for authorization denials"
+        ],
+        orderIndex: startIndex + 2,
+        duration: 45,
+        ceHours: 0.75
+      });
+    }
+    
+    // Default comprehensive lesson for other modules
+    if (lessons.length === 0) {
+      lessons.push({
+        moduleId: module.id,
+        title: `Advanced Concepts in ${module.title}`,
+        slug: `advanced-${module.title.toLowerCase().replace(/\s+/g, '-')}-concepts`,
+        content: `# Advanced Concepts in ${module.title}
+
+## Learning Objectives
+- **Master** advanced principles and regulatory requirements in ${module.title.toLowerCase()}
+- **Analyze** complex compliance scenarios and risk management strategies
+- **Evaluate** industry best practices and emerging trends
+- **Apply** critical thinking to real-world professional challenges
+
+## Professional Context
+
+The Florida insurance landscape requires insurance professionals to maintain comprehensive knowledge of ${module.title.toLowerCase()} regulations and industry standards. This advanced lesson builds upon foundational concepts to explore nuanced applications and emerging challenges.
+
+## Key Regulatory Framework
+
+### Florida Statutes and Administrative Code
+- Chapter 626: Insurance agent licensing and conduct
+- Chapter 627: Insurance contracts and coverage requirements  
+- Chapter 641: Health maintenance organizations
+- Administrative rules and bulletins
+
+### Compliance Requirements
+Insurance professionals must:
+- Maintain continuing education requirements
+- Follow ethical standards and professional conduct rules
+- Implement proper disclosure and documentation procedures
+- Ensure regulatory compliance in all client interactions
+
+## Advanced Applications
+
+### Risk Assessment and Management
+- **Client Needs Analysis:** Comprehensive evaluation of coverage requirements
+- **Product Suitability:** Matching insurance products to client circumstances
+- **Regulatory Compliance:** Ensuring all recommendations meet state requirements
+- **Documentation Standards:** Maintaining complete and accurate client records
+
+### Professional Ethics and Standards
+- **Fiduciary Responsibility:** Acting in the client's best interest
+- **Conflict of Interest:** Identifying and managing potential conflicts
+- **Professional Development:** Maintaining current knowledge and skills
+- **Industry Standards:** Following best practices and professional guidelines
+
+## Emerging Trends and Challenges
+
+### Technology and Innovation
+- Digital platforms and online insurance services
+- Artificial intelligence in underwriting and claims processing
+- Cybersecurity and data protection requirements
+- Mobile applications and customer service enhancement
+
+### Regulatory Evolution
+- Healthcare reform implementation
+- Consumer protection enhancements
+- Market competition and innovation
+- Professional licensing modernization
+
+## Case Study Applications
+
+### Scenario Analysis
+Examine complex client situations requiring:
+- Multi-product insurance solutions
+- Regulatory compliance verification
+- Risk mitigation strategies
+- Professional judgment and decision-making
+
+### Best Practices Implementation
+- Client communication and education
+- Documentation and record-keeping
+- Regulatory reporting and compliance
+- Professional development and networking
+
+## Knowledge Synthesis
+
+This advanced content prepares insurance professionals to:
+- Handle complex client needs with confidence
+- Navigate regulatory requirements effectively
+- Maintain high professional standards
+- Contribute to industry excellence and consumer protection
+
+**Professional Development Note:** Mastery of these advanced concepts enhances career opportunities and establishes credibility as a knowledgeable insurance professional committed to excellence and ethical practice.`,
+        objectives: [
+          `Master advanced principles and regulatory requirements in ${module.title.toLowerCase()}`,
+          "Analyze complex compliance scenarios and risk management strategies",
+          "Apply critical thinking to real-world professional challenges"
+        ],
+        orderIndex: startIndex + 1,
+        duration: 35,
+        ceHours: 0.65
+      });
+    }
+    
+    return lessons;
   }
 
   async getUserCourseProgress(userId: string): Promise<{

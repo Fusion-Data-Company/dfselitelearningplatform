@@ -53,6 +53,16 @@
   
   /* Enterprise Design Tokens */
   --radius: 16px;
+}
+
+/* Glassmorphic Shimmer Animation */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Additional CSS variables */
+:root {
   --elite-radius: 24px;
   --spacing: 0.25rem;
   
