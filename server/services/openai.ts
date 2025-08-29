@@ -117,14 +117,26 @@ export async function generateFlashcards(
   cards: Array<{
     id: string;
     type: 'term' | 'mcq' | 'cloze';
-    front: string;
-    back: string;
+    front?: string;
+    back?: string;
+    prompt?: string;
+    options?: string[];
+    answerIndex?: number;
+    rationale?: string;
     sourceId?: string;
   }>;
   count: number;
 }> {
   try {
-    const systemPrompt = `You are an expert flashcard generator for insurance education. Create ${count} flashcards from the provided content in ${style} style. Focus on key terms, concepts, regulations, and practical applications. Return JSON with this format: {"cards": [{"id": "uuid", "type": "term|mcq|cloze", "front": "question/term", "back": "answer/definition", "sourceId": "optional"}], "count": number}`;
+    const systemPrompt = `You are an expert flashcard generator for insurance education. Create ${count} flashcards from the provided content in ${style} style. Focus on key terms, concepts, regulations, and practical applications. 
+
+For MCQ cards, use this structure:
+{"type": "mcq", "prompt": "Question stem without choices", "options": ["Option A text", "Option B text", "Option C text", "Option D text"], "answerIndex": 1, "rationale": "Brief explanation", "sourceId": "optional"}
+
+For term/cloze cards, use:
+{"type": "term", "front": "question/term", "back": "answer/definition", "sourceId": "optional"}
+
+Return JSON: {"cards": [...], "count": number}`;
 
     const response = await getOpenAI().chat.completions.create({
       model: "gpt-4o",

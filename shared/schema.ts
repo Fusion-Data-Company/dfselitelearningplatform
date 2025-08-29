@@ -148,8 +148,14 @@ export const flashcards = pgTable("flashcards", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }),
   type: varchar("type").notNull(), // 'term', 'mcq', 'cloze'
-  front: text("front").notNull(),
-  back: text("back").notNull(),
+  front: text("front"),
+  back: text("back"),
+  // MCQ-specific fields
+  prompt: text("prompt"), // Question stem for MCQs
+  options: jsonb("options").$type<string[]>(), // Array of choices for MCQs
+  answerIndex: integer("answer_index"), // 0-based correct answer index
+  rationale: text("rationale"), // Explanation for MCQs
+  // Legacy/metadata
   sourceId: varchar("source_id"), // Reference to content chunk or lesson
   difficulty: real("difficulty").default(2.5), // SM-2 ease factor
   interval: integer("interval").default(1), // Days until next review

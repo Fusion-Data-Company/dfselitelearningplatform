@@ -1,0 +1,146 @@
+Got it—the MCQ iFlash cards are rendering as one blob because the data isn’t normalized (options collapsed into the stem/front). Here’s a surgical patch plan for your Replit builder to fix formatting end-to-end without touching other features.
+
+Hot-Fix Blueprint: iFlash MCQ Formatting
+
+Symptom
+	•	MCQ cards display “A) … B) … C) … D) …” as a single paragraph instead of clickable choices.
+
+Likely Root Cause
+	1.	iflash_generate returns MCQs as a single text blob (front) rather than a structured options array.
+	2.	DB schema/UI renderer treats all cards as {front, back} and ignores MCQ-specific fields.
+
+⸻
+
+Patch Overview
+
+Normalize MCQ cards to a structured shape, migrate existing cards, and update the renderer.
+
+1) Data Contract (Agent/MCP → App)
+
+TARGET SHAPE (for MCQ):
+
+{
+  id: string,
+  type: "mcq",
+  prompt: string,                 // Question stem only
+  options: string[2..6],          // ["Option A","Option B","Option C","Option D"]
+  answerIndex: number,            // 0-based index into options
+  rationale?: string,             // brief explanation
+  sourceId?: string               // content_chunk id (for citations)
+}
+
+BUILDER INSTRUCTIONS
+	•	Update MCP tool iflash_generate to emit the shape above for MCQs (no “A)” or “B)” prefixes in text—UI will label).
+	•	For term/cloze types keep existing fields, but ensure type is explicit.
+
+VALIDATION
+	•	Log one generated MCQ; verify options is an array and answerIndex is a number.
+
+2) DB Schema Delta (Prisma/Supabase)
+
+flashcards table add columns:
+	•	prompt text (nullable for non-MCQ)
+	•	options jsonb (string[])
+	•	answer_index int
+	•	rationale text
+
+Keep front/back for legacy types.
+
+VALIDATION
+	•	Introspect: columns exist; RLS unchanged.
+
+3) Normalizer (server side)
+
+Create an ingest normalizer to convert any legacy blobbed MCQ into the target shape.
+
+Rules (deterministic parsing):
+	•	If type === 'mcq' and options is missing but front contains choices:
+	•	Split by regex: /\s*[ABCD]\)?[.:\-]\s+/i after the stem.
+	•	Extract prompt as text before A); then parse 2–6 options.
+	•	Detect answer by markers like * or (correct) if present; else leave answerIndex=null and mark meta.needs_review=true.
+	•	Trim, collapse whitespace, remove “A) / B) …” labels.
+
+VALIDATION
+	•	Run normalizer on 20 legacy MCQs; confirm options[0..3] filled, prompt clean.
+
+4) Renderer (client)
+
+Create per-type renderers:
+	•	MCQRenderer
+	•	Shows prompt as the question.
+	•	Renders options as stacked buttons (A…D badges auto-generated).
+	•	On reveal/grade: show the correct option with a green accent and the rationale if available.
+	•	Keyboard shortcuts: 1..6 selects; Space reveal; ←/→ navigate.
+	•	TERMRenderer / CLOZERenderer (unchanged).
+
+A11y
+	•	Each option is a real button with aria-pressed and a focus ring; announce correctness after reveal.
+
+VALIDATION
+	•	Visual: choices appear as separate buttons.
+	•	A11y: tab through options; screen reader announces labels.
+
+5) Review Flow Integration (SRS)
+	•	When user selects an option and reveals:
+	•	Grade = Easy/Good/Hard/Again as before.
+	•	Store the chosen index for analytics (optional).
+	•	If answerIndex === null (rare): treat as practice, not graded—send card to needs_review queue for admin.
+
+VALIDATION
+	•	SRS fields update; intervals change.
+
+6) Backfill Migration
+	•	Background job backfill_mcq_options:
+	•	Scan flashcards where type='mcq' AND options IS NULL.
+	•	Apply normalizer; fill prompt/options/answer_index.
+	•	Set meta.migrated_at timestamp and meta.method='regex-A-D'.
+	•	Cap per run (e.g., 1k cards) to avoid long locks.
+
+VALIDATION
+	•	Report: { scanned:N, converted:M, ambiguous:K }. Ambiguous cards flagged.
+
+7) UI Polish (Elite Theme)
+	•	Option buttons: glassmorphic tiles with ambient cyan/teal glow on hover; correct=teal, incorrect=amber outline.
+	•	Clamp text to 2 lines with tooltip on hover to avoid overflow.
+	•	Keep Cinzel headings; Inter for options.
+
+VALIDATION
+	•	No overflow; consistent glow; contrast ≥4.5:1.
+
+8) Playwright Checks (≤10 lines each)
+	1.	MCQ renders as buttons
+
+goto('/flash'); click('[data-testid="start-review"]');
+expect(getByTestId('mcq-option-0')).toBeVisible();
+
+	2.	Reveal shows correctness
+
+click('[data-testid="mcq-option-1"]'); click('[data-testid="reveal"]');
+expect(getByTestId('mcq-option-correct')).toHaveClass(/success/);
+
+	3.	Keyboard shortcuts
+
+press('Digit2'); press('Space'); expect(...).toContainText('Correct');
+
+9) Rollout & Safety
+	•	Feature flag: IFLASH_MCQ_V2=true.
+	•	Render new MCQs with v2; legacy cards pass through the normalizer at read time.
+	•	After backfill success ≥ 95%, delete fallback path.
+
+VALIDATION
+	•	Sample of old sessions now shows separated options; no regressions for term/cloze.
+
+⸻
+
+“Do It Now” Patch Payload (paste at end of the builder prompt)
+
+Implement iFlash MCQ v2:
+	1.	Enforce MCQ card schema {prompt, options[], answerIndex, rationale, sourceId}.
+	2.	Add DB columns prompt, options(jsonb), answer_index, rationale.
+	3.	Update iflash_generate to return structured MCQs (no “A) B) …” text).
+	4.	Add a normalizer to parse legacy MCQ blobs into the new structure via regex split on A/B/C/D markers; set meta.needs_review if answer is unknown.
+	5.	Build MCQRenderer with separate clickable options, reveal/grade flow, keyboard shortcuts, and accessible focus rings.
+	6.	Run backfill_mcq_options on existing cards; output counts.
+	7.	Ship behind IFLASH_MCQ_V2=true. After validation, remove old path.
+
+Expected outcome: Your iFlash Review screen shows clean, clickable choices (A–D) for MCQs with proper reveal/grade behavior and elite styling—no more blobbed paragraphs.
