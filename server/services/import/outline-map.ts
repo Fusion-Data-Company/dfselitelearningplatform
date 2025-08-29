@@ -90,41 +90,72 @@ export class OutlineMapper {
             lessons: []
           };
         }
-        // H3 - Lesson level
-        else if (node.level === 3 && currentModule) {
-          // Save previous lesson if exists
-          if (currentLesson) {
-            currentLesson.content = lessonContent.join('\n\n');
-            currentModule.lessons.push(currentLesson);
-            lessonContent = [];
+        // H3 - Lesson level  
+        else if (node.level === 3) {
+          // If no module exists, create a default one
+          if (!currentModule && currentTrack) {
+            moduleOrder++;
+            currentModule = {
+              title: 'Content',
+              slug: 'content-' + moduleOrder,
+              description: 'Course content and materials',
+              orderIndex: moduleOrder,
+              lessons: []
+            };
           }
           
-          // Create new lesson
-          lessonOrder++;
-          const isCE = this.isCELesson(node.text, currentTrack?.title);
-          const isPractice = this.isPracticeLesson(node.text);
-          
-          currentLesson = {
-            title: this.cleanTitle(node.text),
-            slug: this.generateSlug(node.text),
-            description: this.generateDescription(node.text),
-            content: '',
-            orderIndex: lessonOrder,
-            duration: this.estimateDuration(node.text),
-            objectives: this.extractObjectives(nodes, i),
-            ceHours: isCE ? 1 : 0,
-            isActive: true
-          };
+          if (currentModule) {
+            // Save previous lesson if exists
+            if (currentLesson) {
+              currentLesson.content = lessonContent.join('\n\n');
+              currentModule.lessons.push(currentLesson);
+              lessonContent = [];
+            }
+            
+            // Create new lesson
+            lessonOrder++;
+            const isCE = this.isCELesson(node.text, currentTrack?.title);
+            const isPractice = this.isPracticeLesson(node.text);
+            
+            currentLesson = {
+              title: this.cleanTitle(node.text),
+              slug: this.generateSlug(node.text),
+              description: this.generateDescription(node.text),
+              content: '',
+              orderIndex: lessonOrder,
+              duration: this.estimateDuration(node.text),
+              objectives: this.extractObjectives(nodes, i),
+              ceHours: isCE ? 1 : 0,
+              isActive: true
+            };
+          }
         }
         // H4/H5 - Subsections within lesson
         else if ((node.level === 4 || node.level === 5) && currentLesson) {
           const level = node.level === 4 ? '##' : '###';
-          lessonContent.push(`${level} ${node.text}`);
+          lessonContent.push(`${level} ${node.content || node.text}`);
         }
       }
-      // Regular content
-      else if (node.type === 'content' && currentLesson) {
-        lessonContent.push(node.text);
+      // Regular content - use FULL content not truncated text!
+      else if (node.type === 'content') {
+        if (currentLesson) {
+          lessonContent.push(node.content);  // Use full content from DOCX
+        } else if (currentModule && node.content.length > 100) {
+          // Create a default lesson for orphaned content
+          lessonOrder++;
+          currentLesson = {
+            title: this.extractTitleFromContent(node.content),
+            slug: this.generateSlug(this.extractTitleFromContent(node.content)),
+            description: node.content.substring(0, 200) + '...',
+            content: '',
+            orderIndex: lessonOrder,
+            duration: 20,
+            objectives: this.extractObjectives(nodes, i),
+            ceHours: 0,
+            isActive: true
+          };
+          lessonContent.push(node.content);
+        }
       }
     }
     
@@ -226,6 +257,18 @@ export class OutlineMapper {
     if (text.toLowerCase().includes('overview')) return 10;
     if (text.toLowerCase().includes('introduction')) return 15;
     return 20; // Default duration
+  }
+  
+  private extractTitleFromContent(content: string): string {
+    // Extract first meaningful line as title
+    const lines = content.split('\n');
+    for (const line of lines) {
+      const cleaned = line.trim();
+      if (cleaned.length > 10 && cleaned.length < 100) {
+        return cleaned.substring(0, 60);
+      }
+    }
+    return 'Course Content';
   }
   
   private extractObjectives(nodes: ParsedNode[], currentIndex: number): string[] {

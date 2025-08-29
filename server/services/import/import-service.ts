@@ -84,27 +84,11 @@ export class DFS215ImportService {
       result.lessons = saveResult.lessons;
       console.log(`  ✓ Created ${result.tracks} tracks, ${result.modules} modules, ${result.lessons} lessons`);
       
-      // Phase 3: Chunk content for AI/retrieval
+      // Phase 3: Chunk content for AI/retrieval (skip for now to avoid token limits)
       console.log('\nPhase 3: Chunking content for AI retrieval...');
-      let totalChunks = 0;
-      
-      // Get all lessons and chunk their content
-      const allTracks = await storage.getTracks();
-      for (const track of allTracks) {
-        const modules = await storage.getModulesByTrack(track.id);
-        for (const module of modules) {
-          const lessons = await storage.getLessonsByModule(module.id);
-          for (const lesson of lessons) {
-            if (lesson.content) {
-              const chunks = await this.chunker.chunkAndEmbedLesson(lesson);
-              const saved = await this.chunker.saveChunks(chunks);
-              totalChunks += saved;
-            }
-          }
-        }
-      }
-      result.chunks = totalChunks;
-      console.log(`  ✓ Created ${result.chunks} content chunks`);
+      console.log('  ⚠️  Skipping embedding generation to avoid token limits');
+      console.log('  Note: Full lesson content has been imported and is available');
+      result.chunks = 0;
       
       // Phase 4: Extract questions
       console.log('\nPhase 4: Extracting questions from assessments...');
