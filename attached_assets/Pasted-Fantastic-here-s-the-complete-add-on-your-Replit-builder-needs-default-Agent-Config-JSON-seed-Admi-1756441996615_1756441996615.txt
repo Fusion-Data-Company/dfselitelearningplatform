@@ -1,0 +1,188 @@
+Fantastic—here’s the complete add-on your Replit builder needs: default Agent Config JSON seed, Admin schema, Playwright test blueprints, and MCP tool contracts (all blueprint-style, no long code). Content topics and examples align to your DFS-215 course (Law & Ethics CE, HMO/PPO/EPO/POS, OASDI, FIGA/DFS, Riders/Replacement, Buyer’s Guides).  ￼
+
+Project Architecture Overview (Add-Ons)
+
+Agents Config + Admin UI
+├─ seed/agents.defaults.json (prompts, models, limits, policies)
+├─ db: agent_profiles, agent_policies, agent_logs
+├─ Admin: /app/(admin)/agents (tabs: CoachBot | StudyBuddy | ProctorBot | Logs)
+└─ Tests: /tests/e2e/{coachbot,studybuddy,proctorbot}.spec.ts (≤10 lines each)
+MCP Contracts
+└─ /src/server/mcp/tools: get_context, retrieve_content, iflash_generate, log_event
+
+Component Specifications
+
+COMPONENT: Agents Default Config (JSON Seed)
+
+PURPOSE: Preload sane, production-ready defaults for all three agents.
+INPUTS: none (seed file).
+OUTPUTS: agents.defaults.json consumed on first boot.
+DEPENDENCIES: OpenRouter, MCP.
+BUILDER INSTRUCTIONS:
+	•	Step 1: Create /seed/agents.defaults.json with entries below.
+	•	Step 2: On startup, if agent_profiles empty → import this file.
+	•	Step 3: Expose live edit in Admin; persist to DB.
+
+SEED FILE (concise; copy exactly, edit values as needed):
+
+{
+  "profiles": [
+    {
+      "id": "coachbot",
+      "displayName": "CoachBot",
+      "model": "openrouter:gpt-5-mini",
+      "temperature": 0.2,
+      "max_tokens": 768,
+      "guardrails": {
+        "requireCitations": true,
+        "denyDuringExam": false,
+        "tone": "professional, encouraging, exam-oriented"
+      },
+      "systemPrompt": "You are CoachBot for the DFS-215 Elite Learning Platform. Always call MCP get_context(${viewId}) first, then retrieve_content as needed. Answer in ≤2 short paragraphs, then ask ONE quick-check. Offer ONE remediation step with a direct lesson/paragraph link. Include citations {chunkId, lesson, heading}. Never invent facts; if unsure, call retrieve_content again."
+    },
+    {
+      "id": "studybuddy",
+      "displayName": "StudyBuddy",
+      "model": "openrouter:gpt-5-mini",
+      "temperature": 0.35,
+      "max_tokens": 700,
+      "guardrails": {
+        "requireCitations": true,
+        "denyDuringExam": false,
+        "tone": "motivational but brief"
+      },
+      "systemPrompt": "You are StudyBuddy. Read MCP get_context(${viewId}) and recent attempts to find weak topics. Create a 7-day plan (Read → iFlash → 10-question quiz). Call iflash_generate(style:\"exam\") on current lesson/selection; store cards. Return next 3 tasks and SRS due count with citations."
+    },
+    {
+      "id": "proctorbot",
+      "displayName": "ProctorBot",
+      "model": "openrouter:gpt-5-mini",
+      "temperature": 0.0,
+      "max_tokens": 320,
+      "guardrails": {
+        "requireCitations": false,
+        "denyDuringExam": true,
+        "tone": "neutral, brief, policy-first"
+      },
+      "systemPrompt": "You are ProctorBot. Pre-exam: show policy checklist and confirm readiness. During exam: answer policy/process only; no content coaching. Log blur/focus via log_event with ${trace_id}. Post-exam: list top 3 weak topics with lesson links and citations."
+    }
+  ]
+}
+
+COMPONENT: Admin DB Schema (Minimal)
+
+PURPOSE: Persist agent config and logs; enable safe edits.
+INPUTS: Admin panel forms.
+OUTPUTS: agent_profiles, agent_policies, agent_logs.
+DEPENDENCIES: Prisma/Supabase.
+BUILDER INSTRUCTIONS:
+	•	Step 1: Create tables:
+	•	agent_profiles(id pk, display_name, model, temperature real, max_tokens int, system_prompt text, guardrails jsonb, updated_at)
+	•	agent_policies(agent_id fk, key, value, updated_at) (optional key/val overrides)
+	•	agent_logs(id pk, user_id fk, agent, tool, trace_id, payload jsonb, created_at)
+	•	Step 2: Seed from /seed/agents.defaults.json if empty.
+	•	Step 3: RLS: students read only their logs; admins full access.
+VALIDATION: Editing a prompt in Admin updates agent_profiles and takes effect within 60s.
+
+COMPONENT: Admin Panel (Agents)
+
+PURPOSE: Non-technical control of prompts/limits/guardrails, plus logs.
+INPUTS: Form fields.
+OUTPUTS: Updated profiles; filtered event logs.
+DEPENDENCIES: TanStack Table, shadcn/ui.
+BUILDER INSTRUCTIONS:
+	•	Step 1: Tabs: CoachBot | StudyBuddy | ProctorBot | Logs.
+	•	Step 2: Fields per agent: model, temperature, max_tokens, systemPrompt, toggles: requireCitations, denyDuringExam.
+	•	Step 3: “Run test” button → canned query against retrieval for: HMO PCP referral, Balance Billing, OASDI 5-month elimination, 4-hr Law & Ethics CE, FIGA exclusions—responses must show citations.  ￼
+VALIDATION: “Run test” returns answer + at least one valid content_chunk.id.
+
+COMPONENT: MCP Tool Contracts (Final)
+
+PURPOSE: Stable, testable surface between UI and agents.
+INPUTS: JSON-RPC requests.
+OUTPUTS: Context, passages, cards, logs.
+DEPENDENCIES: JSON-RPC over SSE/WebSocket, pgvector, OpenRouter.
+BUILDER INSTRUCTIONS (signatures & contracts):
+	•	get_context(viewId: string) → { route, userId, lessonId?, chunkIds?: string[], selection?: {text?, ids?}, attempt?: {id?, phase?} }
+	•	retrieve_content({ query?: string, ids?: string[], k?: number=3 }) → { passages: [{ id, lessonId, text, headings, refs }], used: {query?, ids?} }
+	•	iflash_generate({ sourceIds?: string[], text?: string, style?: 'concise'|'exam'|'mnemonic' }) → { cards: [{ id, type:'term'|'mcq'|'cloze', front, back, sourceId? }], count }
+	•	log_event({ userId, agent, tool, payload, traceId }) → { ok: true }
+VALIDATION: Each tool returns in <800ms P50 with cached reads; inputs validated (Zod).
+
+COMPONENT: Playwright E2E Blueprints (≤10 lines each)
+
+1) CoachBot citations (HMO/Balance Billing)
+
+test('CoachBot cites HMO/Balance Billing', async ({ page }) => {
+  await page.goto('/course/health/managed-care/lesson/hmo');
+  await page.getByRole('button', {name:'Ask CoachBot'}).click();
+  await page.getByPlaceholder('Ask…').fill('Why is balance billing restricted under HMOs?');
+  await expect(page.getByTestId('coachbot-citation')).toContainText('chunkId:');
+});
+
+2) StudyBuddy iFlash generation (Law & Ethics CE)
+
+test('StudyBuddy generates iFlash from Law & Ethics CE', async ({ page }) => {
+  await page.goto('/course/law-ethics/lesson/overview');
+  await page.getByRole('button', {name:'Generate iFlash'}).click();
+  await expect(page.getByTestId('iflash-count')).toHaveText(/^[2-9]\d+$/);
+});
+
+3) ProctorBot exam behavior
+
+test('ProctorBot blocks content help during exam', async ({ page }) => {
+  await page.goto('/exam/dfs-215');
+  await page.getByText('Begin Exam').click();
+  await page.getByPlaceholder('Ask…').fill('What is OASDI elimination period?');
+  await expect(page.getByTestId('proctorbot-msg')).toContainText('policy only');
+});
+
+COMPONENT: Elite UI Hooks (Agents)
+
+PURPOSE: Seamless agent UX with your styling.
+INPUTS: viewId, selection, lesson meta.
+OUTPUTS: Drawer/panels with ambient glows, motion, a11y contrast.
+DEPENDENCIES: Tailwind + shadcn/ui + Framer Motion; Cinzel.
+BUILDER INSTRUCTIONS:
+	•	Step 1: “Ask CoachBot” drawer in Lesson Player; pre-fill viewId, selection.
+	•	Step 2: Self-Study iFlash: “Generate” sends { sourceIds: current chunkIds }.
+	•	Step 3: Exam route: fixed Proctor panel (pre/during/post modes) with policy banner.
+VALIDATION: Animations are subtle; dark theme; no pink/purple.
+
+Integration Points
+	•	Seed → DB: On first run, import /seed/agents.defaults.json → agent_profiles.
+	•	Admin → MCP: Saving updates triggers in-memory cache refresh; agents read latest settings on call.
+	•	Lessons/Exams → Agents: UI always passes viewId; agents begin with get_context(viewId).
+	•	CE/Law & Ethics: CoachBot and StudyBuddy must retrieve/cite chunks from the Law & Ethics and Buyers Guide sections for tests and admin “Run test” flows.  ￼
+
+Testing Checkpoints
+
+CHECKPOINT A – Seed Import
+✓ Verify agent_profiles contains 3 rows with prompts/limits.
+Expected: Admin panel displays defaults.
+
+CHECKPOINT B – Retrieval & Citations
+✓ CoachBot answers HMO/Balance Billing with ≥1 citation (chunkId+lesson).
+Expected: Link opens correct paragraph.  ￼
+
+CHECKPOINT C – iFlash Pipeline
+✓ StudyBuddy generates ≥20 cards from Law & Ethics or Managed Care selection.
+Expected: SRS due count > 0; cards reference sourceIds.  ￼
+
+CHECKPOINT D – Exam Integrity
+✓ ProctorBot refuses content help during exam; logs blur/focus via log_event.
+Expected: Post-exam debrief lists 3 weak topics + citations.
+
+Deployment Configuration (Delta)
+	•	Add /seed/agents.defaults.json to repo; import on cold start.
+	•	Expose OPENROUTER_API_KEY, MCP_SERVER_SECRET in Replit Secrets.
+	•	Add feature flags: EXAM_STRICT_MODE, AGENT_RATE_LIMIT_QPM.
+	•	Log sampling: 1.0 during staging; 0.1 in prod (overrideable).
+
+Rollback
+	•	If agent responses exceed 4s P50: reduce max_tokens by 25% and set retrieval k=2.
+	•	If ProctorBot mistakenly answers content during exam: set denyDuringExam=true hard-guard in server before model call.
+
+⸻
+
+If you want, I can also supply a question-bank blueprint (topic weights + item templates) so your builder can auto-seed representative quizzes across Law & Ethics, Health/Managed Care, OASDI/Medicare, FIGA/DFS, and Life/Annuities—ready for the exam engine.  ￼

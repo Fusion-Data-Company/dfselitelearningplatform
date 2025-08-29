@@ -1,0 +1,393 @@
+Awesome. Here’s the complete, builder-ready mega-prompt—structured for Replit Builder to construct the entire DFS-215 Elite Learning Platform exactly as specified. It’s blueprint-style (not full code), atomic, verifiable, and mapped to your class content and flows.  ￼
+
+⸻
+
+PROJECT MANIFEST
+
+PROJECT NAME: DFS-215 Elite Learning Platform
+PROJECT TYPE: Web App (single-learner excellence LMS + exam + CE + agents)
+TECH STACK
+	•	Language: TypeScript
+	•	Framework: Next.js (App Router) + tRPC
+	•	DB: Supabase Postgres (+ pgvector)
+	•	Auth: Supabase Auth (email/SSO)
+	•	Video: LiveKit (fallback: Daily)
+	•	Search/LLM: OpenRouter (chat + embeddings) via single MCP server
+	•	Styling: Tailwind + shadcn/ui + Framer Motion; Fonts: Cinzel (display) + Inter (UI)
+	•	Charts/Tables/Docs: Recharts, TanStack Table, TipTap, UploadThing, pdf-lib
+
+DEPLOYMENT TARGET: Replit (dev) → Vercel (prod) + Supabase (managed DB)
+
+⸻
+
+FILE STRUCTURE MAP
+
+/project-root
+├─ /src
+│  ├─ app/(marketing)           – landing, pricing, login routes
+│  ├─ app/(student)
+│  │  ├─ dashboard/page.tsx     – progress & CE status hub
+│  │  ├─ course/[track]/[module]/lesson/[slug]/page.tsx – lesson player
+│  │  ├─ self-study/iflash/page.tsx         – iFlash generator & review
+│  │  ├─ quizzes/[bank]/page.tsx            – practice quiz UI
+│  │  ├─ exam/[examId]/page.tsx             – timed/proctored exam UI
+│  │  ├─ video/room/[roomId]/page.tsx       – live rooms & office hours
+│  │  └─ ce/catalog/page.tsx                – CE catalog & enrollment
+│  ├─ app/(admin)
+│  │  ├─ content-map/page.tsx    – DOCX outline → Tracks/Modules/Lessons
+│  │  ├─ banks/page.tsx          – question banks & item analysis
+│  │  ├─ ce/reporting/page.tsx   – CE exports/certificates/audits
+│  │  └─ agents/page.tsx         – agent prompts, guardrails, event logs
+│  ├─ server/mcp/                – single MCP server (JSON-RPC)
+│  │  ├─ index.ts                – entry; SSE/WebSocket handler
+│  │  └─ tools/*.ts              – get_context, retrieve_content, iflash_generate, log_event
+│  ├─ server/ingest/             – DOCX → markdown → chunks → embeddings
+│  │  ├─ docx-parse.ts           – headings/tables extraction
+│  │  └─ chunk-embed.ts          – splitter + vector upsert (pgvector)
+│  ├─ server/exams/              – orchestration & proctor signals
+│  ├─ server/ce/                 – seat-time, attestations, certs
+│  ├─ components/                – elite UI: glow cards, HUD, timers, modals
+│  ├─ styles/                    – theme tokens, ambient glow utilities
+│  └─ lib/                        – OpenRouter, Supabase, tRPC, Zod schemas
+├─ /config
+│  ├─ prisma/schema.prisma        – DB models (pgvector enabled)
+│  └─ theme.json                  – colors, radii, shadows, glow tokens
+├─ /tests
+│  ├─ e2e/exam.spec.ts            – exam/proctor flow (Playwright)
+│  └─ e2e/iflash.spec.ts          – iFlash generation & SRS review
+└─ README.md                      – builder runbook & acceptance criteria
+
+
+⸻
+
+BUILD SEQUENCE
+
+PHASE 0: GUARDBANDS & THEME
+	•	□ Task 0.1 — Init project
+	•	Builder Action: Create Next.js (TypeScript). Install Tailwind, shadcn/ui, Framer Motion.
+	•	Expected: App boots at / with placeholder.
+	•	□ Task 0.2 — Elite theme
+	•	Builder Action: Add Cinzel for H1–H3; Inter for body. Dark mode default. Create theme.json with deep navy/charcoal base, accents: cyan/teal/amber/silver; no pink/purple. Add glassmorphism cards, ambient glow utilities, 2xl radii, soft shadows, hover micro-motions.
+	•	Expected: Landing shows glow cards; Lighthouse accessibility ≥90.
+
+PHASE 1: AUTH, DB, RLS
+	•	□ Task 1.1 — Supabase & Prisma
+	•	Builder Action: Connect Supabase; enable pgvector. Generate Prisma client.
+	•	□ Task 1.2 — Auth roles
+	•	Builder Action: Supabase Auth with roles: student, instructor, admin. RLS: users can read/write only their records; admins full control.
+	•	□ Task 1.3 — Core models (outline only, no full code)
+	•	Builder Action: Create tables with fields (names/types/notes):
+	•	tracks(id, title, order)
+	•	modules(id, track_id FK, title, order)
+	•	lessons(id, module_id FK, slug, title, order, kind: enum['reading','video','practice','ce'])
+	•	content_units(id, lesson_id FK, type: enum['md','video','pdf','link'], uri, meta jsonb)
+	•	content_chunks(id, lesson_id FK, text, tokens, vec vector, headings jsonb, refs jsonb)
+	•	flashcards(id, owner_id FK, source_kind, source_ids[], type enum['term','mcq','cloze'], front, back, meta jsonb)
+	•	flashcard_reviews(id, card_id FK, user_id FK, ease, interval_days, due_at, grade)
+	•	question_banks(id, title, topic_tags[])
+	•	questions(id, bank_id FK, type enum['mcq','tf','ms'], stem, options jsonb, answer_key jsonb, stats jsonb)
+	•	attempts(id, user_id FK, kind enum['quiz','exam'], config jsonb, started_at, submitted_at, score, detail jsonb)
+	•	exam_configs(id, title, duration_sec, bank_weights jsonb, rules jsonb)
+	•	ce_courses(id, title, hours, requirements jsonb)
+	•	ce_progress(id, user_id FK, ce_id FK, seat_time_sec, passed boolean, certificate_url)
+	•	video_sessions(id, room_id, title, started_at, ended_at, meta jsonb)
+	•	video_attendance(id, session_id FK, user_id FK, joined_at, left_at)
+	•	agent_events(id, user_id FK, agent, tool, payload jsonb, trace_id, created_at)
+	•	□ Task 1.4 — Seeds
+	•	Builder Action: Seed a minimal sample track to confirm wiring.
+
+PHASE 2: DOCX INGEST → INDEX (CLASS CONTENT)
+	•	□ Task 2.1 — Upload & parse
+	•	Builder Action: Admin /content-map accepts DOCX upload. Parse headings H1–H4 + tables; normalize to markdown; preserve sections (Law & Ethics, DFS/CFO/FIGA, Health Buyer’s Guide & Managed Care, Disability Income, Social Insurance/OASDI, Life & Annuities, Variable/Prospectus, Quizzes & Glossaries).  ￼
+	•	Expected: Outline tree appears; counts of lessons/sections match parse.
+	•	□ Task 2.2 — Chunk & embed
+	•	Builder Action: Token-aware splitter (≈400–800 tokens, overlap 80). Store in content_chunks with metadata (lesson_id, heading path, page anchors). Compute embeddings (OpenRouter or Supabase embeddings) → vec.
+	•	Expected: retrieve_content(query) returns top-k relevant chunks for “HMO referral,” “OASDI elimination,” “Law & Ethics CE 4-hr,” etc.  ￼
+	•	□ Task 2.3 — Outline mapping
+	•	Builder Action: Map parsed sections to Tracks → Modules → Lessons, including:
+	•	Law & Ethics (incl. Required 4-hr Law & Ethics CE unit)
+	•	Health Insurance (Traditional vs. Managed Care; HMO/PPO/EPO/POS; Balance Billing; Cost-Sharing; ACA essentials; Buyers Guide quizzes)
+	•	Disability Income (own/any occ, elimination, group vs individual)
+	•	Social Insurance (OASDI, Medicare A/B/C/D, Medicaid, dual eligibility, look-back)
+	•	Life & Annuities (Term/Whole/UL, riders, replacements, prospectus/variable)
+	•	FIGA / DFS / CFO (guaranty association, liquidator/rehabilitator, exclusions)
+	•	Quizzes/Glossaries (topic-tagged).  ￼
+	•	Expected: Admin can drag-reorder, tag CE lessons, and publish.
+
+PHASE 3: LESSON PLAYER & SELF-STUDY (iFlash)
+	•	□ Task 3.1 — Lesson player
+	•	Builder Action: Sections per lesson: Objectives → Reading → Media → iFlash → Practice → Checkpoint. Sticky progress HUD (percent, time-on-task, CE seat-time if CE).
+	•	Acceptance: Keyboard nav (←/→), progress persists, glow focus states.
+	•	□ Task 3.2 — iFlash generator
+	•	Builder Action: From any selection (lesson/chunk/text), call MCP tool iflash_generate to create term/definition, MCQ, cloze cards; store in flashcards with SRS schedule (Leitner or SM-2).
+	•	Acceptance: Generating from Law & Ethics and HMO/PPO lessons yields ≥20 high-quality cards referencing chunk IDs.  ￼
+	•	□ Task 3.3 — iFlash review UI
+	•	Builder Action: Due queue; confidence buttons (Again/Hard/Good/Easy); streaks & heatmap; “remediate” button opens cited paragraph.
+
+PHASE 4: QUIZZES & EXAM
+	•	□ Task 4.1 — Quiz engine
+	•	Builder Action: Supports MCQ/TF/multi-select; randomize options; item analysis (p-value, discrimination); remediation links to source chunk.
+	•	□ Task 4.2 — Exam orchestrator
+	•	Builder Action: Timed exam (configurable duration), forms mode, autosave every 30s, single submit, attempt lock. Soft proctor: blur/focus warnings, camera opt-in, environment checklist. Post-exam report with weak topics and citations.
+	•	□ Task 4.3 — ProctorBot
+	•	Builder Action: During exam route, MCP-driven agent that: (1) communicates rules, (2) issues periodic reminders, (3) logs suspicious events via log_event.
+
+PHASE 5: VIDEO & OFFICE HOURS
+	•	□ Task 5.1 — Live rooms
+	•	Builder Action: LiveKit integration: “Live Class,” “Office Hours,” “1:1 Coaching.” Attendance logged (video_attendance). Recording links appear on lesson page.
+	•	□ Task 5.2 — Notes
+	•	Builder Action: TipTap notebook per lesson; export to PDF; MCP can read the current note via get_context.
+
+PHASE 6: CE TRACK & CERTIFICATES
+	•	□ Task 6.1 — CE courses
+	•	Builder Action: CE course type with seat-time tracking, idle detection, attestation modal, gated assessment, certificate PDF with serial number & student info, CSV exports for audits.
+	•	Acceptance: Implement Required 4-hr Law & Ethics CE end-to-end (unit tagging, seat-time, assessment, certificate).  ￼
+
+PHASE 7: MCP & AGENTS (Single Server)
+	•	□ Task 7.1 — Single MCP server
+	•	Builder Action: Implement JSON-RPC over SSE/WebSocket at /api/mcp.
+	•	Required tools (signatures/specs):
+	•	get_context(viewId: string): { route, selection, lessonId, chunkIds[], note?, userId }
+	•	retrieve_content({ query?: string, ids?: string[], k?: number }): { passages: {id, lessonId, text, headings, refs}[] }
+	•	iflash_generate({ sourceIds?: string[], text?: string, style?: 'concise'|'exam'|'mnemonic' }): { cards: {type, front, back, sourceId?}[] }
+	•	log_event({ userId, agent, tool, payload, traceId }): { ok: true }
+	•	Security: Require MCP_SERVER_SECRET bearer; per-user scoping; rate limits; redact PII in logs.
+	•	□ Task 7.2 — Agents via OpenRouter
+	•	Builder Action: Wire three agents to MCP:
+	•	CoachBot – teach/explain/quiz; must always cite content_chunk.id.
+	•	StudyBuddy – builds weekly study plan; drives iFlash/SRS.
+	•	ProctorBot – exam policy & post-exam debrief; neutral tone.
+	•	Acceptance: Agents respond in <4s median, include citations, and respect route context.
+
+PHASE 8: ANALYTICS & ADMIN
+	•	□ Task 8.1 — Student dashboard
+	•	Builder Action: Progress cards (per track/module), study streak, CE status, upcoming sessions; TanStack Table for attempts; Recharts for mastery by topic.
+	•	□ Task 8.2 — Admin dashboards
+	•	Builder Action: Question difficulty distribution, distractor performance, exam psychometrics (KR-20 proxy), CE exports, agent usage traces.
+
+PHASE 9: HARDEN & RELEASE
+	•	□ Task 9.1 — RLS & tests
+	•	Builder Action: Playwright E2E for: (a) iFlash gen/review, (b) exam attempt, (c) CE certificate. Enforce RLS for all user-data reads/writes.
+	•	□ Task 9.2 — Deploy
+	•	Builder Action: Vercel build, custom domain, Supabase backups, uptime checks, error monitoring.
+
+⸻
+
+CONFIGURATION SPECIFICATIONS
+
+ENV VARS (Replit Secrets & Vercel):
+	•	OPENROUTER_API_KEY – LLM access (required)
+	•	SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY (required)
+	•	LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_SECRET (optional; required for video)
+	•	MCP_SERVER_SECRET (required)
+	•	NEXT_PUBLIC_APP_URL (required in prod)
+
+PACKAGES (pin latest stable):
+	•	Core: next, react, typescript, zod, @trpc/*
+	•	UI: tailwindcss, clsx, @radix-ui/*, framer-motion, lucide-react, @tanstack/react-table, recharts, @uploadthing/react
+	•	Data: @supabase/supabase-js, prisma, @prisma/client, pgvector
+	•	Content: mammoth, remark/rehype ecosystem, tiptap packages
+	•	AI/Search: langchain (splitters), OpenRouter SDK
+	•	PDFs: pdf-lib
+	•	Tests: @playwright/test
+
+REPLIT:
+	•	.replit run: npm run dev
+	•	replit.nix: Node 20+, postgresql client, bash, coreutils
+
+⸻
+
+INTEGRATION POINTS (HOW THINGS CONNECT)
+	•	DOCX → Lessons: /content-map parses & maps to Tracks/Modules/Lessons; Admin publishes. (Law & Ethics, Health/Managed Care/Buyers Guide, Disability Income, Social Insurance/OASDI, Life/Annuities/Variable, FIGA/DFS/CFO, Quizzes/Glossaries).  ￼
+	•	Search: retrieve_content hybrid: pgvector top-k + BM25 fallback.
+	•	iFlash: iflash_generate produces 3 card types per ~1k tokens; stored with SRS fields.
+	•	Agents: Every agent call begins with get_context(viewId); must cite content_chunk.id.
+	•	Exam: exam_configs defines timer, bank blend, rules. attempts stores results; ProctorBot writes events to agent_events.
+	•	CE: CE-flagged lessons track seat-time; assessment gate issues certificate (PDF) and CSV export for audit.
+
+⸻
+
+COMPONENT SPECIFICATIONS (PER-MODULE BLUEPRINTS)
+
+COMPONENT: Content Ingestion & Indexer
+
+PURPOSE: Convert class DOCX into structured LMS content with embeddings.
+INPUTS: DOCX upload.
+OUTPUTS: tracks/modules/lessons, content_units, content_chunks (+ vectors).
+DEPENDENCIES: mammoth, langchain, pgvector, Prisma.
+BUILDER INSTRUCTIONS:
+	•	Step 1: Parse headings H1–H4; convert to markdown; extract tables/callouts.
+	•	Step 2: Create lessons for major sections (see mapping above). Tag CE items.  ￼
+	•	Step 3: Chunk + embed; store path metadata (track/module/lesson/heading).
+VALIDATION: Searching “Balance Billing,” “Return of Premium rider,” “OASDI 5-month elimination” returns precise passages.  ￼
+
+COMPONENT: Lesson Player
+
+PURPOSE: Elite consumption experience with progress and contextual agent.
+INPUTS: lesson_id → content units/chunks.
+OUTPUTS: progress events, notes, iFlash sets.
+DEPENDENCIES: Tailwind, shadcn/ui, TipTap, Framer Motion.
+BUILDER INSTRUCTIONS:
+	•	Step 1: Layout sections; sticky HUD with percent/time; CE shows seat-time.
+	•	Step 2: “Ask CoachBot” drawer; MCP context = current route + selection.
+	•	Step 3: Ambient glow focus, keyboard nav, accessible contrast.
+VALIDATION: HUD updates live; CoachBot answers cite chunk IDs.
+
+COMPONENT: iFlash Service
+
+PURPOSE: Turn any content into flashcards with SRS.
+INPUTS: sourceIds[] or raw text; style preset.
+OUTPUTS: cards (term/def, MCQ, cloze) + SRS due schedule.
+DEPENDENCIES: MCP iflash_generate, OpenRouter.
+BUILDER INSTRUCTIONS:
+	•	Step 1: Implement tool to return normalized cards referencing source chunk IDs.
+	•	Step 2: Save to flashcards + flashcard_reviews with due dates.
+	•	Step 3: Review UI: due queue; Again/Hard/Good/Easy; “Open source paragraph.”
+VALIDATION: ≥20 cards generated from Law & Ethics/Managed Care sections.
+
+COMPONENT: Quiz Engine
+
+PURPOSE: Practice with remediation and analytics.
+INPUTS: bank blueprint by topic/difficulty.
+OUTPUTS: attempt, score, item analysis, remediation links.
+DEPENDENCIES: Zod, Prisma, Recharts.
+BUILDER INSTRUCTIONS:
+	•	Step 1: MCQ/TF/multi-select; randomize options & order.
+	•	Step 2: Show remediation (top-1 chunk) after submit.
+	•	Step 3: Track item stats; dashboard for distractor performance.
+VALIDATION: Weak topics listed with direct links to lessons/chunks.
+
+COMPONENT: Exam Orchestrator + ProctorBot
+
+PURPOSE: Timed, secure exams with integrity prompts.
+INPUTS: exam_config, candidate id.
+OUTPUTS: attempt lock, score report, proctor events.
+DEPENDENCIES: Timer, camera opt-in, MCP ProctorBot.
+BUILDER INSTRUCTIONS:
+	•	Step 1: Preflight: ID check, environment checklist, policy acknowledgement.
+	•	Step 2: Timer; autosave 30s; single submit; blur/focus warnings logged.
+	•	Step 3: ProctorBot reminders; post-exam debrief with weak areas.
+VALIDATION: Attempt cannot reopen; KR-20 proxy displayed; logs stored.
+
+COMPONENT: CE Module
+
+PURPOSE: CE courses, seat-time, certificates, audits.
+INPUTS: CE course id; hours; rules.
+OUTPUTS: certificate PDF, CSV export.
+DEPENDENCIES: pdf-lib, Supabase storage.
+BUILDER INSTRUCTIONS:
+	•	Step 1: Seat-time w/ idle detection; attestation modal; pass gate.
+	•	Step 2: Generate branded certificate (serial, user, course, date/time).
+	•	Step 3: Export CSV (range) for audits.
+VALIDATION: 4-hr Law & Ethics CE produces certificate & CSV.  ￼
+
+COMPONENT: Single MCP Server
+
+PURPOSE: One bridge for all agents to query “what the user sees.”
+INPUTS: viewId, userId, optional query.
+OUTPUTS: context, retrieved passages, iFlash cards, event logs.
+DEPENDENCIES: JSON-RPC 2.0, SSE/WebSocket, pgvector.
+BUILDER INSTRUCTIONS:
+	•	Step 1: Implement tools (get_context, retrieve_content, iflash_generate, log_event).
+	•	Step 2: Auth via MCP_SERVER_SECRET; rate limit; trace id on every call.
+	•	Step 3: Unit tests for each tool (mock data).
+VALIDATION: Agents answer contextually & always include citations.
+
+COMPONENT: Video Layer
+
+PURPOSE: Live classes, office hours, 1:1 coaching.
+INPUTS: room token; role.
+OUTPUTS: attendance, durations, recording links.
+DEPENDENCIES: LiveKit client.
+BUILDER INSTRUCTIONS:
+	•	Step 1: Create join flow from lessons/dashboard.
+	•	Step 2: Log presence to video_attendance.
+	•	Step 3: Show past recordings under lesson media.
+VALIDATION: Attendance rows created; durations >0.
+
+COMPONENT: Elite UI Theme
+
+PURPOSE: Fortune-50 visual quality, cyber-futuristic, no pink/purple.
+INPUTS: theme.json.
+OUTPUTS: Consistent cinematics: ambient glow, glass, motion.
+DEPENDENCIES: Tailwind, shadcn/ui, Framer Motion, Cinzel.
+BUILDER INSTRUCTIONS:
+	•	Step 1: Cinzel for display (H1-H3), Inter body; 2xl radii; soft shadows.
+	•	Step 2: Ambient glows (cyan/teal/amber/silver); hover micro-animations.
+	•	Step 3: A11y contrast; motion-reduce support.
+VALIDATION: Visual parity on dashboard, lesson player, exam, and CE.
+
+⸻
+
+CONFIGURATION & SECRETS (ENV)
+	•	OPENROUTER_API_KEY – required
+	•	SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY – required
+	•	LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_SECRET – required if video enabled
+	•	MCP_SERVER_SECRET – required
+	•	NEXT_PUBLIC_APP_URL – required (prod)
+
+⸻
+
+INTEGRATION CHECKPOINTS (AFTER EACH PHASE)
+
+CHECKPOINT 1 — Foundation
+✓ App boots, elite theme visible; Cinzel headings; glow cards.
+Troubleshoot: Fonts not loading → add next/font usage.
+
+CHECKPOINT 2 — Ingest & Index
+✓ DOCX outline visible; lessons created; search returns correct passages for HMO/PPO, OASDI, Law & Ethics CE.  ￼
+Troubleshoot: No results → verify embeddings job and pgvector extension.
+
+CHECKPOINT 3 — iFlash
+✓ Generate cards from any lesson; SRS review works; citations present.
+Troubleshoot: Duplicate cards → add hash-based uniqueness on (owner, sourceId, front).
+
+CHECKPOINT 4 — Quiz
+✓ 15-item randomized quiz; remediation links; item analysis visible.
+Troubleshoot: Stats missing → ensure attempt finalize writes stats.
+
+CHECKPOINT 5 — Exam
+✓ Timer, autosave, submit once; post-report; ProctorBot logs events.
+Troubleshoot: Blur warnings not logging → attach window listeners to log_event.
+
+CHECKPOINT 6 — Video
+✓ Join Office Hours; attendance rows appear; duration >0.
+Troubleshoot: Token error → check server token generation & room name.
+
+CHECKPOINT 7 — CE
+✓ Complete 4-hr Law & Ethics; certificate PDF generated; CSV export works.  ￼
+Troubleshoot: Seat-time not counting → verify idle detection thresholds.
+
+⸻
+
+ROLLBACK INSTRUCTIONS
+	•	If any migration fails: prisma migrate resolve --applied to last good, revert commit, restore Supabase backup.
+	•	If MCP latency spikes: disable agent features temporarily via feature flag; keep lesson reading & quizzes online.
+	•	If video fails: hide “Join Room” CTA and show “Asynchronous Q&A” fallback (CoachBot only).
+
+⸻
+
+REPLIT BUILDER PROMPT (COPY THIS VERBATIM TO RUN THE BUILD)
+
+You are Replit Builder. Construct the DFS-215 Elite Learning Platform as specified below. Follow phases in order; after each task, verify acceptance criteria. Do not substitute tech choices or alter the elite theme. Use Cinzel for headings, Inter for body; cyber-futuristic styling with ambient glows (cyan/teal/amber/silver), glassmorphism, 2xl radii, soft shadows. No pink or purple.
+
+PHASE 0–9: Execute every task exactly as listed in the BUILD SEQUENCE above, creating files/folders per the FILE STRUCTURE MAP.
+DB: Create all tables/fields listed in PHASE 1.3; enable pgvector. Add RLS so students only see their own data.
+DOCX INGEST: Implement /content-map to upload/parse the DFS-215 course doc, map to Tracks/Modules/Lessons, then chunk & embed. Confirm search retrieval for: Law & Ethics CE, HMO/PPO/EPO/POS, Balance Billing, OASDI/Medicare/Medicaid, FIGA/DFS/CFO, Riders/Replacement, Buyer’s Guides & Glossaries.  ￼
+LESSON PLAYER: Build Objectives → Reading → Media → iFlash → Practice → Checkpoint layout with sticky progress HUD & CE time.
+iFLASH: Implement MCP iflash_generate tool to produce term/def, MCQ, cloze cards. Save to flashcards with SRS schedule. Provide review UI (due queue; Again/Hard/Good/Easy).
+QUIZZES/EXAM: Quiz engine (MCQ/TF/MS), item analysis, remediation links. Exam orchestrator with timer, autosave, single submit, blur/focus proctor warnings; ProctorBot logs.
+VIDEO: LiveKit rooms for Live Class/Office Hours/1:1; attendance logged; recordings attached to lessons.
+CE: Tag CE courses; implement 4-hr Law & Ethics CE with seat-time, attestation, certificate (pdf-lib), CSV export for audits.  ￼
+MCP SERVER: Single endpoint /api/mcp with tools: get_context, retrieve_content, iflash_generate, log_event. Require MCP_SERVER_SECRET. All agents must begin by calling get_context(viewId) and must cite content_chunk.id in outputs.
+AGENTS: Wire CoachBot, StudyBuddy, ProctorBot via OpenRouter to MCP. Enforce guardrails: academic integrity, neutral tone on exams, always cite.
+ADMIN: Dashboards for banks, psychometrics, CE exports, agent logs.
+THEME: Ensure elite visuals and accessibility on dashboard, lesson, exam, CE pages.
+TESTS: Add Playwright E2E specs for iFlash generation/review, exam flow, CE certificate issuance.
+DEPLOY: Provide Vercel & Supabase env templates, health checks, and error logging.
+
+ACCEPTANCE CRITERIA: Must pass Integration Checkpoints and Validation sections in this spec, produce certificates for CE, and demonstrate retrieval-augmented answers with citations for at least five representative queries from the curriculum (e.g., Balance Billing, Return of Premium rider, OASDI 5-month elimination, FIGA exclusions, HMO PCP referrals).  ￼
+
+⸻
+
+If you want, I can now draft the agent prompt pack (CoachBot/StudyBuddy/ProctorBot system prompts with guardrails and citation patterns) to drop into /app/(admin)/agents.

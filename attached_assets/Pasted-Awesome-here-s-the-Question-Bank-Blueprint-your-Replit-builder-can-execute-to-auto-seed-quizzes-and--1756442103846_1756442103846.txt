@@ -1,0 +1,92 @@
+Awesome—here’s the Question-Bank Blueprint your Replit builder can execute to auto-seed quizzes and exams across the full DFS-215 curriculum (Law & Ethics, Health/Managed Care, Disability Income, Social Insurances/OASDI & Medicare, FIGA/DFS, Life & Annuities, Buyer’s Guides). It follows your architect style (no long code) and plugs into the platform, iFlash, MCP, and exam engine you already approved.  ￼
+
+Project Architecture Overview
+
+Question Banks & Exams
+├─ Banks (topic-weighted, LO-tagged)
+│  ├─ Law & Ethics (incl. 4-hr CE unit)
+│  ├─ Health / Managed Care / Buyers Guide
+│  ├─ Disability Income
+│  ├─ Social Insurance (OASDI, Medicare/Medicaid)
+│  ├─ Life Insurance
+│  ├─ Annuities & Variable (prospectus, separate acct)
+│  └─ FIGA / DFS / CFO
+├─ Item Templates (MCQ, MS, TF, scenario, cloze-stem)
+├─ Seeding Pipeline (DOCX → chunks → generator)
+├─ Calibration (stats, blueprint conformance)
+└─ Remediation (chunk-level links, iFlash handoff)
+
+File Structure Map
+
+/src/server/exams/
+  ├─ bank-blueprints/         – JSON blueprints per topic (weights, LOs)
+  ├─ seeding/
+  │   ├─ outline-map.json     – DOCX sections → modules/lessons/LOs
+  │   └─ seed-plan.ts         – (builder) orchestrates seeding jobs
+  ├─ item-templates/
+  │   ├─ law-ethics.json
+  │   ├─ health-managed.json
+  │   └─ ...
+  └─ calibration/
+      └─ postseed-checklist.md
+/seed/
+  └─ banks.defaults.json      – Initial banks & counts
+
+Build Sequence
+
+PHASE 1: Bank Schemas
+	•	□ Task 1.1 – Define Bank Model
+	•	Fields: id, title, topics[], blueprint{topic→(easy,med,hard counts)}, timeLimitSec, attemptPolicy, shuffle
+	•	□ Task 1.2 – Define Question Model
+	•	Fields: id, bankId, type('mcq'|'ms'|'tf'|'scenario'|'cloze'), stem, options[], answerKey, explanation, loTags[], chunkRefs[], difficulty('E'|'M'|'H'), stats{p,disc,exposure}
+
+PHASE 2: Learning Objectives (LO) Map
+	•	□ Task 2.1 – Map DOCX sections → LOs
+	•	Example LOs (IDs are illustrative; link to lesson slugs):
+	•	LE-CE-4H — Law & Ethics: 4-hour CE requirement & compliance workflow.
+	•	HC-HMO-BAL — Health: Balance Billing restrictions; PCP referral flow in HMOs.
+	•	SI-OASDI-ELIM5 — Social Insurance: 5-month OASDI elimination period.
+	•	FIGA-EXCL — FIGA exclusions & claim scope.
+	•	LIFE-ROP-RIDER — Life: Return of Premium tested as Increasing Term rider.
+	•	VAR-PROSPECTUS — Variable: Prospectus & Separate Account basics.
+	•	Store mapping in /src/server/exams/seeding/outline-map.json.  ￼
+
+PHASE 3: Item Templates (by Topic)
+	•	□ Task 3.1 – Template Types
+	•	Recall MCQ: definition/rule (low complexity).
+	•	Scenario MCQ/MS: short vignette → single or multi-select outcome.
+	•	Policy Flow TF: true/false with “because …” in explanation.
+	•	Cloze Stem: remove key term/figure (e.g., “OASDI requires __ months…”).
+	•	□ Task 3.2 – Authoring Rules
+	•	1 correct option; 3 distractors (plausible, distinct).
+	•	Stems ≤ 35 words; options ≤ 12 words.
+	•	No “All/None of the above”; avoid negatives unless tagged H.
+	•	Every item has chunkRefs[] (top-k retrieved passages).
+
+PHASE 4: Seeding Pipeline
+	•	□ Task 4.1 – Source Retrieval
+	•	For each LO, call MCP retrieve_content({query: <LO keywords>, k:3}) and capture chunkIds.
+	•	□ Task 4.2 – Template Fill
+	•	Fill item templates using retrieved text; write chunkRefs with lesson slug + heading.
+	•	□ Task 4.3 – Validation Pass
+	•	Enforce lint rules (lengths, duplicates, overlap by LO ≤ 20%).
+	•	Store to questions with difficulty tags.
+
+PHASE 5: Calibration
+	•	□ Task 5.1 – Quiz Smoke Tests
+	•	Generate 10-item quizzes per topic; ensure remediation opens chunk anchor.
+	•	□ Task 5.2 – Stats Init
+	•	Set stats.p=null, disc=null initially; compute after first 100 attempts.
+
+Configuration Specifications
+
+Bank-Level Blueprints (counts per form):
+	•	Pre-Licensing Master Quiz (50 items)
+	•	Law & Ethics – 8
+	•	Health/Managed Care/Buyers Guide – 12
+	•	Disability Income – 6
+	•	Social Insurance (OASDI/Medicare/Medicaid) – 8
+	•	Life Insurance – 10
+	•	Annuities & Variable – 4
+	•	FIGA/DFS/CFO – 2
+	•	**End-of-Module Quizzes (10–15 items

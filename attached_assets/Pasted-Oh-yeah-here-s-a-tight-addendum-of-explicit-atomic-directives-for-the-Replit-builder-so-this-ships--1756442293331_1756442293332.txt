@@ -1,0 +1,118 @@
+Oh yeah—here’s a tight addendum of explicit, atomic directives for the Replit builder so this ships cleanly and scales. Drop these at the end of your mega-prompt.
+
+Replit Builder – Final Directives & Guardrails
+
+1) Performance, Quality & A11y Gates
+	•	Lighthouse budgets (desktop & mobile):
+	•	Performance ≥ 85, Accessibility ≥ 90, Best Practices ≥ 90.
+	•	CLS/LCP budget: CLS ≤ 0.05, LCP ≤ 2.5s on lesson and exam routes.
+	•	Bundle control: Code-split routes; lazy-load video & exam modules; tree-shake shadcn.
+	•	A11y: All interactive elements focusable with visible focus ring; ARIA labels for timers, question lists, and iFlash controls; color contrast ≥ 4.5:1.
+	•	Keyboard navigation:
+	•	Lesson nav ←/→, “Start/Stop” timer = Space/Enter; Exam options 1–5 keys; Submit = Cmd/Ctrl+Enter.
+
+Validation: Fail build if budgets are exceeded; output a short report with the failing route and metric.
+
+2) Content Safety & Compliance
+	•	Citations always on: Any agent or remediation that references course content must include content_chunk.id + lesson slug.
+	•	Exam integrity: ProctorBot refuses content help while exam_mode=true; show a single, neutral policy reminder if asked.
+	•	Audit trail: Sign all attempts and agent_events with an HMAC of {userId, route, ts} using MCP_SERVER_SECRET.
+
+Validation: E2E test asserts citations present; ProctorBot blocks content coaching during active exam.
+
+3) Data & Security
+	•	RLS: Students can only read/write records where user_id = auth.uid(). Admins bypass via service role.
+	•	Secrets: Never expose SERVICE_ROLE_KEY to the client; MCP server runs on server-only route.
+	•	Rate limits (server): 60 req/min/user on MCP tools; burst 10; exponential backoff.
+	•	PII redaction: log_event.payload must redact email/phone; store hashed identifiers.
+
+Validation: Attempt to fetch another user’s attempt returns 403. MCP denies requests without bearer secret.
+
+4) OpenRouter Resilience
+	•	Model fallback order: gpt-5-mini → gpt-4.1-mini → llama-3.1-70b-instruct.
+	•	Time budgets: CoachBot 4s, StudyBuddy 5s, ProctorBot 2s; if over budget, return cached retrieval + “tap to retry”.
+	•	Token limits: CoachBot 768, StudyBuddy 700, ProctorBot 320; truncate context beyond 4k tokens using a “most-recent + citations” heuristic.
+
+Validation: Kill primary model in staging; system falls back and still returns answers with citations.
+
+5) iFlash SRS Details
+	•	Scheduler: SM-2 (Anki-style) with ease factor floor 1.3; intervals in days; store last grade (0–3).
+	•	Card uniqueness: Hash on {ownerId|type|front|sourceId}; reject duplicates.
+	•	Bulk-generate: From any lesson, cap at 60 cards/run; queue additional in background job.
+
+Validation: Create 60+ potential cards; only 60 saved, with dedupes enforced; due counts appear accurately.
+
+6) Exam Engine Specifics
+	•	Randomization: Shuffle item order and option order; preserve “All/None” ban.
+	•	Timers: Client timer authoritative; server drift check every 60s; lock at expiry.
+	•	Resume logic: If connection drops, restore from last autosave within 15s.
+	•	Blueprint fit: Build forms to exact topic/difficulty quotas; fail if quota cannot be satisfied.
+
+Validation: Turn Wi-Fi off mid-exam; resume with no item loss; timer consistent (±3s).
+
+7) Video & Presence
+	•	Tokens: Server-generated, 10-minute TTL; role = student|host.
+	•	Attendance: Start when both camera permission granted and media tracks flowing; stop on tab close or 60s idle.
+	•	Recording links: Save to content_units for that lesson.
+
+Validation: Joining/Leaving writes video_attendance rows with non-zero duration.
+
+8) Admin UX Must-Haves
+	•	Content Map: Drag to reorder; “Publish Draft” button that snapshots current tree as content_version (semantic version vX.Y).
+	•	Agents Panel: Live edit prompts/limits; “Run test” uses canned queries (HMO balance billing, OASDI 5-month, 4-hr Law & Ethics CE); show citations inline.
+	•	Banks Panel: Heatmap by LO coverage; flagged items (too easy/hard/low-disc) queue for revision; one-click rotate-out.
+
+Validation: Changing prompts updates agents within 60s; banks show correct coverage totals.
+
+9) Observability & Ops
+	•	Telemetry: Minimal event schema: { ts, userId, route, action, meta }.
+	•	Error tracking: Capture unhandled rejections and MCP tool errors with stack + traceId.
+	•	Backups: Nightly Supabase backup; keep 7 days rolling.
+
+Validation: Trigger fake error; verify it appears in logs with traceId and redacted PII.
+
+10) Theming & Motion (Elite Finish)
+	•	Typography: Cinzel for H1–H3 (weights 600–700); Inter for body/labels (400–600).
+	•	Colorway: Deep navy/charcoal base; accents cyan/teal/amber/silver only (no pink/purple).
+	•	Surface: Glassmorphism cards, 2xl radii, soft layered shadows; micro-interactions < 180ms; respect prefers-reduced-motion.
+
+Validation: Visual QA across dashboard, lesson, exam, CE; consistent focus rings and no color drift.
+
+11) Print & Export
+	•	Certificates: Print-CSS layout (A4/Letter); PDF with embedded fonts; serial + QR to verify.
+	•	Exports: CE CSV, Attempts CSV (with item IDs, not stems), Agent Logs CSV (redacted).
+
+Validation: Download sample certificate and CSVs; QR resolves to verification endpoint.
+
+12) Offline & Reliability (Nice-to-Have if time)
+	•	PWA shell: Cache lesson HTML and CSS; read-only mode offline; block exams offline.
+	•	Retry queue: iFlash review posts queue if offline; flush on reconnect.
+
+Validation: Offline in a lesson; reading works; exam route blocks with clear message.
+
+⸻
+
+Final “Do / Don’t” Checklist (embed verbatim)
+
+DO
+	•	Call get_context(viewId) before any agent reply.
+	•	Cite content_chunk.id + lesson slug in teaching responses.
+	•	Enforce RLS on every read/write.
+	•	Keep time budgets; fall back models if needed.
+	•	Validate blueprint quotas before starting an exam.
+
+DON’T
+	•	Don’t expose service keys to the client.
+	•	Don’t allow ProctorBot to teach during active exams.
+	•	Don’t create duplicate iFlash cards.
+	•	Don’t let unfinished migrations deploy.
+
+⸻
+
+Acceptance Snapshot (builder must output)
+	•	✅ Lighthouse report (4 scores) and route list.
+	•	✅ List of seeded LOs and item counts per topic.
+	•	✅ MCP tool ping with round-trip latencies P50/P95.
+	•	✅ Screenshots: Dashboard, Lesson Player (with CoachBot), iFlash review, Exam screen, CE certificate.
+
+If the builder follows all of the above, you’ll have a production-ready, elite-styled, exam-calibrated platform with airtight guardrails.
