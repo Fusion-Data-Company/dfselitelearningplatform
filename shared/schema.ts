@@ -10,7 +10,8 @@ import {
   integer,
   real,
   uuid,
-  pgEnum
+  pgEnum,
+  uniqueIndex
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -124,7 +125,9 @@ export const userProgress = pgTable("user_progress", {
   progressPercent: real("progress_percent").default(0),
   lastAccessed: timestamp("last_accessed").defaultNow(),
   createdAt: timestamp("created_at").defaultNow(),
-});
+}, (table) => ({
+  userLessonUnique: uniqueIndex("idx_user_progress_user_lesson").on(table.userId, table.lessonId),
+}));
 
 export const quizAttempts = pgTable("quiz_attempts", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),

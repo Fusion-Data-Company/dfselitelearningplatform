@@ -260,8 +260,8 @@ export default function LessonPage() {
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
               {/* Main Content */}
               <div className="lg:col-span-3">
-                <Card className="glassmorphism border-border">
-                  <CardContent className="p-8">
+                <Card className="education-card border-primary/20 hover:border-primary/40 transition-all duration-300">
+                  <CardContent className="p-8 relative overflow-hidden">
                     {activeSection === "objectives" && (
                       <div className="prose prose-invert max-w-none">
                         <h3 className="cinzel text-xl font-bold mb-4">Learning Objectives</h3>
@@ -306,26 +306,157 @@ export default function LessonPage() {
                     )}
 
                     {activeSection === "iflash" && (
-                      <div className="text-center py-12">
-                        <Layers3 className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-                        <h3 className="cinzel text-xl font-bold mb-2">iFlash Generation</h3>
-                        <p className="text-muted-foreground mb-6">Generate flashcards from this lesson content.</p>
-                        <Button className="bg-secondary text-secondary-foreground hover:bg-secondary/90">
-                          <Layers3 className="w-4 h-4 mr-2" />
-                          Generate iFlash Cards
-                        </Button>
+                      <div>
+                        <div className="flex items-center space-x-3 mb-8">
+                          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-chart-2 to-chart-4 flex items-center justify-center">
+                            <Layers3 className="w-6 h-6 text-white" />
+                          </div>
+                          <h3 className="cinzel text-3xl font-bold text-shimmer">iFlash Spaced Repetition</h3>
+                        </div>
+                        
+                        {/* Flashcard Interface */}
+                        <div className="space-y-6">
+                          <div className="glassmorphism-card rounded-2xl p-8 border border-chart-2/20 min-h-[300px] relative overflow-hidden group">
+                            <div className="absolute inset-0 bg-gradient-to-br from-chart-2/5 via-transparent to-chart-4/3 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                            <div className="relative z-10">
+                              <div className="text-center">
+                                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-chart-2 to-chart-4 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                                  <Layers3 className="w-8 h-8 text-white" />
+                                </div>
+                                <h4 className="cinzel text-2xl font-bold mb-4 text-foreground">What is HMO Balance Billing?</h4>
+                                <p className="text-muted-foreground mb-6 max-w-md mx-auto leading-relaxed geist">
+                                  Test your knowledge of this key insurance concept using spaced repetition.
+                                </p>
+                                <Button className="floating-action px-8 py-3">
+                                  <Layers3 className="w-5 h-5 mr-2" />
+                                  Reveal Answer
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Flashcard Controls */}
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <Button variant="outline" className="p-4 h-auto border-destructive/30 hover:bg-destructive/10 transition-all duration-300">
+                              <div className="text-center">
+                                <div className="text-2xl mb-2">😰</div>
+                                <div className="text-sm font-medium">Again</div>
+                                <div className="text-xs text-muted-foreground">&lt; 1m</div>
+                              </div>
+                            </Button>
+                            <Button variant="outline" className="p-4 h-auto border-orange-500/30 hover:bg-orange-500/10 transition-all duration-300">
+                              <div className="text-center">
+                                <div className="text-2xl mb-2">🤔</div>
+                                <div className="text-sm font-medium">Hard</div>
+                                <div className="text-xs text-muted-foreground">6m</div>
+                              </div>
+                            </Button>
+                            <Button variant="outline" className="p-4 h-auto border-yellow-500/30 hover:bg-yellow-500/10 transition-all duration-300">
+                              <div className="text-center">
+                                <div className="text-2xl mb-2">😊</div>
+                                <div className="text-sm font-medium">Good</div>
+                                <div className="text-xs text-muted-foreground">1d</div>
+                              </div>
+                            </Button>
+                            <Button variant="outline" className="p-4 h-auto border-green-500/30 hover:bg-green-500/10 transition-all duration-300">
+                              <div className="text-center">
+                                <div className="text-2xl mb-2">🚀</div>
+                                <div className="text-sm font-medium">Easy</div>
+                                <div className="text-xs text-muted-foreground">4d</div>
+                              </div>
+                            </Button>
+                          </div>
+                          
+                          {/* Statistics */}
+                          <div className="glassmorphism-card rounded-2xl p-6 border border-primary/20">
+                            <h4 className="font-bold text-lg mb-4">Review Statistics</h4>
+                            <div className="grid grid-cols-3 gap-4">
+                              <div className="text-center">
+                                <div className="text-2xl font-bold text-chart-2">12</div>
+                                <div className="text-sm text-muted-foreground">Cards Due</div>
+                              </div>
+                              <div className="text-center">
+                                <div className="text-2xl font-bold text-chart-4">85%</div>
+                                <div className="text-sm text-muted-foreground">Success Rate</div>
+                              </div>
+                              <div className="text-center">
+                                <div className="text-2xl font-bold text-primary">7</div>
+                                <div className="text-sm text-muted-foreground">Day Streak</div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     )}
 
                     {activeSection === "practice" && (
-                      <div className="text-center py-12">
-                        <HelpCircle className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-                        <h3 className="cinzel text-xl font-bold mb-2">Practice Questions</h3>
-                        <p className="text-muted-foreground mb-6">Test your understanding with practice questions.</p>
-                        <Button className="bg-accent text-accent-foreground hover:bg-accent/90">
-                          <HelpCircle className="w-4 h-4 mr-2" />
-                          Start Practice Quiz
-                        </Button>
+                      <div>
+                        <div className="flex items-center space-x-3 mb-8">
+                          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-accent to-chart-2 flex items-center justify-center">
+                            <Edit3 className="w-6 h-6 text-white" />
+                          </div>
+                          <h3 className="cinzel text-3xl font-bold text-shimmer">Practice Questions</h3>
+                        </div>
+                        
+                        <div className="space-y-6">
+                          {/* Sample Practice Question */}
+                          <div className="glassmorphism-card rounded-2xl p-6 border border-accent/20">
+                            <div className="mb-4">
+                              <Badge className="elite-badge bg-gradient-to-r from-accent/30 to-accent/20 text-accent border-accent/40 mb-3">
+                                Question 1 of 3
+                              </Badge>
+                              <h4 className="font-bold text-lg mb-4 leading-relaxed">In an HMO model, which of the following statements about balance billing is correct?</h4>
+                            </div>
+                            <div className="space-y-3">
+                              {[
+                                'A) HMO providers may balance bill for covered services',
+                                'B) HMO providers are prohibited from balance billing members',
+                                'C) Balance billing is allowed only for emergency services',
+                                'D) Balance billing depends on the member\'s deductible amount'
+                              ].map((option, index) => (
+                                <Button 
+                                  key={index}
+                                  variant="outline" 
+                                  className="w-full justify-start p-4 h-auto text-left hover:bg-accent/10 hover:border-accent/50 transition-all duration-300 group"
+                                >
+                                  <span className="w-6 h-6 rounded-full bg-muted group-hover:bg-accent/20 flex items-center justify-center text-sm font-bold mr-3 transition-colors">
+                                    {String.fromCharCode(65 + index)}
+                                  </span>
+                                  <span className="geist">{option}</span>
+                                </Button>
+                              ))}
+                            </div>
+                            <div className="mt-6 flex items-center justify-between">
+                              <Button variant="outline" className="border-muted-foreground/30 hover:bg-muted/20">
+                                <ArrowLeft className="w-4 h-4 mr-2" />
+                                Previous
+                              </Button>
+                              <Button className="floating-action">
+                                Submit Answer
+                                <ArrowRight className="w-4 h-4 ml-2" />
+                              </Button>
+                            </div>
+                          </div>
+                          
+                          {/* Practice Progress */}
+                          <div className="glassmorphism-card rounded-2xl p-6 border border-secondary/20">
+                            <h4 className="font-bold text-lg mb-4">Practice Progress</h4>
+                            <div className="grid grid-cols-3 gap-4">
+                              <div className="text-center">
+                                <div className="text-2xl font-bold text-accent">2/3</div>
+                                <div className="text-sm text-muted-foreground">Questions</div>
+                              </div>
+                              <div className="text-center">
+                                <div className="text-2xl font-bold text-primary">100%</div>
+                                <div className="text-sm text-muted-foreground">Accuracy</div>
+                              </div>
+                              <div className="text-center">
+                                <div className="text-2xl font-bold text-secondary">45s</div>
+                                <div className="text-sm text-muted-foreground">Avg Time</div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     )}
 

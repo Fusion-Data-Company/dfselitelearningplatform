@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { PlayCircle, BarChart3, CheckCircle, X, Flag } from "lucide-react";
+import { PlayCircle, BarChart3, CheckCircle, X, Flag, HelpCircle, Target, Bot, TrendingUp } from "lucide-react";
 
 interface QuestionBank {
   id: string;
@@ -189,19 +189,33 @@ export default function QuizPage() {
             <div className="max-w-5xl mx-auto">
               {/* Header */}
               <div className="glassmorphism-card rounded-2xl p-8 mb-8">
-                <h1 className="cinzel text-4xl font-bold text-shimmer mb-4">
-                  DFS-215 Practice Quiz
-                </h1>
-                <p className="text-lg text-muted-foreground mb-4">
-                  Test your knowledge with practice questions from the DFS-215 curriculum. Build confidence before taking your certification exam.
-                </p>
-                <div className="flex items-center space-x-4">
-                  <Badge className="bg-primary/20 text-primary border-primary/30">
-                    Florida Department of Financial Services
-                  </Badge>
-                  <Badge className="bg-secondary/20 text-secondary border-secondary/30">
-                    Insurance Agent Certification
-                  </Badge>
+                <div className="flex items-center space-x-4 mb-6">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-accent to-accent/80 flex items-center justify-center animate-elite-glow">
+                    <HelpCircle className="w-8 h-8 text-white drop-shadow-lg" />
+                  </div>
+                  <div>
+                    <h1 className="cinzel text-4xl font-bold text-shimmer mb-2">
+                      Practice Quiz Arena
+                    </h1>
+                    <p className="text-lg text-muted-foreground geist">
+                      Test your knowledge with adaptive questions and instant AI feedback
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center space-x-6 text-sm text-muted-foreground">
+                  <div className="flex items-center space-x-2">
+                    <Target className="w-4 h-4 text-accent" />
+                    <span>Adaptive Learning</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Bot className="w-4 h-4 text-accent" />
+                    <span>AI Feedback</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <TrendingUp className="w-4 h-4 text-accent" />
+                    <span>Performance Tracking</span>
+                  </div>
                 </div>
               </div>
 
