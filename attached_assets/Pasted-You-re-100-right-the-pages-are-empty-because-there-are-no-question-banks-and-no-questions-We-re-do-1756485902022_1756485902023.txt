@@ -1,0 +1,179 @@
+You’re 100% right—the pages are empty because there are no question_banks and no questions. We’re done guessing. Here’s a single, “do-it-now” SEED & PUBLISH BLUEPRINT that ingests your DOCX, builds every lesson, extracts Q/A, creates banks, and composes the timed exam. It’s atomic, idempotent, and gives you verifiable counts at the end.
+
+⸻
+
+PROJECT MANIFEST
+
+PROJECT NAME: DFS-215 Question/Exam Auto-Seeding
+PROJECT TYPE: One-shot ingestion + publishing job
+TECH STACK:
+	•	Language: TypeScript
+	•	Runtime: Node on your existing server
+	•	DB: Your current Postgres/Supabase schema (uses tracks/modules/lessons/content_units/content_chunks/question_banks/questions/exam_configs)
+	•	Key Libraries: mammoth (DOCX→HTML), remark/rehype (clean Markdown), pgvector splitter (≈600 tokens / 80 overlap)
+
+DEPLOYMENT TARGET: Run inside the Replit instance; then persist to your prod DB.
+
+⸻
+
+FILE STRUCTURE MAP
+
+/src/server/seeding/
+  ├─ docx-parse.ts           - PURPOSE: DOCX → clean Markdown + heading nodes
+  ├─ outline-map.ts          - PURPOSE: H1→Track, H2→Module, H3→Lesson, H4+ subsections
+  ├─ chunk-embed.ts          - PURPOSE: chunk lessons, compute embeddings, store citations
+  ├─ question-extract.ts     - PURPOSE: mine MCQ/TF/scenario from DOCX assessments
+  ├─ exam-blueprint.ts       - PURPOSE: assemble timed exam per DFS-215 weights
+  └─ seed-dfs215.ts          - PURPOSE: orchestrator (idempotent import_publish job)
+/src/lib/schemas/assessment.ts - PURPOSE: Zod types for Question, Bank, ExamConfig
+
+
+⸻
+
+BUILD SEQUENCE
+
+PHASE 1: FOUNDATION
+
+□ Task 1.1: Create docx-parse.ts
+Builder Action:
+	•	Load /mnt/data/215 DFS Blended - Self Study Course July 2025.docx.
+	•	Convert to HTML (mammoth) → sanitize → Markdown (remark).
+	•	Emit a node stream of { level, text, html? } with normalized headings:
+	•	H1 = Track, H2 = Module, H3 = Lesson, H4+ = lesson sections.
+	•	Preserve callouts: “Identify / Define / Contrast / Note / [ iFlash4u ]”.
+	•	Detect assessment blocks by titles like Quiz, Review Questions, Practice Exam, or stems that start with 1) or 1. followed by options A)..D).
+
+Validation: Returns ≥ 6 major topic tracks and multiple H3 lessons (see ToC references to Law & Ethics CE, HMO/Managed Care, OASDI etc.  ￼).
+
+□ Task 1.2: Create outline-map.ts
+Builder Action:
+	•	Upsert tracks/modules/lessons with published=true & visibility='public'.
+	•	Write a content_units row (markdown) per lesson.
+	•	Generate lesson slugs and stable orders.
+
+Validation: Navigate to 3 random lessons; content renders.
+
+PHASE 2: CORE FEATURES
+
+□ Task 2.1: Create chunk-embed.ts
+Builder Action:
+	•	Split each lesson into ≈600-token chunks (80 overlap).
+	•	Upsert content_chunks(lesson_id, text, headings, vec).
+	•	This enables CoachBot citations and remediation.
+
+Validation: Retrieval on “HMO balance billing” returns a Managed Care chunk (the manuscript explicitly covers HMO mechanics/billing).  ￼
+
+□ Task 2.2: Create question-extract.ts
+Builder Action:
+	•	Parse assessment blocks into normalized items:
+
+Question {
+  id, type: 'mcq'|'ms'|'tf'|'scenario',
+  stem, options[], answerKey[], difficulty: 'E'|'M'|'H',
+  loTags[], chunkRefs[{chunkId, lesson, anchor?}]
+}
+
+
+	•	Rules:
+	•	MCQ options are an array (strip “A) B) …” labels).
+	•	answerKey = indices (from “Answer: C” etc.).
+	•	Difficulty heuristic: definitions→E; “EXCEPT/NOT” or multi-step→H; else M.
+	•	Attach chunkRefs by querying content_chunks for the stem’s keywords.
+	•	Upsert into question_banks by topic:
+	•	law-ethics-core (4-hr CE & ethics),
+	•	health-managed-fundamentals (HMO/PPO/billing),
+	•	disability-income, social-insurances (OASDI/Medicare),
+	•	life-insurance, annuities-variable, figa-dfs.
+
+Validation: Each bank ≥10 items; stems and answer keys are present.
+(Example: OASDI 5-month elimination content is clearly in manuscript and should produce items; see lines discussing the 5-month EP and timing to Medicare.  ￼  ￼)
+
+□ Task 2.3: Create exam-blueprint.ts
+Builder Action:
+	•	Build a timed exam form using DFS-215 weights (E40/M45/H15):
+	•	Law & Ethics 8; Health 12; Disability 6; Social Ins 8; Life 10; Annuities/Variable 4; FIGA/DFS 2.
+	•	Persist exam_configs with id: 'dfs-215-sim', durationSec: 3600, rules: {shuffle:true, oneSubmit:true, proctor:true}.
+
+Validation: /exam/dfs-215-sim shows Begin Exam (enabled).
+
+□ Task 2.4: Orchestrator seed-dfs215.ts (idempotent)
+Builder Action:
+	•	Pipeline: docx-parse → outline-map → chunk-embed → question-extract → exam-blueprint.
+	•	Upsert by slugs/hashes so re-runs update instead of duplicating.
+	•	Print summary counts to console and return JSON.
+
+Validation (expected sample):
+
+{ tracks:8, modules:30+, lessons:90+, chunks:10k+,
+  banks:7, items:400+, examForm:'dfs-215-sim' }
+
+
+⸻
+
+CONFIGURATION SPECIFICATIONS
+
+ENVIRONMENT VARIABLES
+	•	DOCX_SOURCE_PATH = /mnt/data/215 DFS Blended - Self Study Course July 2025.docx | Required
+	•	PUBLISH_VISIBILITY = public | Default: public | yes
+	•	EXAM_WEIGHTS_JSON = optional JSON override of quotas | no
+
+PACKAGE REQUIREMENTS
+	•	mammoth: DOCX → HTML
+	•	remark / rehype minimal set
+	•	zod: schema validation
+	•	Your existing vector lib (for content_chunks.vec)
+
+REPLIT SPECIFIC
+	•	Add an npm script: "seed:dfs215": "ts-node src/server/seeding/seed-dfs215.ts"
+	•	Keep logs visible in the Replit console; the script prints final counts.
+
+⸻
+
+INTEGRATION CHECKPOINTS
+
+CHECKPOINT 1
+✓ GET /api/question-banks returns 7+ banks (not []).
+Expected Result: names like “Health Managed Care – Fundamentals”.
+
+CHECKPOINT 2
+✓ /quiz bank selector lists all banks; start → items render; submit shows item analysis and remediation with passages.
+
+CHECKPOINT 3
+✓ /exam/dfs-215-sim has 60-min timer, autosaves, locks on submit; debrief lists 3 weak topics and iFlash CTAs.
+
+CHECKPOINT 4
+✓ CoachBot answers “Why is balance billing restricted under HMOs?” with citations; StudyBuddy generates iFlash from lesson selection.
+
+Troubleshooting: If banks still [], the ingest didn’t find assessment blocks—log first 10 parsed stems and regex patterns used.
+
+⸻
+
+“DO IT NOW” — BUILDER ACTION (paste verbatim)
+
+Run the full DOCX ingestion and publishing job now.
+	1.	Implement the six files exactly as listed (no placeholders).
+	2.	Execute pipeline docx-parse → outline-map → chunk-embed → question-extract → exam-blueprint.
+	3.	Upsert tracks/modules/lessons/content_units/content_chunks/question_banks/questions/exam_configs with visibility='public'.
+	4.	Emit a JSON summary to console:
+
+{ tracks, modules, lessons, chunks, banks, items, examForm }
+
+
+	5.	Fail fast if DOCX_SOURCE_PATH missing.
+	6.	After seeding, hit these routes automatically and verify non-empty: /quiz and /exam/dfs-215-sim.
+	7.	Print the first 10 lesson slugs and the bank names so we can click them.
+
+⸻
+
+ACCEPTANCE CRITERIA
+	•	/api/question-banks returns non-empty with ≥ 7 banks.
+	•	/api/questions?bank=health-managed-fundamentals returns ≥ 10 items (MCQ options array, keys present).
+	•	/quiz starts and completes a session; remediation opens chunk with citations.
+	•	/exam/dfs-215-sim runs end-to-end with timing, submit lock, and debrief.
+	•	Rerunning the seed script does not duplicate records (idempotent upserts).
+
+⸻
+
+This is the fastest, safest way to fill your quiz & exam pages with actual DFS-215 content from the Word doc you provided (including OASDI 5-month EP, FIGA/DFS, Law & Ethics CE, HMO balance billing, etc.—all of which are explicitly in the manuscript).  ￼  ￼  ￼
+
+When the builder runs this, you’ll immediately see populated banks and the timed exam live. If it prints an error or counts look off, paste the console summary here and I’ll give you a laser-targeted micro-patch for that stage only.

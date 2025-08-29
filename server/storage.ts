@@ -69,10 +69,12 @@ export interface IStorage {
   getContentChunksByLesson(lessonId: string): Promise<ContentChunk[]>;
   getContentChunk(id: string): Promise<ContentChunk | undefined>;
   searchContentChunks(query: string, limit?: number): Promise<ContentChunk[]>;
+  createContentChunk(chunk: any): Promise<ContentChunk>;
 
   // Question banks and questions
   getQuestionBanks(): Promise<QuestionBank[]>;
   getQuestionBank(id: string): Promise<QuestionBank | undefined>;
+  getQuestionBankBySlug(slug: string): Promise<QuestionBank | undefined>;
   createQuestionBank(bank: InsertQuestionBank): Promise<QuestionBank>;
   updateQuestionBank(id: string, bank: Partial<InsertQuestionBank>): Promise<QuestionBank>;
 
@@ -112,6 +114,25 @@ export interface IStorage {
   // CE records
   getUserCERecords(userId: string): Promise<CERecord[]>;
   createCERecord(record: Omit<CERecord, 'id'>): Promise<CERecord>;
+  
+  // Exam configurations
+  getExamConfig(id: string): Promise<any>;
+  createExamConfig(config: any): Promise<any>;
+  associateQuestionsWithExam(examId: string, questionIds: string[]): Promise<void>;
+  
+  // Additional search and utility methods
+  searchLessonsByTopic(topic: string): Promise<Lesson[]>;
+  getAllLessons(): Promise<Lesson[]>;
+  
+  // Clear methods for import
+  clearAllFlashcards(): Promise<void>;
+  clearAllQuestions(): Promise<void>;
+  clearAllQuestionBanks(): Promise<void>;
+  clearAllExamConfigs(): Promise<void>;
+  clearAllContentChunks(): Promise<void>;
+  clearAllLessons(): Promise<void>;
+  clearAllModules(): Promise<void>;
+  clearAllTracks(): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -468,6 +489,78 @@ export class DatabaseStorage implements IStorage {
   async createCERecord(record: Omit<CERecord, 'id'>): Promise<CERecord> {
     const [newRecord] = await db.insert(ceRecords).values(record).returning();
     return newRecord;
+  }
+
+  // Additional methods for import system
+  async getQuestionBankBySlug(slug: string): Promise<QuestionBank | undefined> {
+    const [bank] = await db.select().from(questionBanks).where(eq(questionBanks.slug, slug));
+    return bank;
+  }
+
+  async createContentChunk(chunk: any): Promise<ContentChunk> {
+    const [newChunk] = await db.insert(contentChunks).values(chunk).returning();
+    return newChunk;
+  }
+
+  async getExamConfig(id: string): Promise<any> {
+    // For now, return undefined as exam configs table doesn't exist yet
+    return undefined;
+  }
+
+  async createExamConfig(config: any): Promise<any> {
+    // For now, just return the config as exam configs table doesn't exist yet
+    return config;
+  }
+
+  async associateQuestionsWithExam(examId: string, questionIds: string[]): Promise<void> {
+    // For now, this is a no-op as the association table doesn't exist yet
+    console.log(`Would associate ${questionIds.length} questions with exam ${examId}`);
+  }
+
+  async searchLessonsByTopic(topic: string): Promise<Lesson[]> {
+    // Simple keyword search in lesson titles and descriptions
+    const allLessons = await db.select().from(lessons);
+    return allLessons.filter(lesson => 
+      lesson.title.toLowerCase().includes(topic.toLowerCase()) ||
+      lesson.description?.toLowerCase().includes(topic.toLowerCase())
+    );
+  }
+
+  async getAllLessons(): Promise<Lesson[]> {
+    return await db.select().from(lessons).orderBy(asc(lessons.orderIndex));
+  }
+
+  // Clear methods for import
+  async clearAllFlashcards(): Promise<void> {
+    await db.delete(flashcards);
+  }
+
+  async clearAllQuestions(): Promise<void> {
+    await db.delete(questions);
+  }
+
+  async clearAllQuestionBanks(): Promise<void> {
+    await db.delete(questionBanks);
+  }
+
+  async clearAllExamConfigs(): Promise<void> {
+    // No-op for now as exam configs table doesn't exist
+  }
+
+  async clearAllContentChunks(): Promise<void> {
+    await db.delete(contentChunks);
+  }
+
+  async clearAllLessons(): Promise<void> {
+    await db.delete(lessons);
+  }
+
+  async clearAllModules(): Promise<void> {
+    await db.delete(modules);
+  }
+
+  async clearAllTracks(): Promise<void> {
+    await db.delete(tracks);
   }
 }
 

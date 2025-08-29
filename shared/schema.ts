@@ -43,6 +43,7 @@ export const users = pgTable("users", {
 export const tracks = pgTable("tracks", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   title: text("title").notNull(),
+  slug: varchar("slug"),
   description: text("description"),
   orderIndex: integer("order_index").notNull(),
   ceHours: real("ce_hours").default(0),
@@ -54,6 +55,7 @@ export const modules = pgTable("modules", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   trackId: varchar("track_id").references(() => tracks.id, { onDelete: "cascade" }),
   title: text("title").notNull(),
+  slug: varchar("slug"),
   description: text("description"),
   orderIndex: integer("order_index").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
@@ -64,11 +66,13 @@ export const lessons = pgTable("lessons", {
   moduleId: varchar("module_id").references(() => modules.id, { onDelete: "cascade" }),
   title: text("title").notNull(),
   slug: varchar("slug").notNull(),
+  description: text("description"),
   content: text("content"),
   objectives: text("objectives").array(),
   orderIndex: integer("order_index").notNull(),
   duration: integer("duration"), // in minutes
   ceHours: real("ce_hours").default(0),
+  isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -76,10 +80,14 @@ export const lessons = pgTable("lessons", {
 export const contentChunks = pgTable("content_chunks", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   lessonId: varchar("lesson_id").references(() => lessons.id, { onDelete: "cascade" }),
-  text: text("text").notNull(),
+  content: text("content"),
+  text: text("text"), // For backward compatibility
+  tokens: integer("tokens"),
+  headings: text("headings").array(),
+  pageRef: integer("page_ref"),
   heading: text("heading"),
-  orderIndex: integer("order_index").notNull(),
-  embedding: text("embedding"), // Vector embedding for search
+  orderIndex: integer("order_index").default(0),
+  embedding: text("embedding"), // Keep as text for now
   metadata: jsonb("metadata"),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -88,12 +96,15 @@ export const contentChunks = pgTable("content_chunks", {
 export const questionBanks = pgTable("question_banks", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   title: text("title").notNull(),
+  slug: varchar("slug").unique(),
   description: text("description"),
+  topicId: varchar("topic_id"),
   topics: text("topics").array(),
   blueprint: jsonb("blueprint"), // Topic weights and counts
   timeLimitSec: integer("time_limit_sec"),
   attemptPolicy: varchar("attempt_policy").default("unlimited"),
   shuffleQuestions: boolean("shuffle_questions").default(true),
+  isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
