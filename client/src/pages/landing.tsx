@@ -4,9 +4,9 @@ import { BookOpen, Brain, Shield, Trophy } from "lucide-react";
 
 export default function Landing() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
+    <div className="min-h-screen education-bg">
       {/* Header */}
-      <nav className="fixed top-0 left-0 right-0 z-50 glassmorphism border-b border-border">
+      <nav className="fixed top-0 left-0 right-0 z-50 glassmorphism-card border-b border-border/50">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center">
@@ -67,12 +67,12 @@ export default function Landing() {
 
           {/* Features */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
-            <Card className="glow-card glassmorphism border-border group hover:scale-105 transition-transform duration-300">
+            <Card className="education-card group hover:scale-105 transition-transform duration-300">
               <CardContent className="p-6 text-center">
-                <div className="w-12 h-12 bg-primary/20 rounded-xl mx-auto mb-4 flex items-center justify-center group-hover:bg-primary/30 transition-colors">
-                  <Brain className="w-6 h-6 text-primary" />
+                <div className="w-14 h-14 bg-gradient-to-br from-primary to-secondary rounded-xl mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Brain className="w-7 h-7 text-white" />
                 </div>
-                <h3 className="cinzel text-lg font-semibold mb-2">AI Coaching</h3>
+                <h3 className="cinzel text-xl font-bold mb-3 text-foreground">AI Coaching</h3>
                 <p className="text-sm text-muted-foreground">
                   Personal AI tutors guide your learning with CoachBot, StudyBuddy, and ProctorBot
                 </p>

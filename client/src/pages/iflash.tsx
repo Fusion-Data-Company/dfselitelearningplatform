@@ -108,12 +108,12 @@ export default function IFlashPage() {
 
   if (cardsLoading || statsLoading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen education-bg">
         <Navigation />
         <Sidebar />
         <main className="ml-64 pt-16 min-h-screen">
           <div className="p-8">
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-5xl mx-auto">
               <div className="animate-pulse space-y-6">
                 <div className="h-32 bg-muted rounded-2xl"></div>
                 <div className="h-96 bg-muted rounded-2xl"></div>
@@ -127,12 +127,12 @@ export default function IFlashPage() {
 
   if (!flashcards.length && !sessionActive) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen education-bg">
         <Navigation />
         <Sidebar />
         <main className="ml-64 pt-16 min-h-screen">
           <div className="p-8">
-            <div className="max-w-4xl mx-auto text-center">
+            <div className="max-w-5xl mx-auto text-center">
               <div className="mb-8">
                 <Layers3 className="w-20 h-20 mx-auto mb-4 text-muted-foreground" />
                 <h2 className="cinzel text-3xl font-bold mb-2">No Flashcards Available</h2>
@@ -164,22 +164,46 @@ export default function IFlashPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen education-bg">
       <Navigation />
       <Sidebar />
       
       <main className="ml-64 pt-16 min-h-screen">
         <div className="p-8">
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-5xl mx-auto">
             
             {!sessionActive ? (
               // Study Session Overview
               <>
-                <div className="text-center mb-8">
-                  <h2 className="cinzel text-3xl font-bold mb-2">iFlash Review System</h2>
-                  <p className="text-muted-foreground">
-                    Spaced Repetition System • {stats?.dueToday || 0} cards due today
-                  </p>
+                <div className="glassmorphism-card rounded-2xl p-8 mb-8">
+                  <div className="flex items-center space-x-4 mb-6">
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-chart-2 to-chart-2/80 flex items-center justify-center">
+                      <Layers3 className="w-8 h-8 text-white" />
+                    </div>
+                    <div className="text-left">
+                      <h1 className="cinzel text-4xl font-bold text-shimmer mb-2">
+                        iFlash Learning System
+                      </h1>
+                      <p className="text-lg text-muted-foreground">
+                        Adaptive flashcard review • {stats?.dueToday || 0} cards due today
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-center space-x-6 text-sm text-muted-foreground">
+                    <div className="flex items-center space-x-2">
+                      <Target className="w-4 h-4 text-chart-2" />
+                      <span>Adaptive Learning</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <TrendingUp className="w-4 h-4 text-chart-2" />
+                      <span>Progress Tracking</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Flame className="w-4 h-4 text-chart-2" />
+                      <span>Streak Building</span>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Study Stats */}

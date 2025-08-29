@@ -216,52 +216,107 @@ export default function ExamPage() {
   // Show exam selection if no exam is active
   if (!examSession && !examResults && !examStarted) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen education-bg">
         <Navigation />
         <Sidebar />
         
         <main className="ml-64 pt-16 min-h-screen">
           <div className="p-8">
             <div className="max-w-4xl mx-auto">
-              <div className="text-center mb-8">
-                <h2 className="cinzel text-3xl font-bold mb-2">Timed Examinations</h2>
-                <p className="text-muted-foreground">
-                  Proctored exam environment with time limits and monitoring
-                </p>
+              {/* Header */}
+              <div className="glassmorphism-card rounded-2xl p-8 mb-8">
+                <div className="flex items-center justify-center mb-6">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-destructive to-destructive/80 flex items-center justify-center mr-4">
+                    <Shield className="w-8 h-8 text-white" />
+                  </div>
+                  <div className="text-center">
+                    <h1 className="cinzel text-4xl font-bold text-shimmer mb-2">
+                      DFS-215 Certification Exam
+                    </h1>
+                    <p className="text-lg text-muted-foreground">
+                      Official proctored examination with ProctorBot monitoring
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-center space-x-6 text-sm text-muted-foreground">
+                  <div className="flex items-center space-x-2">
+                    <Clock className="w-4 h-4 text-destructive" />
+                    <span>Timed & Monitored</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Shield className="w-4 h-4 text-destructive" />
+                    <span>ProctorBot Active</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <AlertTriangle className="w-4 h-4 text-destructive" />
+                    <span>Official Certification</span>
+                  </div>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {questionBanks?.map((bank) => (
-                  <Card key={bank.id} className="glow-card glassmorphism border-border">
-                    <CardContent className="p-6">
-                      <h3 className="cinzel text-xl font-bold mb-2">{bank.title}</h3>
-                      <p className="text-muted-foreground mb-4">{bank.description}</p>
+                  <Card key={bank.id} className="education-card p-6 group cursor-pointer relative overflow-hidden border-destructive/20">
+                    <div className="absolute inset-0 bg-gradient-to-br from-destructive/5 to-destructive/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div className="relative z-10">
+                      <div className="flex items-center space-x-3 mb-4">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-destructive to-destructive/80 flex items-center justify-center">
+                          <Shield className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                          <h3 className="cinzel text-xl font-bold group-hover:text-destructive transition-colors">{bank.title}</h3>
+                          <p className="text-sm text-muted-foreground">Official Certification Exam</p>
+                        </div>
+                      </div>
                       
-                      <div className="flex items-center justify-between mb-4">
-                        <Badge variant="outline" className="text-destructive border-destructive">
+                      <p className="text-muted-foreground mb-6">{bank.description}</p>
+                      
+                      <div className="flex items-center justify-between mb-6">
+                        <Badge className="bg-destructive/20 text-destructive border-destructive/30">
                           <Clock className="w-3 h-3 mr-1" />
                           {Math.floor(bank.timeLimitSec / 60)} minutes
                         </Badge>
-                        <Badge variant="outline" className="text-accent border-accent">
+                        <Badge className="bg-accent/20 text-accent border-accent/30">
                           <Shield className="w-3 h-3 mr-1" />
-                          Proctored
+                          ProctorBot Active
                         </Badge>
                       </div>
                       
                       <Button
                         onClick={() => handleStartExam(bank.id)}
                         disabled={startExamMutation.isPending}
-                        className="w-full bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        className="w-full bg-gradient-to-r from-destructive to-destructive/80 hover:from-destructive/80 hover:to-destructive text-white font-semibold"
                         data-testid={`button-start-exam-${bank.id}`}
                       >
                         <PlayCircle className="w-4 h-4 mr-2" />
-                        {startExamMutation.isPending ? "Starting..." : "Begin Exam"}
+                        {startExamMutation.isPending ? "Initializing ProctorBot..." : "Begin Certification Exam"}
                       </Button>
-                    </CardContent>
+                    </div>
                   </Card>
                 )) || (
-                  <div className="col-span-full text-center py-12">
-                    <p className="text-muted-foreground">No exam banks available.</p>
+                  <div className="col-span-full">
+                    <Card className="education-card p-12 text-center">
+                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-destructive to-destructive/80 flex items-center justify-center mx-auto mb-6">
+                        <Shield className="w-8 h-8 text-white" />
+                      </div>
+                      <h3 className="cinzel text-2xl font-bold mb-4">Certification Exams Coming Soon</h3>
+                      <p className="text-muted-foreground mb-6">Official DFS-215 certification examinations are being prepared with ProctorBot integration.</p>
+                      <div className="space-y-3 text-left max-w-md mx-auto">
+                        <div className="flex items-center space-x-3">
+                          <CheckCircle className="w-5 h-5 text-destructive" />
+                          <span>Timed examination environment</span>
+                        </div>
+                        <div className="flex items-center space-x-3">
+                          <CheckCircle className="w-5 h-5 text-destructive" />
+                          <span>ProctorBot monitoring system</span>
+                        </div>
+                        <div className="flex items-center space-x-3">
+                          <CheckCircle className="w-5 h-5 text-destructive" />
+                          <span>Official certification scoring</span>
+                        </div>
+                      </div>
+                    </Card>
                   </div>
                 )}
               </div>
