@@ -333,10 +333,10 @@ export default function Sidebar() {
             
             {(!courseProgress || courseProgress.tracks.length === 0) && (
               <>
-                <div className="p-5 education-card border border-primary/30 hover:border-primary/50 transition-all duration-300 group">
+                <div className="p-5 education-card border border-border/30 hover:border-border/50 transition-all duration-300 group">
                   <div className="flex justify-between items-center mb-4">
-                    <span className="text-sm font-bold text-foreground geist group-hover:text-primary transition-colors">Loading Progress...</span>
-                    <Badge className="elite-badge bg-gradient-to-r from-primary/30 to-primary/20 text-primary border-primary/40 text-xs font-semibold">
+                    <span className="text-sm font-bold text-foreground geist transition-colors">Loading Progress...</span>
+                    <Badge className="elite-badge bg-gradient-to-r from-muted/30 to-muted/20 text-muted-foreground border-border/40 text-xs font-semibold">
                       --%
                     </Badge>
                   </div>
