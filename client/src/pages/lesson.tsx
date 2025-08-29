@@ -146,7 +146,7 @@ export default function LessonPage() {
   const viewId = `lesson:${lesson.id}:${activeSection}`;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen education-bg">
       <Navigation />
       <Sidebar />
       
@@ -154,16 +154,41 @@ export default function LessonPage() {
         <div className="p-8">
           <div className="max-w-6xl mx-auto">
             {/* Lesson Header */}
-            <Card className="glassmorphism border-border mb-6">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
+            <Card className="glassmorphism-card border-border/50 mb-6">
+              <CardContent className="p-8">
+                <div className="flex items-center justify-between mb-6">
                   <div>
-                    <h2 className="cinzel text-2xl font-bold" data-testid="lesson-title">
+                    <div className="flex items-center space-x-3 mb-3">
+                      <Button variant="outline" size="sm" onClick={() => window.history.back()} className="border-primary/50 text-primary hover:bg-primary/10">
+                        <ArrowLeft className="w-4 h-4 mr-2" />
+                        Back to Course
+                      </Button>
+                      <Button
+                        onClick={() => setCoachBotOpen(true)}
+                        className="floating-action text-background font-semibold"
+                        data-testid="button-coach-bot"
+                      >
+                        <Brain className="w-4 h-4 mr-2" />
+                        Ask CoachBot
+                      </Button>
+                    </div>
+                    <h2 className="cinzel text-3xl font-bold text-shimmer mb-2" data-testid="lesson-title">
                       {lesson.title}
                     </h2>
-                    <p className="text-muted-foreground">
-                      Health Insurance & Managed Care • Lesson 3.2
-                    </p>
+                    <div className="flex items-center space-x-4">
+                      <p className="text-lg text-muted-foreground">
+                        Health Insurance & Managed Care • Lesson 3.2
+                      </p>
+                      <Badge className="bg-primary/20 text-primary border-primary/30">
+                        <Clock className="w-3 h-3 mr-1" />
+                        {lesson.duration} min
+                      </Badge>
+                      {lesson.ceHours && (
+                        <Badge className="bg-secondary/20 text-secondary border-secondary/30">
+                          {lesson.ceHours} CE Hours
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                   <div className="flex items-center space-x-4">
                     <div className="text-right">

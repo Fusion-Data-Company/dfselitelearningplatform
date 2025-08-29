@@ -109,37 +109,58 @@ export default function Dashboard() {
                         courseProgress?.tracks.map((track) => (
                           <Card 
                             key={track.id}
-                            className="p-4 bg-card border-border hover:border-primary/50 transition-colors cursor-pointer group"
+                            className="education-card p-5 cursor-pointer group relative overflow-hidden"
                             data-testid={`track-${track.id}`}
                           >
-                            <div className="flex items-center justify-between mb-3">
-                              <h4 className="font-semibold group-hover:text-primary transition-colors">
-                                {track.title}
-                              </h4>
-                              <div className="flex items-center space-x-2">
-                                {track.ceHours > 0 && (
-                                  <Badge variant="secondary" className="bg-primary/20 text-primary">
-                                    {track.ceHours}-Hr CE
-                                  </Badge>
-                                )}
-                                <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <div className="relative z-10">
+                              <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center space-x-3">
+                                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+                                    <BookOpen className="w-6 h-6 text-white" />
+                                  </div>
+                                  <div>
+                                    <h4 className="font-bold text-lg group-hover:text-primary transition-colors">
+                                      {track.title}
+                                    </h4>
+                                    <p className="text-sm text-muted-foreground">
+                                      {track.completedLessons} of {track.totalLessons} lessons
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  {track.ceHours > 0 && (
+                                    <Badge className="bg-primary/20 text-primary border-primary/30">
+                                      {track.ceHours}-Hr CE
+                                    </Badge>
+                                  )}
+                                  <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                                </div>
                               </div>
-                            </div>
-                            
-                            <p className="text-sm text-muted-foreground mb-3">
-                              {track.completedLessons} of {track.totalLessons} lessons completed
-                            </p>
-                            
-                            <div className="flex items-center justify-between">
-                              <div className="w-full bg-muted rounded-full h-2 mr-3">
-                                <div 
-                                  className="bg-gradient-to-r from-primary to-secondary h-2 rounded-full transition-all duration-500"
-                                  style={{ width: `${track.progress}%` }}
-                                />
+                              
+                              <div className="mb-4">
+                                <div className="flex justify-between items-center mb-2">
+                                  <span className="text-sm font-medium text-muted-foreground">
+                                    Progress
+                                  </span>
+                                  <span className="text-sm font-bold text-primary">{track.progress}%</span>
+                                </div>
+                                <div className="w-full bg-muted/30 rounded-full h-3 relative overflow-hidden">
+                                  <div 
+                                    className="premium-gradient h-3 rounded-full transition-all duration-500 ease-out relative"
+                                    style={{ width: `${track.progress}%` }}
+                                  >
+                                    <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
+                                  </div>
+                                </div>
                               </div>
-                              <span className="text-sm font-medium text-primary min-w-0">
-                                {track.progress}%
-                              </span>
+                              
+                              <div className="flex items-center justify-between">
+                                <span className="text-xs text-muted-foreground">Next: {track.progress < 100 ? 'Continue Learning' : 'Review Complete'}</span>
+                                <Button size="sm" className="bg-primary/10 hover:bg-primary/20 text-primary border-primary/30">
+                                  {track.progress < 100 ? 'Continue' : 'Review'}
+                                </Button>
+                              </div>
                             </div>
                           </Card>
                         ))

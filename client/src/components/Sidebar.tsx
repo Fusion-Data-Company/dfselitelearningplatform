@@ -24,7 +24,7 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="fixed left-0 top-16 bottom-0 w-64 glassmorphism border-r border-border p-6 overflow-y-auto">
+    <aside className="fixed left-0 top-16 bottom-0 w-64 glassmorphism-card border-r border-border/50 p-6 overflow-y-auto">
       <div className="space-y-6">
         {/* Navigation Menu */}
         <div className="space-y-2">
@@ -62,39 +62,45 @@ export default function Sidebar() {
             Course Progress
           </h3>
           <div className="space-y-3">
-            <div className="p-3 bg-card rounded-xl border border-border">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium">Law & Ethics</span>
-                <Badge variant="secondary" className="bg-primary/20 text-primary text-xs">
+            <div className="p-4 education-card border border-primary/20">
+              <div className="flex justify-between items-center mb-3">
+                <span className="text-sm font-semibold text-foreground">Law & Ethics</span>
+                <Badge className="bg-primary/20 text-primary border-primary/30 text-xs">
                   85%
                 </Badge>
               </div>
-              <div className="w-full bg-muted rounded-full h-2">
-                <div className="lesson-progress h-2 rounded-full" style={{ width: "85%" }} />
+              <div className="w-full bg-muted/30 rounded-full h-2.5 relative overflow-hidden">
+                <div className="premium-gradient h-2.5 rounded-full transition-all duration-500" style={{ width: "85%" }}>
+                  <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
+                </div>
               </div>
             </div>
             
-            <div className="p-3 bg-card rounded-xl border border-border">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium">Health Insurance</span>
-                <Badge variant="secondary" className="bg-secondary/20 text-secondary text-xs">
+            <div className="p-4 education-card border border-secondary/20">
+              <div className="flex justify-between items-center mb-3">
+                <span className="text-sm font-semibold text-foreground">Health Insurance</span>
+                <Badge className="bg-secondary/20 text-secondary border-secondary/30 text-xs">
                   65%
                 </Badge>
               </div>
-              <div className="w-full bg-muted rounded-full h-2">
-                <div className="bg-secondary h-2 rounded-full" style={{ width: "65%" }} />
+              <div className="w-full bg-muted/30 rounded-full h-2.5 relative overflow-hidden">
+                <div className="bg-gradient-to-r from-secondary to-secondary/80 h-2.5 rounded-full transition-all duration-500" style={{ width: "65%" }}>
+                  <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
+                </div>
               </div>
             </div>
             
-            <div className="p-3 bg-card rounded-xl border border-border">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium">OASDI & Medicare</span>
-                <Badge variant="secondary" className="bg-accent/20 text-accent text-xs">
+            <div className="p-4 education-card border border-accent/20">
+              <div className="flex justify-between items-center mb-3">
+                <span className="text-sm font-semibold text-foreground">OASDI & Medicare</span>
+                <Badge className="bg-accent/20 text-accent border-accent/30 text-xs">
                   40%
                 </Badge>
               </div>
-              <div className="w-full bg-muted rounded-full h-2">
-                <div className="bg-accent h-2 rounded-full" style={{ width: "40%" }} />
+              <div className="w-full bg-muted/30 rounded-full h-2.5 relative overflow-hidden">
+                <div className="bg-gradient-to-r from-accent to-accent/80 h-2.5 rounded-full transition-all duration-500" style={{ width: "40%" }}>
+                  <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
+                </div>
               </div>
             </div>
           </div>

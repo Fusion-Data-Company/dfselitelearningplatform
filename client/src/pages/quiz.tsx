@@ -180,32 +180,53 @@ export default function QuizPage() {
   // Show quiz selection if no quiz is active
   if (!quizSession && !quizResults) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen education-bg">
         <Navigation />
         <Sidebar />
         
         <main className="ml-64 pt-16 min-h-screen">
           <div className="p-8">
-            <div className="max-w-4xl mx-auto">
-              <div className="text-center mb-8">
-                <h2 className="cinzel text-3xl font-bold mb-2">Practice Quizzes</h2>
-                <p className="text-muted-foreground">
-                  Select a quiz topic to test your knowledge
+            <div className="max-w-5xl mx-auto">
+              {/* Header */}
+              <div className="glassmorphism-card rounded-2xl p-8 mb-8">
+                <h1 className="cinzel text-4xl font-bold text-shimmer mb-4">
+                  DFS-215 Practice Quiz
+                </h1>
+                <p className="text-lg text-muted-foreground mb-4">
+                  Test your knowledge with practice questions from the DFS-215 curriculum. Build confidence before taking your certification exam.
                 </p>
+                <div className="flex items-center space-x-4">
+                  <Badge className="bg-primary/20 text-primary border-primary/30">
+                    Florida Department of Financial Services
+                  </Badge>
+                  <Badge className="bg-secondary/20 text-secondary border-secondary/30">
+                    Insurance Agent Certification
+                  </Badge>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {questionBanks?.map((bank) => (
-                  <Card key={bank.id} className="glow-card glassmorphism border-border">
-                    <CardContent className="p-6">
-                      <h3 className="cinzel text-xl font-bold mb-2">{bank.title}</h3>
+                  <Card key={bank.id} className="education-card p-6 group cursor-pointer relative overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div className="relative z-10">
+                      <div className="flex items-center space-x-3 mb-4">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+                          <HelpCircle className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                          <h3 className="cinzel text-xl font-bold group-hover:text-primary transition-colors">{bank.title}</h3>
+                          <p className="text-sm text-muted-foreground">Practice Questions</p>
+                        </div>
+                      </div>
+                      
                       <p className="text-muted-foreground mb-4">{bank.description}</p>
                       
-                      <div className="flex items-center justify-between mb-4">
-                        <Badge variant="outline">
+                      <div className="flex items-center justify-between mb-6">
+                        <Badge className="bg-primary/20 text-primary border-primary/30">
                           {Math.floor(bank.timeLimitSec / 60)} minutes
                         </Badge>
-                        <Badge variant="outline">
+                        <Badge className="bg-secondary/20 text-secondary border-secondary/30">
                           Practice Mode
                         </Badge>
                       </div>
@@ -213,17 +234,42 @@ export default function QuizPage() {
                       <Button
                         onClick={() => handleStartQuiz(bank.id)}
                         disabled={startQuizMutation.isPending}
-                        className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+                        className="floating-action w-full text-background font-semibold"
                         data-testid={`button-start-quiz-${bank.id}`}
                       >
                         <PlayCircle className="w-4 h-4 mr-2" />
                         {startQuizMutation.isPending ? "Starting..." : "Start Quiz"}
                       </Button>
-                    </CardContent>
+                    </div>
                   </Card>
                 )) || (
-                  <div className="col-span-full text-center py-12">
-                    <p className="text-muted-foreground">No quiz banks available.</p>
+                  <div className="col-span-full">
+                    <Card className="education-card p-12 text-center">
+                      <h3 className="cinzel text-2xl font-bold mb-4">Quiz Banks Coming Soon</h3>
+                      <p className="text-muted-foreground mb-6">Practice quizzes are being prepared for your DFS-215 certification journey.</p>
+                      <div className="space-y-4">
+                        <div className="text-left space-y-2">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
+                              <CheckCircle className="w-4 h-4 text-primary" />
+                            </div>
+                            <span>Law & Ethics Fundamentals</span>
+                          </div>
+                          <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 rounded-lg bg-secondary/20 flex items-center justify-center">
+                              <CheckCircle className="w-4 h-4 text-secondary" />
+                            </div>
+                            <span>Health Insurance & HMO Operations</span>
+                          </div>
+                          <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 rounded-lg bg-accent/20 flex items-center justify-center">
+                              <CheckCircle className="w-4 h-4 text-accent" />
+                            </div>
+                            <span>OASDI, Medicare & Annuities</span>
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
                   </div>
                 )}
               </div>

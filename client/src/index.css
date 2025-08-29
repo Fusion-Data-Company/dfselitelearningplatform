@@ -80,30 +80,86 @@
   }
 
   body {
-    @apply font-sans antialiased bg-background text-foreground;
+    @apply font-sans antialiased text-foreground;
     font-family: var(--font-sans);
+    background: linear-gradient(135deg, hsl(230, 35%, 7%) 0%, hsl(235, 40%, 10%) 50%, hsl(240, 45%, 8%) 100%);
+    background-attachment: fixed;
   }
 
   .cinzel {
     font-family: var(--font-serif);
   }
+
+  .education-bg {
+    background-image: 
+      radial-gradient(circle at 20% 20%, rgba(0, 217, 255, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(120, 220, 180, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 40% 60%, rgba(255, 191, 0, 0.06) 0%, transparent 50%);
+    position: relative;
+  }
+
+  .education-bg::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse"><path d="M 50 0 L 0 0 0 50" fill="none" stroke="%23ffffff" stroke-width="0.5" opacity="0.1"/></pattern></defs><rect width="100%" height="100%" fill="url(%23grid)"/></svg>');
+    opacity: 0.4;
+    pointer-events: none;
+  }
 }
 
 @layer components {
   .glassmorphism {
-    background: rgba(42, 48, 82, 0.3);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(42, 48, 82, 0.4);
+    backdrop-filter: blur(16px) saturate(120%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+
+  .glassmorphism-card {
+    background: rgba(30, 35, 60, 0.6);
+    backdrop-filter: blur(20px) saturate(150%);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 
+      0 8px 32px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
 
   .glow-card {
-    box-shadow: 0 4px 15px 0 rgba(0, 217, 255, 0.2);
-    transition: all 0.3s ease;
+    box-shadow: 
+      0 4px 15px 0 rgba(0, 217, 255, 0.2),
+      0 0 30px rgba(0, 217, 255, 0.1);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: perspective(1000px) rotateX(0deg);
   }
 
   .glow-card:hover {
-    box-shadow: 0 8px 25px 0 rgba(0, 217, 255, 0.4);
-    transform: translateY(-2px);
+    box-shadow: 
+      0 12px 35px 0 rgba(0, 217, 255, 0.4),
+      0 0 50px rgba(0, 217, 255, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    transform: perspective(1000px) rotateX(2deg) translateY(-8px);
+  }
+
+  .education-card {
+    background: linear-gradient(135deg, 
+      rgba(0, 217, 255, 0.1) 0%, 
+      rgba(30, 35, 60, 0.8) 20%, 
+      rgba(42, 48, 82, 0.9) 100%);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 217, 255, 0.3);
+    transition: all 0.3s ease;
+  }
+
+  .education-card:hover {
+    border-color: rgba(0, 217, 255, 0.6);
+    box-shadow: 
+      0 10px 40px rgba(0, 217, 255, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transform: translateY(-4px);
   }
 
   .ambient-glow {
@@ -120,6 +176,47 @@
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask-composite: xor;
     opacity: 0.5;
+  }
+
+  .floating-action {
+    box-shadow: 0 8px 25px rgba(0, 217, 255, 0.3);
+    background: linear-gradient(135deg, hsl(195, 100%, 50%), hsl(167, 85%, 45%));
+    transition: all 0.3s ease;
+  }
+
+  .floating-action:hover {
+    box-shadow: 0 12px 35px rgba(0, 217, 255, 0.5);
+    transform: translateY(-2px) scale(1.02);
+  }
+
+  .premium-gradient {
+    background: linear-gradient(135deg, 
+      hsl(195, 100%, 50%) 0%,
+      hsl(167, 85%, 45%) 50%,
+      hsl(43, 96%, 51%) 100%);
+  }
+
+  .text-shimmer {
+    background: linear-gradient(90deg, 
+      hsl(195, 100%, 50%), 
+      hsl(167, 85%, 45%), 
+      hsl(43, 96%, 51%), 
+      hsl(195, 100%, 50%));
+    background-size: 400% 100%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 3s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 100% 0%; }
+    50% { background-position: 0% 0%; }
+    100% { background-position: 100% 0%; }
+  }
+
+  .progress-ring {
+    transition: stroke-dasharray 0.5s ease-in-out;
   }
 
   .lesson-progress {
