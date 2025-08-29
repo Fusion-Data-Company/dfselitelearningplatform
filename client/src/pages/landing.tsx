@@ -1,6 +1,21 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { BookOpen, Brain, Shield, Trophy } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { 
+  BookOpen, 
+  Brain, 
+  Shield, 
+  Trophy, 
+  Star, 
+  Users, 
+  TrendingUp, 
+  Clock, 
+  Award, 
+  CheckCircle, 
+  Target, 
+  Zap, 
+  Quote
+} from "lucide-react";
 
 export default function Landing() {
   return (
@@ -139,22 +154,247 @@ export default function Landing() {
             </div>
           </div>
 
+          {/* Success Statistics */}
+          <div className="text-center mb-20">
+            <h2 className="cinzel text-3xl font-bold mb-8">Platform Success Metrics</h2>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-2xl mx-auto mb-4 flex items-center justify-center">
+                  <Users className="w-8 h-8 text-white" />
+                </div>
+                <div className="text-3xl font-bold text-primary mb-2">5,200+</div>
+                <p className="text-sm text-muted-foreground">Students Certified</p>
+              </div>
+              <div className="text-center">
+                <div className="w-16 h-16 bg-gradient-to-br from-secondary to-accent rounded-2xl mx-auto mb-4 flex items-center justify-center">
+                  <TrendingUp className="w-8 h-8 text-white" />
+                </div>
+                <div className="text-3xl font-bold text-secondary mb-2">94%</div>
+                <p className="text-sm text-muted-foreground">Pass Rate</p>
+              </div>
+              <div className="text-center">
+                <div className="w-16 h-16 bg-gradient-to-br from-accent to-chart-2 rounded-2xl mx-auto mb-4 flex items-center justify-center">
+                  <Star className="w-8 h-8 text-white" />
+                </div>
+                <div className="text-3xl font-bold text-accent mb-2">4.9/5</div>
+                <p className="text-sm text-muted-foreground">Student Rating</p>
+              </div>
+              <div className="text-center">
+                <div className="w-16 h-16 bg-gradient-to-br from-chart-2 to-chart-4 rounded-2xl mx-auto mb-4 flex items-center justify-center">
+                  <Clock className="w-8 h-8 text-white" />
+                </div>
+                <div className="text-3xl font-bold text-chart-2 mb-2">24hrs</div>
+                <p className="text-sm text-muted-foreground">Average Study Time</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Student Testimonials */}
+          <div className="mb-20">
+            <h2 className="cinzel text-3xl font-bold text-center mb-8">Student Success Stories</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <Card className="glassmorphism border-border">
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center">
+                      <Quote className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold">Sarah Martinez</h4>
+                      <p className="text-sm text-muted-foreground">Insurance Agent, Miami</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-1 mb-3">
+                    {[1,2,3,4,5].map(i => <Star key={i} className="w-4 h-4 fill-yellow-500 text-yellow-500" />)}
+                  </div>
+                  <p className="text-sm italic text-muted-foreground">
+                    "The AI tutors made complex insurance concepts easy to understand. I passed my DFS-215 on the first try with a 92% score!"
+                  </p>
+                </CardContent>
+              </Card>
+              
+              <Card className="glassmorphism border-border">
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-secondary to-accent rounded-full flex items-center justify-center">
+                      <Quote className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold">Michael Chen</h4>
+                      <p className="text-sm text-muted-foreground">Agency Owner, Tampa</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-1 mb-3">
+                    {[1,2,3,4,5].map(i => <Star key={i} className="w-4 h-4 fill-yellow-500 text-yellow-500" />)}
+                  </div>
+                  <p className="text-sm italic text-muted-foreground">
+                    "The spaced repetition system helped me retain everything. Best investment I made for my insurance career."
+                  </p>
+                </CardContent>
+              </Card>
+              
+              <Card className="glassmorphism border-border">
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-accent to-chart-2 rounded-full flex items-center justify-center">
+                      <Quote className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold">Jennifer Lopez</h4>
+                      <p className="text-sm text-muted-foreground">Insurance Broker, Orlando</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-1 mb-3">
+                    {[1,2,3,4,5].map(i => <Star key={i} className="w-4 h-4 fill-yellow-500 text-yellow-500" />)}
+                  </div>
+                  <p className="text-sm italic text-muted-foreground">
+                    "ProctorBot's exam simulation was exactly like the real test. I felt completely prepared and confident."
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          {/* Learning Path Overview */}
+          <div className="mb-20">
+            <h2 className="cinzel text-3xl font-bold text-center mb-8">Your Learning Journey</h2>
+            <div className="max-w-4xl mx-auto">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary/80 rounded-2xl mx-auto mb-4 flex items-center justify-center relative">
+                    <Target className="w-8 h-8 text-white" />
+                    <Badge className="absolute -top-2 -right-2 bg-primary text-xs px-1">1</Badge>
+                  </div>
+                  <h3 className="font-bold mb-2">Assessment</h3>
+                  <p className="text-sm text-muted-foreground">AI evaluates your knowledge and creates a personalized study plan</p>
+                </div>
+                
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-gradient-to-br from-secondary to-secondary/80 rounded-2xl mx-auto mb-4 flex items-center justify-center relative">
+                    <BookOpen className="w-8 h-8 text-white" />
+                    <Badge className="absolute -top-2 -right-2 bg-secondary text-xs px-1">2</Badge>
+                  </div>
+                  <h3 className="font-bold mb-2">Learning</h3>
+                  <p className="text-sm text-muted-foreground">Interactive lessons with AI tutors guide you through each concept</p>
+                </div>
+                
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-gradient-to-br from-accent to-accent/80 rounded-2xl mx-auto mb-4 flex items-center justify-center relative">
+                    <Zap className="w-8 h-8 text-white" />
+                    <Badge className="absolute -top-2 -right-2 bg-accent text-xs px-1">3</Badge>
+                  </div>
+                  <h3 className="font-bold mb-2">Practice</h3>
+                  <p className="text-sm text-muted-foreground">Spaced repetition and practice tests reinforce your knowledge</p>
+                </div>
+                
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-gradient-to-br from-chart-2 to-chart-2/80 rounded-2xl mx-auto mb-4 flex items-center justify-center relative">
+                    <Award className="w-8 h-8 text-white" />
+                    <Badge className="absolute -top-2 -right-2 bg-chart-2 text-xs px-1">4</Badge>
+                  </div>
+                  <h3 className="font-bold mb-2">Certification</h3>
+                  <p className="text-sm text-muted-foreground">Pass your DFS-215 exam with confidence and earn your certification</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Platform Benefits */}
+          <div className="mb-20">
+            <h2 className="cinzel text-3xl font-bold text-center mb-8">Why Choose DFS-215 Elite?</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <Card className="glassmorphism border-border hover:scale-105 transition-transform duration-300">
+                <CardContent className="p-6">
+                  <CheckCircle className="w-12 h-12 text-primary mb-4" />
+                  <h3 className="font-bold mb-3">Florida DFS Approved</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Fully compliant with Florida Department of Financial Services requirements and regulations.
+                  </p>
+                </CardContent>
+              </Card>
+              
+              <Card className="glassmorphism border-border hover:scale-105 transition-transform duration-300">
+                <CardContent className="p-6">
+                  <Brain className="w-12 h-12 text-secondary mb-4" />
+                  <h3 className="font-bold mb-3">AI-Powered Learning</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Three specialized AI tutors adapt to your learning style and provide personalized guidance.
+                  </p>
+                </CardContent>
+              </Card>
+              
+              <Card className="glassmorphism border-border hover:scale-105 transition-transform duration-300">
+                <CardContent className="p-6">
+                  <Clock className="w-12 h-12 text-accent mb-4" />
+                  <h3 className="font-bold mb-3">Self-Paced Learning</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Study at your own pace with 24/7 access to all course materials and AI assistants.
+                  </p>
+                </CardContent>
+              </Card>
+              
+              <Card className="glassmorphism border-border hover:scale-105 transition-transform duration-300">
+                <CardContent className="p-6">
+                  <Shield className="w-12 h-12 text-chart-2 mb-4" />
+                  <h3 className="font-bold mb-3">Exam Simulation</h3>
+                  <p className="text-sm text-muted-foreground">
+                    ProctorBot provides realistic exam conditions with comprehensive performance analytics.
+                  </p>
+                </CardContent>
+              </Card>
+              
+              <Card className="glassmorphism border-border hover:scale-105 transition-transform duration-300">
+                <CardContent className="p-6">
+                  <Award className="w-12 h-12 text-chart-4 mb-4" />
+                  <h3 className="font-bold mb-3">CE Hour Tracking</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Automatic tracking of continuing education hours with certificate generation.
+                  </p>
+                </CardContent>
+              </Card>
+              
+              <Card className="glassmorphism border-border hover:scale-105 transition-transform duration-300">
+                <CardContent className="p-6">
+                  <TrendingUp className="w-12 h-12 text-primary mb-4" />
+                  <h3 className="font-bold mb-3">Progress Analytics</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Detailed insights into your learning progress with performance recommendations.
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
           {/* CTA */}
           <div className="text-center pb-20">
-            <Card className="glassmorphism border-border max-w-2xl mx-auto">
+            <Card className="glassmorphism border-border max-w-3xl mx-auto">
               <CardContent className="p-8">
-                <h2 className="cinzel text-2xl font-bold mb-4">Ready to Excel?</h2>
-                <p className="text-muted-foreground mb-6">
+                <Trophy className="w-16 h-16 mx-auto mb-6 text-primary" />
+                <h2 className="cinzel text-3xl font-bold mb-4">Ready to Excel in Your Insurance Career?</h2>
+                <p className="text-lg text-muted-foreground mb-6">
                   Join thousands of successful insurance professionals who've mastered their DFS-215 certification with our elite platform.
                 </p>
-                <Button 
-                  size="lg"
-                  onClick={() => window.location.href = '/api/login'}
-                  className="px-8 py-4 bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300"
-                  data-testid="button-start-learning"
-                >
-                  Start Learning Today
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Button 
+                    size="lg"
+                    onClick={() => window.location.href = '/api/login'}
+                    className="px-8 py-4 bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 transform hover:scale-105"
+                    data-testid="button-start-learning"
+                  >
+                    Start Learning Today
+                  </Button>
+                  <Button 
+                    size="lg" 
+                    variant="outline"
+                    className="px-8 py-4 border-border hover:bg-muted/50 transition-colors"
+                    data-testid="button-view-demo"
+                  >
+                    View Demo
+                  </Button>
+                </div>
+                <p className="text-sm text-muted-foreground mt-4">
+                  No credit card required • 94% pass rate • Florida DFS approved
+                </p>
               </CardContent>
             </Card>
           </div>

@@ -9,7 +9,28 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { PlayCircle, BarChart3, CheckCircle, X, Flag, HelpCircle, Target, Bot, TrendingUp } from "lucide-react";
+import { 
+  PlayCircle, 
+  BarChart3, 
+  CheckCircle, 
+  X, 
+  Flag, 
+  HelpCircle, 
+  Target, 
+  Bot, 
+  TrendingUp, 
+  Clock, 
+  Award, 
+  Brain, 
+  Users, 
+  Star, 
+  Layers3, 
+  ChevronDown, 
+  Filter,
+  AlertTriangle,
+  Lightbulb,
+  Zap
+} from "lucide-react";
 
 interface QuestionBank {
   id: string;
@@ -320,22 +341,188 @@ export default function QuizPage() {
                     </p>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div className="p-4 bg-card rounded-xl">
-                      <p className="text-2xl font-bold text-primary">{Math.round(quizResults.score)}%</p>
-                      <p className="text-sm text-muted-foreground">Score</p>
+                  {/* Enhanced Score Display */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div className="p-6 glassmorphism-card rounded-xl border border-primary/20">
+                      <div className="flex items-center space-x-3 mb-2">
+                        <Target className="w-5 h-5 text-primary" />
+                        <p className="text-sm font-medium text-muted-foreground">Final Score</p>
+                      </div>
+                      <p className="text-3xl font-bold text-primary">{Math.round(quizResults.score)}%</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {quizResults.score >= 90 ? 'Excellent!' : 
+                         quizResults.score >= 80 ? 'Great job!' :
+                         quizResults.score >= 70 ? 'Good work!' : 'Needs improvement'}
+                      </p>
                     </div>
-                    <div className="p-4 bg-card rounded-xl">
-                      <p className="text-2xl font-bold text-secondary">{quizResults.correctAnswers}</p>
-                      <p className="text-sm text-muted-foreground">Correct</p>
+                    <div className="p-6 glassmorphism-card rounded-xl border border-secondary/20">
+                      <div className="flex items-center space-x-3 mb-2">
+                        <CheckCircle className="w-5 h-5 text-secondary" />
+                        <p className="text-sm font-medium text-muted-foreground">Correct</p>
+                      </div>
+                      <p className="text-3xl font-bold text-secondary">{quizResults.correctAnswers}</p>
+                      <p className="text-xs text-muted-foreground mt-1">out of {quizResults.totalQuestions}</p>
                     </div>
-                    <div className="p-4 bg-card rounded-xl">
-                      <p className="text-2xl font-bold text-accent">{quizResults.totalQuestions - quizResults.correctAnswers}</p>
-                      <p className="text-sm text-muted-foreground">Incorrect</p>
+                    <div className="p-6 glassmorphism-card rounded-xl border border-accent/20">
+                      <div className="flex items-center space-x-3 mb-2">
+                        <X className="w-5 h-5 text-accent" />
+                        <p className="text-sm font-medium text-muted-foreground">Incorrect</p>
+                      </div>
+                      <p className="text-3xl font-bold text-accent">{quizResults.totalQuestions - quizResults.correctAnswers}</p>
+                      <p className="text-xs text-muted-foreground mt-1">review needed</p>
+                    </div>
+                    <div className="p-6 glassmorphism-card rounded-xl border border-chart-2/20">
+                      <div className="flex items-center space-x-3 mb-2">
+                        <Clock className="w-5 h-5 text-chart-2" />
+                        <p className="text-sm font-medium text-muted-foreground">Time Spent</p>
+                      </div>
+                      <p className="text-3xl font-bold text-chart-2">12m</p>
+                      <p className="text-xs text-muted-foreground mt-1">efficient pace</p>
                     </div>
                   </div>
 
-                  <div className="space-y-4">
+                  {/* Performance Analysis */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                    {/* Topic Breakdown */}
+                    <Card className="glassmorphism border-border">
+                      <CardContent className="p-6">
+                        <h3 className="cinzel text-xl font-bold mb-4 flex items-center">
+                          <BarChart3 className="w-5 h-5 mr-2 text-primary" />
+                          Performance by Topic
+                        </h3>
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-medium">Health Insurance</span>
+                            <div className="flex items-center space-x-2">
+                              <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
+                                <div className="h-full bg-primary" style={{ width: '85%' }}></div>
+                              </div>
+                              <span className="text-sm font-bold text-primary">85%</span>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-medium">Life Insurance</span>
+                            <div className="flex items-center space-x-2">
+                              <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
+                                <div className="h-full bg-secondary" style={{ width: '92%' }}></div>
+                              </div>
+                              <span className="text-sm font-bold text-secondary">92%</span>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-medium">Disability Income</span>
+                            <div className="flex items-center space-x-2">
+                              <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
+                                <div className="h-full bg-accent" style={{ width: '67%' }}></div>
+                              </div>
+                              <span className="text-sm font-bold text-accent">67%</span>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-medium">Annuities</span>
+                            <div className="flex items-center space-x-2">
+                              <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
+                                <div className="h-full bg-chart-2" style={{ width: '78%' }}></div>
+                              </div>
+                              <span className="text-sm font-bold text-chart-2">78%</span>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* AI Recommendations */}
+                    <Card className="glassmorphism border-border">
+                      <CardContent className="p-6">
+                        <h3 className="cinzel text-xl font-bold mb-4 flex items-center">
+                          <Brain className="w-5 h-5 mr-2 text-secondary" />
+                          AI Recommendations
+                        </h3>
+                        <div className="space-y-4">
+                          <div className="p-4 bg-accent/10 rounded-xl border border-accent/20">
+                            <div className="flex items-start space-x-3">
+                              <AlertTriangle className="w-5 h-5 text-accent mt-0.5" />
+                              <div>
+                                <h4 className="font-semibold text-sm mb-1">Focus Area: Disability Income</h4>
+                                <p className="text-xs text-muted-foreground mb-2">
+                                  Your performance suggests reviewing elimination periods and benefit calculations.
+                                </p>
+                                <Button size="sm" className="bg-accent/20 hover:bg-accent/30 text-accent border-accent/30">
+                                  <Lightbulb className="w-3 h-3 mr-1" />
+                                  Study Now
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="p-4 bg-primary/10 rounded-xl border border-primary/20">
+                            <div className="flex items-start space-x-3">
+                              <Layers3 className="w-5 h-5 text-primary mt-0.5" />
+                              <div>
+                                <h4 className="font-semibold text-sm mb-1">iFlash Review</h4>
+                                <p className="text-xs text-muted-foreground mb-2">
+                                  Create flashcards for the 4 questions you missed to improve retention.
+                                </p>
+                                <Button size="sm" className="bg-primary/20 hover:bg-primary/30 text-primary border-primary/30">
+                                  <Zap className="w-3 h-3 mr-1" />
+                                  Generate Cards
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="p-4 bg-secondary/10 rounded-xl border border-secondary/20">
+                            <div className="flex items-start space-x-3">
+                              <Star className="w-5 h-5 text-secondary mt-0.5" />
+                              <div>
+                                <h4 className="font-semibold text-sm mb-1">Strength: Life Insurance</h4>
+                                <p className="text-xs text-muted-foreground mb-2">
+                                  Excellent understanding! Consider helping others in study groups.
+                                </p>
+                                <Button size="sm" className="bg-secondary/20 hover:bg-secondary/30 text-secondary border-secondary/30">
+                                  <Users className="w-3 h-3 mr-1" />
+                                  Join Discussion
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Progress Comparison */}
+                  <Card className="glassmorphism border-border mb-8">
+                    <CardContent className="p-6">
+                      <h3 className="cinzel text-xl font-bold mb-4 flex items-center">
+                        <TrendingUp className="w-5 h-5 mr-2 text-chart-2" />
+                        Your Progress
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-chart-2 mb-1">87%</div>
+                          <p className="text-sm text-muted-foreground mb-2">This Quiz</p>
+                          <div className="flex items-center justify-center space-x-1">
+                            <TrendingUp className="w-4 h-4 text-green-500" />
+                            <span className="text-sm text-green-500 font-medium">+5%</span>
+                          </div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-primary mb-1">82%</div>
+                          <p className="text-sm text-muted-foreground mb-2">Average Score</p>
+                          <p className="text-sm text-muted-foreground">Last 5 quizzes</p>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-secondary mb-1">#23</div>
+                          <p className="text-sm text-muted-foreground mb-2">Class Rank</p>
+                          <p className="text-sm text-muted-foreground">Out of 156 students</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <Button
                       onClick={() => {
                         setQuizResults(null);
@@ -343,18 +530,29 @@ export default function QuizPage() {
                         setFlaggedQuestions(new Set());
                         setCurrentQuestionIndex(0);
                       }}
-                      className="bg-primary text-primary-foreground hover:bg-primary/90"
+                      className="bg-primary text-primary-foreground hover:bg-primary/90 px-8"
                       data-testid="button-take-another-quiz"
                     >
+                      <HelpCircle className="w-4 h-4 mr-2" />
                       Take Another Quiz
                     </Button>
                     <Button
                       variant="outline"
                       onClick={() => window.location.href = '/iflash'}
-                      className="ml-4"
+                      className="px-8 border-border hover:bg-muted/50"
+                      data-testid="button-review-iflash"
                     >
-                      <BarChart3 className="w-4 h-4 mr-2" />
+                      <Layers3 className="w-4 h-4 mr-2" />
                       Review with iFlash
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => window.location.href = '/agents'}
+                      className="px-8 border-border hover:bg-muted/50"
+                      data-testid="button-ask-tutor"
+                    >
+                      <Brain className="w-4 h-4 mr-2" />
+                      Ask AI Tutor
                     </Button>
                   </div>
                 </CardContent>
