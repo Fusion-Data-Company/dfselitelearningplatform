@@ -73,24 +73,43 @@ export default function Sidebar() {
       if (new RegExp(pattern, 'i').test(messyTitle)) {
         return {
           title: data.title,
-          topics: data.topics.map(topic => typeof topic === 'string' ? topic : topic.replace(/[^a-zA-Z0-9\s-]/g, '').trim()).filter(t => t.length > 2).slice(0, 4),
+          topics: data.topics.slice(0, 4),
           colorType: data.color
         };
       }
     }
     
-    // Extract bullet points from messy title
-    const bulletPoints = messyTitle
-      .replace(/I\s+/g, '• ')
-      .split(/\s*[•|]\s*/)
-      .filter(item => item.length > 5 && item.length < 50)
-      .slice(0, 4)
-      .map(item => item.replace(/\d+/g, '').replace(/[^a-zA-Z\s]/g, '').trim())
-      .filter(item => item.length > 3);
+    // Handle extremely messy titles by creating clean structure  
+    let cleanTitle = messyTitle;
+    
+    // Clean up common patterns in messy titles
+    if (messyTitle.length > 100) {
+      // Very long concatenated text - extract key concepts
+      if (messyTitle.includes('Managed Care') || messyTitle.includes('HMO') || messyTitle.includes('PPO')) {
+        cleanTitle = 'Managed Care Organizations';
+      } else if (messyTitle.includes('Medicare') || messyTitle.includes('OASDI')) {
+        cleanTitle = 'Medicare & Social Insurance';
+      } else if (messyTitle.includes('Disability') && messyTitle.includes('INCOME')) {
+        cleanTitle = 'Disability Income Insurance';
+      } else if (messyTitle.includes('FEDERALLY') || messyTitle.includes('Health Plan')) {
+        cleanTitle = 'Healthcare Regulation';
+      } else {
+        // Extract first meaningful phrase
+        cleanTitle = messyTitle.split(/[|I]/).find(part => part.trim().length > 10 && part.trim().length < 60)?.trim() || 'Professional Course';
+      }
+    }
+    
+    // Extract bullet points from original messy title for topics
+    const topicCandidates = messyTitle
+      .replace(/I\s+/g, '|')
+      .split(/[|,&]/)
+      .map(item => item.replace(/\d+/g, '').replace(/[()]/g, '').trim())
+      .filter(item => item.length > 5 && item.length < 40 && !item.includes('BEGIN'))
+      .slice(0, 4);
     
     return {
-      title: 'Professional Development Course',
-      topics: bulletPoints.length > 0 ? bulletPoints : ['Insurance Principles', 'Regulatory Compliance', 'Product Knowledge', 'Sales Practices'],
+      title: cleanTitle,
+      topics: topicCandidates.length > 0 ? topicCandidates : ['Course Content', 'Professional Development', 'Certification Material'],
       colorType: 'default'
     };
   };
@@ -356,11 +375,20 @@ export default function Sidebar() {
               const parsedCourse = parseComplexCourseData(track.title);
               const courseDescription = `${parsedCourse.title} - ${parsedCourse.topics.join(' • ')}`;
               
-              // Get color scheme based on course type
-              const courseColorScheme = parsedCourse.colorType === 'emerald' ? trackColors[1] :
-                                      parsedCourse.colorType === 'blue' ? trackColors[2] :
-                                      parsedCourse.colorType === 'cyan' ? trackColors[0] :
-                                      trackColor;
+              // Get color scheme based on course type with enhanced ambient glow
+              const courseColorScheme = parsedCourse.colorType === 'emerald' ? {
+                ...trackColors[1],
+                shimmer: 'via-emerald-500/20'
+              } : parsedCourse.colorType === 'blue' ? {
+                ...trackColors[2], 
+                shimmer: 'via-blue-500/20'
+              } : parsedCourse.colorType === 'cyan' ? {
+                ...trackColors[0],
+                shimmer: 'via-cyan-500/20'
+              } : {
+                ...trackColor,
+                shimmer: trackColor.shimmer || 'via-violet-500/10'
+              };
               
               return (
                 <Link key={track.id} href="/lesson/hmo-balance-billing">
