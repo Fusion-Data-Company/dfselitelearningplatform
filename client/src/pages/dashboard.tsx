@@ -24,7 +24,8 @@ import {
   Star,
   Activity,
   Zap,
-  Trophy
+  Trophy,
+  Bot
 } from "lucide-react";
 
 interface CourseProgress {
@@ -47,7 +48,7 @@ export default function Dashboard() {
   });
 
   return (
-    <div className="min-h-screen education-bg particle-field">
+    <div className="min-h-screen education-bg particle-field floating-elements">
       <Navigation />
       <Sidebar />
       
@@ -121,8 +122,138 @@ export default function Dashboard() {
               />
             </div>
 
-            {/* Performance Analytics */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            {/* Advanced Analytics Dashboard */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+              {/* Real-time Performance Chart */}
+              <div className="lg:col-span-2 chart-container p-6 neural-card">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-12 h-12 morphing-bg rounded-xl flex items-center justify-center animate-quantum">
+                      <Activity className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="cinzel text-xl font-bold holographic-text">Performance Analytics</h3>
+                      <p className="text-sm text-muted-foreground">Real-time learning metrics</p>
+                    </div>
+                  </div>
+                  <Badge className="divine-button px-3 py-1">Live</Badge>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4 mb-6">
+                  <div className="metric-card p-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">Study Efficiency</span>
+                      <TrendingUp className="w-4 h-4 text-primary animate-quantum" />
+                    </div>
+                    <div className="metric-value text-2xl font-bold mt-2">94.2%</div>
+                    <div className="elite-progress h-2 mt-3">
+                      <div className="elite-progress-fill" style={{ width: '94.2%' }}></div>
+                    </div>
+                  </div>
+                  
+                  <div className="metric-card p-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">Retention Rate</span>
+                      <Brain className="w-4 h-4 text-secondary animate-cosmic" />
+                    </div>
+                    <div className="metric-value text-2xl font-bold mt-2">87.6%</div>
+                    <div className="elite-progress h-2 mt-3">
+                      <div className="elite-progress-fill" style={{ width: '87.6%' }}></div>
+                    </div>
+                  </div>
+                  
+                  <div className="metric-card p-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">Exam Readiness</span>
+                      <Target className="w-4 h-4 text-accent animate-divine" />
+                    </div>
+                    <div className="metric-value text-2xl font-bold mt-2">92.1%</div>
+                    <div className="elite-progress h-2 mt-3">
+                      <div className="elite-progress-fill" style={{ width: '92.1%' }}></div>
+                    </div>
+                  </div>
+                  
+                  <div className="metric-card p-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">AI Interaction</span>
+                      <Zap className="w-4 h-4 text-chart-4 animate-morphing" />
+                    </div>
+                    <div className="metric-value text-2xl font-bold mt-2">156</div>
+                    <div className="text-xs text-muted-foreground mt-1">Sessions this week</div>
+                  </div>
+                </div>
+                
+                <div className="h-48 ultra-glass p-4 rounded-xl">
+                  <div className="text-center py-16 text-muted-foreground">
+                    <Activity className="w-12 h-12 mx-auto mb-4 animate-quantum" />
+                    <p className="font-medium">Advanced Performance Chart</p>
+                    <p className="text-sm">Real-time learning analytics visualization</p>
+                  </div>
+                </div>
+              </div>
+              
+              {/* AI Learning Assistant Panel */}
+              <div className="neural-card p-6">
+                <div className="flex items-center space-x-3 mb-6">
+                  <div className="w-10 h-10 morphing-bg rounded-xl flex items-center justify-center animate-divine">
+                    <Brain className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="cinzel text-lg font-bold holographic-text">AI Assistant</h3>
+                    <p className="text-xs text-muted-foreground">Your learning companion</p>
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="ultra-glass p-4 rounded-xl micro-glow">
+                    <div className="flex items-start space-x-3">
+                      <div className="w-8 h-8 bg-primary/20 rounded-lg flex items-center justify-center">
+                        <Bot className="w-4 h-4 text-primary" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium mb-1">StudyBuddy</p>
+                        <p className="text-xs text-muted-foreground">Ready to help with Law & Ethics concepts</p>
+                      </div>
+                      <Badge className="text-xs px-2 py-1 bg-primary/20 text-primary">Active</Badge>
+                    </div>
+                  </div>
+                  
+                  <div className="ultra-glass p-4 rounded-xl micro-glow">
+                    <div className="flex items-start space-x-3">
+                      <div className="w-8 h-8 bg-secondary/20 rounded-lg flex items-center justify-center">
+                        <Trophy className="w-4 h-4 text-secondary" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium mb-1">CoachBot</p>
+                        <p className="text-xs text-muted-foreground">Motivational learning strategies</p>
+                      </div>
+                      <Badge className="text-xs px-2 py-1 bg-secondary/20 text-secondary">Ready</Badge>
+                    </div>
+                  </div>
+                  
+                  <div className="ultra-glass p-4 rounded-xl micro-glow">
+                    <div className="flex items-start space-x-3">
+                      <div className="w-8 h-8 bg-accent/20 rounded-lg flex items-center justify-center">
+                        <Shield className="w-4 h-4 text-accent" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium mb-1">ProctorBot</p>
+                        <p className="text-xs text-muted-foreground">Exam supervision and monitoring</p>
+                      </div>
+                      <Badge className="text-xs px-2 py-1 bg-accent/20 text-accent">Standby</Badge>
+                    </div>
+                  </div>
+                </div>
+                
+                <Button className="w-full mt-6 divine-button" data-testid="button-chat-ai">
+                  <Brain className="w-4 h-4 mr-2" />
+                  Start AI Chat Session
+                </Button>
+              </div>
+            </div>
+            
+            {/* Enhanced Learning Modules */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
               <Card className="ultra-glass micro-glow micro-tilt animate-quantum">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">

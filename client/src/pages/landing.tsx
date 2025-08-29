@@ -19,9 +19,9 @@ import {
 
 export default function Landing() {
   return (
-    <div className="min-h-screen education-bg particle-field">
+    <div className="min-h-screen education-bg particle-field floating-elements">
       {/* Header */}
-      <nav className="fixed top-0 left-0 right-0 z-50 ultra-glass border-b border-border/50 micro-shimmer">
+      <nav className="fixed top-0 left-0 right-0 z-50 ultra-glass border-b border-border/50 micro-shimmer neural-card">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 morphing-bg rounded-xl flex items-center justify-center animate-divine micro-bounce">

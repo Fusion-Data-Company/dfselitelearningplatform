@@ -108,7 +108,7 @@ export default function IFlashPage() {
 
   if (cardsLoading || statsLoading) {
     return (
-      <div className="min-h-screen education-bg particle-field">
+      <div className="min-h-screen education-bg particle-field floating-elements">
         <Navigation />
         <Sidebar />
         <main className="ml-64 pt-16 min-h-screen">
@@ -127,7 +127,7 @@ export default function IFlashPage() {
 
   if (!flashcards.length && !sessionActive) {
     return (
-      <div className="min-h-screen education-bg particle-field">
+      <div className="min-h-screen education-bg particle-field floating-elements">
         <Navigation />
         <Sidebar />
         <main className="ml-64 pt-16 min-h-screen">
@@ -165,7 +165,7 @@ export default function IFlashPage() {
   }
 
   return (
-    <div className="min-h-screen education-bg particle-field">
+    <div className="min-h-screen education-bg particle-field floating-elements">
       <Navigation />
       <Sidebar />
       
