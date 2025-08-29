@@ -1,0 +1,147 @@
+Got it. Here’s a diagnostic, builder-ready prompt you can paste to your Replit Builder to make it (1) audit the platform—especially iFlash—and (2) report exactly what’s implemented vs missing, with reproducible checks. It follows your blueprint style, is atomic, and verifiable.
+
+⸻
+
+🛠 Replit Builder – iFlash & Platform Readiness Self-Audit Prompt
+
+You are Replit Builder. Run the following implementation audit and return a structured report. Do not write long code; perform targeted checks and output results in the exact “REPORT FORMAT” below.
+
+SCOPE
+
+Audit the DFS-215 Elite Learning Platform against these critical areas, with a focus on iFlash:
+	1.	Content Ingestion & Retrieval
+	2.	iFlash Generation & SRS
+	3.	Agent/MCP Wiring (CoachBot, StudyBuddy, ProctorBot)
+	4.	Quizzes & Exams (remediation → chunks → iFlash handoff)
+	5.	CE flow (Law & Ethics 4-hr)
+	6.	UI/Theme (Cinzel + elite styling)
+	7.	Security & RLS
+	8.	Performance budgets
+
+REQUIRED INPUTS
+
+Use these assumptions unless overridden by environment:
+	•	View under test: Lesson page containing Health/Managed Care or Law & Ethics content.
+	•	MCP Endpoint: /api/mcp with tools: get_context, retrieve_content, iflash_generate, log_event.
+	•	Auth: signed-in student account.
+	•	Env secrets present: OPENROUTER_API_KEY, MCP_SERVER_SECRET, SUPABASE_*.
+
+PROCEDURE (Atomic Checks)
+
+A. Content & Retrieval
+
+A1. Context Probe: Call get_context(viewId) from a lesson.
+– Expect: {route, lessonId, chunkIds[], selection?} non-empty.
+A2. Search Probe: Call retrieve_content({query:'HMO balance billing', k:3}).
+– Expect: ≥1 passage returned with id, lessonId, text, headings.
+
+B. iFlash Pipeline
+
+B1. Generate iFlash (sourceIds): From current lesson, call
+iflash_generate({ sourceIds: <chunkIds>, style:'exam' }).
+– Expect: cards[].length ≥ 20; each card has {type:'term'|'mcq'|'cloze', front, back, sourceId?}.
+B2. SRS Scheduling: Create/review cards; confirm flashcards and flashcard_reviews rows with due dates using SM-2/Leitner fields (ease, interval_days, due_at).
+B3. Dedup Guard: Attempt to generate the same set twice; expect no duplicate inserts (hash on {ownerId|type|front|sourceId}).
+B4. UI Review Mode: Open Self-Study → Due queue.
+– Expect: visible due count; review buttons Again/Hard/Good/Easy update next due.
+
+C. Agents & MCP
+
+C1. CoachBot: Ask “Why is balance billing restricted under HMOs?” from within the lesson.
+– Expect: ≤2 paragraphs, 1 quick-check, citations with content_chunk.id.
+C2. StudyBuddy: “Generate a 7-day plan and iFlash for this lesson.”
+– Expect: plan JSON + iflash_generate action + SRS due count.
+C3. ProctorBot (exam route): Ask a content question during exam.
+– Expect: polite refusal (policy-only) + event logged via log_event.
+
+D. Quiz → Remediation → iFlash Handoff
+
+D1. Quiz Miss: Miss one question on HMO topic.
+– Expect: remediation panel shows top-1 passage + “Generate iFlash” CTA.
+D2. Click CTA: Should create ≥3 cards (term/rule/cloze) linked to the passage (sourceId).
+
+E. CE Law & Ethics 4-hr
+
+E1. Seat-time: Start CE unit; verify seat-time increments and idle detection.
+E2. Certificate: Pass assessment; expect PDF with serial + CSV export entry.
+
+F. Elite UI & Performance
+
+F1. Typography: Verify Cinzel for H1–H3, Inter for body; dark mode; ambient glows (cyan/teal/amber/silver), no pink/purple.
+F2. Budgets: LCP ≤ 2.5s on lesson & exam routes; Lighthouse: Perf ≥85, A11y ≥90, BP ≥90.
+F3. A11y: Focus rings visible; keyboard shortcuts: lesson ←/→, exam 1–5, submit Cmd/Ctrl+Enter.
+
+G. Security & RLS
+
+G1. RLS: Attempt to fetch another user’s attempt; expect 403.
+G2. MCP Auth: Call /api/mcp without bearer → 401.
+G3. Redaction: agent_events.payload contains no raw PII.
+
+⸻
+
+REPORT FORMAT (return exactly this shape)
+
+CHECKLIST
+- Content Context: [PASS|FAIL] - details
+- Retrieval Top-k: [PASS|FAIL] - details
+- iFlash Generate ≥20: [PASS|FAIL] - details (#cards=, types=)
+- iFlash SRS Scheduling: [PASS|FAIL] - details (due count=, next due=)
+- iFlash Dedup Guard: [PASS|FAIL] - details
+- iFlash Review UI: [PASS|FAIL] - details
+- CoachBot Citations: [PASS|FAIL] - details (chunkIds=…)
+- StudyBuddy Plan & SRS: [PASS|FAIL] - details (dueCount=…)
+- ProctorBot Exam Policy-Only: [PASS|FAIL] - details (log_event trace=…)
+- Quiz→Remediation→iFlash: [PASS|FAIL] - details
+- CE 4-hr Seat-time & Cert: [PASS|FAIL] - details (serial=…, csvRow=…)
+- UI Elite Theme: [PASS|FAIL] - details (Cinzel/Inter/glows)
+- Performance Budgets: [PASS|FAIL] - details (LCP=…, Lighthouse=…)
+- A11y & Shortcuts: [PASS|FAIL] - details
+- RLS & MCP Security: [PASS|FAIL] - details (403/401/redaction)
+
+MISSING_OR_OUT_OF_SPEC
+- [Area]: expected X, observed Y, fix suggestion (atomic)
+- …
+
+ROOT-CAUSE HYPOTHESES (ranked)
+1) …
+2) …
+3) …
+
+FIX PLAN (atomic, ordered)
+1) …
+2) …
+3) …
+
+ATTACHMENTS
+- sample CoachBot response (with citations)
+- sample StudyBuddy plan (JSON)
+- iFlash sample set (counts by type)
+- Lighthouse summary (3 key numbers)
+- CE certificate URL + CSV row id
+
+
+⸻
+
+ACCEPTANCE CRITERIA FOR THIS AUDIT
+	•	The CHECKLIST is fully populated with specific numbers (e.g., “#cards=24, types: term=12/mcq=8/cloze=4”).
+	•	MISSING_OR_OUT_OF_SPEC lists every deviation with a single next action to fix it (e.g., “Add hash-based dedup check in iFlash save path”).
+	•	FIX PLAN has ≤7 steps, each independently verifiable.
+	•	All sample artifacts (citations, plan JSON, cert URL) are included under ATTACHMENTS.
+
+⸻
+
+ROLLBACK IF AUDIT FAILS CATASTROPHICALLY
+	•	Disable iFlash “Generate” buttons behind a feature flag IFLASH_ENABLED=false.
+	•	Keep CoachBot read-only retrieval active.
+	•	Log audit state to agent_events with tag audit:failing for triage.
+
+⸻
+
+Notes to Builder
+	•	If any step errors, record the error and continue to next step; do not abort the entire audit.
+	•	Keep responses concise, numeric, and actionable—no filler.
+	•	The goal is to tell the operator exactly what’s here and what’s not, with the shortest path to green.
+
+⸻
+
+Use that as-is. It will return a clean, “here vs not here” inventory and pinpoint why the flashcards aren’t matching my spec. If you want, I can also give you a 1-click remediation prompt that consumes this report and outputs the exact patch plan for the builder.
