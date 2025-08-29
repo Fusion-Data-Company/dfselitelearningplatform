@@ -410,9 +410,12 @@ export default function FlashCard({ card, onReview, cardNumber, totalCards }: Fl
   const renderLegacyCard = () => (
     <div className="space-y-8">
       <Card 
-        className={`glassmorphism border-border cursor-pointer flashcard ${isFlipped ? 'flipped' : ''} bg-gradient-to-br from-card/80 to-card/60`}
+        className={`education-card glassmorphism-card cursor-pointer flashcard ${isFlipped ? 'flipped' : ''} bg-gradient-to-br from-card/95 to-card/85 border border-border/50 shadow-lg hover:shadow-xl transition-all duration-300`}
         onClick={handleFlip}
         data-testid="flashcard"
+        style={{
+          boxShadow: '0 0 15px hsla(195, 100%, 45%, 0.15), 0 0 25px hsla(167, 90%, 38%, 0.08)'
+        }}
       >
         <CardContent className="p-8 h-64 relative">
           <div className="flashcard-inner relative w-full h-full">
@@ -448,7 +451,10 @@ export default function FlashCard({ card, onReview, cardNumber, totalCards }: Fl
       </Card>
 
       {/* Voice Q&A Section for Legacy Cards */}
-      <Card className="glassmorphism border-border bg-gradient-to-br from-accent/10 to-accent/5">
+      <Card className="education-card glassmorphism-card bg-gradient-to-br from-accent/10 to-accent/5 border border-accent/20 shadow-md"
+        style={{
+          boxShadow: '0 0 10px hsla(43, 90%, 45%, 0.12), 0 0 20px hsla(43, 90%, 45%, 0.06)'
+        }}>
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-4">
             <h4 className="font-semibold text-accent flex items-center space-x-2">

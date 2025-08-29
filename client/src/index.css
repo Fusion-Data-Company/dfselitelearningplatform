@@ -4,30 +4,30 @@
 @tailwind utilities;
 
 :root {
-  /* Elite Enterprise Color System */
-  --background: hsl(222, 18%, 4%);
-  --foreground: hsl(213, 40%, 96%);
-  --card: hsl(222, 22%, 6%);
-  --card-foreground: hsl(213, 38%, 94%);
-  --popover: hsl(222, 25%, 5%);
-  --popover-foreground: hsl(210, 35%, 98%);
+  /* Elite Enterprise Light Theme Color System */
+  --background: hsl(0, 0%, 98%);
+  --foreground: hsl(222, 18%, 12%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(222, 18%, 15%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(222, 18%, 12%);
   
   /* Premium Brand Colors */
-  --primary: hsl(195, 100%, 55%);
-  --primary-foreground: hsl(222, 18%, 4%);
-  --secondary: hsl(167, 90%, 48%);
-  --secondary-foreground: hsl(222, 18%, 4%);
-  --accent: hsl(43, 100%, 55%);
-  --accent-foreground: hsl(222, 18%, 4%);
-  --destructive: hsl(0, 88%, 62%);
-  --destructive-foreground: hsl(210, 35%, 98%);
+  --primary: hsl(195, 100%, 45%);
+  --primary-foreground: hsl(0, 0%, 98%);
+  --secondary: hsl(167, 80%, 38%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(43, 90%, 45%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 88%, 52%);
+  --destructive-foreground: hsl(0, 0%, 98%);
   
   /* Enhanced UI Colors */
-  --muted: hsl(222, 25%, 12%);
-  --muted-foreground: hsl(215, 25%, 68%);
-  --border: hsl(222, 20%, 18%);
-  --input: hsl(222, 22%, 10%);
-  --ring: hsl(195, 100%, 55%);
+  --muted: hsl(210, 20%, 92%);
+  --muted-foreground: hsl(215, 25%, 35%);
+  --border: hsl(210, 20%, 85%);
+  --input: hsl(210, 20%, 95%);
+  --ring: hsl(195, 100%, 45%);
   
   /* Elite Chart Palette */
   --chart-1: hsl(195, 100%, 55%);
@@ -36,15 +36,15 @@
   --chart-4: hsl(280, 85%, 65%);
   --chart-5: hsl(340, 90%, 60%);
   
-  /* Sidebar System */
-  --sidebar: hsl(222, 22%, 6%);
-  --sidebar-foreground: hsl(213, 38%, 94%);
-  --sidebar-primary: hsl(195, 100%, 55%);
-  --sidebar-primary-foreground: hsl(222, 18%, 4%);
-  --sidebar-accent: hsl(222, 25%, 12%);
-  --sidebar-accent-foreground: hsl(195, 100%, 55%);
-  --sidebar-border: hsl(222, 20%, 18%);
-  --sidebar-ring: hsl(195, 100%, 55%);
+  /* Sidebar System - Light Theme */
+  --sidebar: hsl(0, 0%, 100%);
+  --sidebar-foreground: hsl(222, 18%, 15%);
+  --sidebar-primary: hsl(195, 100%, 45%);
+  --sidebar-primary-foreground: hsl(0, 0%, 98%);
+  --sidebar-accent: hsl(210, 20%, 95%);
+  --sidebar-accent-foreground: hsl(195, 100%, 45%);
+  --sidebar-border: hsl(210, 20%, 85%);
+  --sidebar-ring: hsl(195, 100%, 45%);
   
   /* Elite Typography */
   --font-sans: 'Inter', 'Geist', sans-serif;
@@ -130,16 +130,16 @@
   /* Enterprise Elite Background System */
   .education-bg {
     background: 
-      radial-gradient(ellipse 1200px 800px at 50% 20%, hsla(195, 100%, 15%, 0.3) 0%, transparent 60%),
-      radial-gradient(ellipse 800px 600px at 20% 80%, hsla(167, 90%, 15%, 0.25) 0%, transparent 60%),
-      radial-gradient(ellipse 600px 400px at 80% 80%, hsla(280, 85%, 15%, 0.2) 0%, transparent 60%),
-      radial-gradient(ellipse 400px 300px at 80% 20%, hsla(43, 100%, 18%, 0.15) 0%, transparent 60%),
+      url('/attached_assets/generated_images/Premium_light_theme_background_03c62485.png') center/cover fixed,
+      radial-gradient(ellipse 1000px 600px at 50% 30%, hsla(195, 100%, 85%, 0.4) 0%, transparent 70%),
+      radial-gradient(ellipse 800px 500px at 20% 80%, hsla(167, 90%, 85%, 0.3) 0%, transparent 70%),
+      radial-gradient(ellipse 600px 400px at 80% 20%, hsla(43, 100%, 85%, 0.25) 0%, transparent 70%),
       linear-gradient(135deg, 
-        hsl(var(--background)) 0%, 
-        hsl(222, 22%, 6%) 25%,
-        hsl(222, 25%, 5%) 50%,
-        hsl(222, 28%, 4%) 75%,
-        hsl(var(--background)) 100%
+        hsla(0, 0%, 98%, 0.95) 0%, 
+        hsla(210, 20%, 96%, 0.9) 25%,
+        hsla(210, 25%, 94%, 0.85) 50%,
+        hsla(210, 30%, 92%, 0.9) 75%,
+        hsla(0, 0%, 98%, 0.95) 100%
       );
     background-attachment: fixed;
     position: relative;
@@ -154,13 +154,13 @@
     right: 0;
     bottom: 0;
     background-image: 
-      radial-gradient(circle at 25% 25%, hsla(195, 100%, 55%, 0.08) 0%, transparent 70%),
-      radial-gradient(circle at 75% 75%, hsla(167, 90%, 48%, 0.06) 0%, transparent 70%),
-      radial-gradient(circle at 50% 50%, hsla(43, 100%, 55%, 0.04) 0%, transparent 70%),
-      radial-gradient(circle at 80% 30%, hsla(280, 85%, 65%, 0.05) 0%, transparent 70%);
+      radial-gradient(circle at 25% 25%, hsla(195, 100%, 45%, 0.12) 0%, transparent 60%),
+      radial-gradient(circle at 75% 75%, hsla(167, 90%, 38%, 0.10) 0%, transparent 60%),
+      radial-gradient(circle at 50% 50%, hsla(43, 90%, 45%, 0.08) 0%, transparent 60%),
+      radial-gradient(circle at 80% 30%, hsla(280, 85%, 55%, 0.06) 0%, transparent 60%);
     pointer-events: none;
     z-index: 0;
-    animation: ambient-pulse 25s ease-in-out infinite alternate;
+    animation: ambient-pulse 30s ease-in-out infinite alternate;
   }
 
   .education-bg::after {
@@ -364,13 +364,13 @@
 
   .glassmorphism-card {
     background: linear-gradient(135deg, 
-      hsla(var(--card), 0.95) 0%, 
-      hsla(var(--card), 0.88) 40%,
-      hsla(var(--card), 0.82) 70%,
-      hsla(var(--card), 0.75) 100%
+      hsla(0, 0%, 100%, 0.95) 0%, 
+      hsla(0, 0%, 100%, 0.88) 40%,
+      hsla(0, 0%, 100%, 0.82) 70%,
+      hsla(0, 0%, 100%, 0.75) 100%
     );
-    backdrop-filter: blur(32px) saturate(1.5) brightness(1.15);
-    border: var(--elite-border);
+    backdrop-filter: blur(32px) saturate(1.2) brightness(1.05);
+    border: 1px solid hsla(210, 20%, 85%, 0.8);
     border-radius: var(--elite-radius);
     box-shadow: 
       var(--shadow-enterprise),
