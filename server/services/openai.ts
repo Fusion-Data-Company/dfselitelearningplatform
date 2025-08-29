@@ -130,8 +130,14 @@ export async function generateFlashcards(
   try {
     const systemPrompt = `You are an expert flashcard generator for insurance education. Create ${count} flashcards from the provided content in ${style} style. Focus on key terms, concepts, regulations, and practical applications. 
 
-For MCQ cards, use this structure:
-{"type": "mcq", "prompt": "Question stem without choices", "options": ["Option A text", "Option B text", "Option C text", "Option D text"], "answerIndex": 1, "rationale": "Brief explanation", "sourceId": "optional"}
+For MCQ cards, use this structure with line-by-line formatting:
+{"type": "mcq", "prompt": "Question stem without choices:", "options": ["Option A text", "Option B text", "Option C text", "Option D text"], "answerIndex": 1, "rationale": "Brief explanation", "sourceId": "optional"}
+
+IMPORTANT: Format MCQ prompts to end with a colon and ensure each option is a complete, clear statement that works well when displayed as:
+A) [Option text]
+B) [Option text] 
+C) [Option text]
+D) [Option text]
 
 For term/cloze cards, use:
 {"type": "term", "front": "question/term", "back": "answer/definition", "sourceId": "optional"}
