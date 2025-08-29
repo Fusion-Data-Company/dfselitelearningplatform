@@ -64,7 +64,7 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="fixed left-0 top-16 bottom-0 w-64 glassmorphism-card border-r border-border/30 backdrop-blur-[32px] p-6 overflow-y-auto">
+    <aside className="fixed left-0 top-16 bottom-0 w-80 glassmorphism-card border-r border-border/30 backdrop-blur-[32px] p-6 overflow-y-auto">
       <div className="space-y-6">
         {/* Navigation Menu */}
         <div className="space-y-2">
@@ -103,11 +103,11 @@ export default function Sidebar() {
                       }
                     }}
                   >
-                    <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500/20 to-black/40 mr-3 flex-shrink-0 border border-cyan-500/30">
-                      <Icon className={`w-5 h-5 ${isActive ? 'text-cyan-300 animate-pulse drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]' : item.color} transition-all duration-300`} />
+                    <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-gradient-to-br from-cyan-500/20 to-black/40 mr-4 flex-shrink-0 border border-cyan-500/30">
+                      <Icon className={`w-6 h-6 ${isActive ? 'text-cyan-300 animate-pulse drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]' : item.color} transition-all duration-300`} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <span className={`text-sm font-medium leading-tight ${isActive ? 'text-cyan-200' : 'text-foreground'} transition-colors duration-300 block`}>
+                      <span className={`text-base font-medium leading-tight ${isActive ? 'text-cyan-200' : 'text-foreground'} transition-colors duration-300 block`}>
                         {item.label}
                       </span>
                     </div>
@@ -134,9 +134,9 @@ export default function Sidebar() {
               const color = colors[index % 3];
               
               return (
-                <Link key={track.id} href="/lesson/HMO-balance-billing">
+                <Link key={track.id} href="/lesson/hmo-balance-billing">
                   <div 
-                    className={`p-4 education-card border ${color.border} transition-all duration-300 group cursor-pointer hover:shadow-lg relative overflow-hidden`}
+                    className={`p-5 education-card border ${color.border} transition-all duration-300 group cursor-pointer hover:shadow-lg relative overflow-hidden`}
                     style={{
                       boxShadow: `0 0 15px #06b6d415, 0 0 25px #06b6d408, inset 0 1px 0 rgba(255,255,255,0.05)`
                     }}
@@ -150,10 +150,10 @@ export default function Sidebar() {
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-500/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                     <div className="relative z-10">
                       <div className="flex justify-between items-center mb-3">
-                        <div className="flex items-center space-x-2">
-                          <div className="w-2 h-2 rounded-full bg-gradient-to-r from-cyan-400 to-cyan-600 animate-pulse"></div>
-                          <span className="text-sm font-bold text-cyan-100 cinzel tracking-wide">
-                            {track.title.length > 18 ? track.title.substring(0, 18) + '...' : track.title}
+                        <div className="flex items-center space-x-3">
+                          <div className="w-3 h-3 rounded-full bg-gradient-to-r from-cyan-400 to-cyan-600 animate-pulse"></div>
+                          <span className="text-base font-bold text-cyan-100 cinzel tracking-wide">
+                            {track.title.length > 25 ? track.title.substring(0, 25) + '...' : track.title}
                           </span>
                         </div>
                         <Badge className="bg-gradient-to-r from-cyan-500/30 to-cyan-700/30 text-cyan-200 text-xs font-bold border border-cyan-500/50 backdrop-blur-sm">

@@ -212,7 +212,7 @@ export default function QuizPage() {
         <Navigation />
         <Sidebar />
         
-        <main className="ml-64 pt-16 min-h-screen">
+        <main className="ml-80 pt-16 min-h-screen">
           <div className="p-8">
             <div className="max-w-5xl mx-auto">
               {/* Header */}
@@ -329,7 +329,7 @@ export default function QuizPage() {
         <Navigation />
         <Sidebar />
         
-        <main className="ml-64 pt-16 min-h-screen">
+        <main className="ml-80 pt-16 min-h-screen">
           <div className="p-8">
             <div className="max-w-4xl mx-auto">
               <Card className="glassmorphism border-border">
@@ -405,7 +405,7 @@ export default function QuizPage() {
         <Navigation />
         <Sidebar />
         
-        <main className="ml-64 pt-16 min-h-screen">
+        <main className="ml-80 pt-16 min-h-screen">
           <div className="p-8">
             <div className="max-w-5xl mx-auto">
               <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">

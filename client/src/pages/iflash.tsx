@@ -125,7 +125,7 @@ export default function IFlashPage() {
       <div className="min-h-screen education-bg">
         <Navigation />
         <Sidebar />
-        <main className="ml-64 pt-16 min-h-screen">
+        <main className="ml-80 pt-16 min-h-screen">
           <div className="p-8">
             <div className="max-w-5xl mx-auto">
               <div className="animate-pulse space-y-6">
@@ -144,7 +144,7 @@ export default function IFlashPage() {
       <div className="min-h-screen education-bg">
         <Navigation />
         <Sidebar />
-        <main className="ml-64 pt-16 min-h-screen">
+        <main className="ml-80 pt-16 min-h-screen">
           <div className="p-8">
             <div className="max-w-5xl mx-auto text-center">
               <div className="mb-8">
@@ -182,7 +182,7 @@ export default function IFlashPage() {
       <Navigation />
       <Sidebar />
       
-      <main className="ml-64 pt-16 min-h-screen">
+      <main className="ml-80 pt-16 min-h-screen">
         <div className="p-8">
           <div className="max-w-5xl mx-auto">
             

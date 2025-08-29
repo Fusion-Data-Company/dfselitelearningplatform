@@ -677,7 +677,7 @@ export default function LessonPage() {
       <div className="min-h-screen education-bg">
         <Navigation />
         <Sidebar />
-        <main className="ml-64 pt-16 min-h-screen">
+        <main className="ml-80 pt-16 min-h-screen">
           <div className="p-8">
             <div className="max-w-4xl mx-auto">
               <div className="space-y-6">
@@ -696,7 +696,7 @@ export default function LessonPage() {
       <div className="min-h-screen education-bg">
         <Navigation />
         <Sidebar />
-        <main className="ml-64 pt-16 min-h-screen">
+        <main className="ml-80 pt-16 min-h-screen">
           <div className="p-8">
             <div className="max-w-4xl mx-auto text-center">
               <Card className="education-card p-12">
