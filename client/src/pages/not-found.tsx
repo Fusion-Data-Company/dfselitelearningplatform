@@ -38,7 +38,7 @@ export default function NotFound() {
   return (
     <div className="min-h-screen education-bg particle-field floating-elements">
       {/* Header */}
-      <nav className="fixed top-0 left-0 right-0 z-50 ultra-glass border-b border-border/50 micro-shimmer neural-card">
+      <nav className="fixed top-0 left-0 right-0 z-50 ultra-glass border-b border-border/50 micro-shimmer neural-card holographic-interface quantum-tunnel">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center">
@@ -78,7 +78,7 @@ export default function NotFound() {
               <Button 
                 size="lg"
                 onClick={() => window.location.href = '/'}
-                className="px-8 py-4 bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 transform hover:scale-105"
+                className="ultimate-button px-8 py-4 text-white font-bold transition-all duration-300 transform hover:scale-105"
                 data-testid="button-dashboard"
               >
                 <Home className="w-5 h-5 mr-2" />

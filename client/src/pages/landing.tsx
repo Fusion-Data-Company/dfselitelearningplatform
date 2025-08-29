@@ -21,21 +21,21 @@ export default function Landing() {
   return (
     <div className="min-h-screen education-bg particle-field floating-elements">
       {/* Header */}
-      <nav className="fixed top-0 left-0 right-0 z-50 ultra-glass border-b border-border/50 micro-shimmer neural-card">
+      <nav className="fixed top-0 left-0 right-0 z-50 ultra-glass border-b border-border/50 micro-shimmer neural-card holographic-interface quantum-tunnel">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 morphing-bg rounded-xl flex items-center justify-center animate-divine micro-bounce">
+            <div className="w-10 h-10 morphing-bg rounded-xl flex items-center justify-center animate-divine micro-bounce neural-pulse">
               <BookOpen className="w-6 h-6 text-primary-foreground animate-cosmic" />
             </div>
             <div>
-              <h1 className="cinzel text-xl font-bold holographic-text" data-text="DFS-215 Elite">DFS-215 Elite</h1>
+              <h1 className="cinzel text-xl font-bold transcendent-text" data-text="DFS-215 Elite">DFS-215 Elite</h1>
               <p className="text-xs text-muted-foreground animate-particle">Learning Platform</p>
             </div>
           </div>
           
           <Button 
             onClick={() => window.location.href = '/api/login'}
-            className="divine-button px-6 py-3 text-white font-bold micro-tilt"
+            className="ultimate-button px-6 py-3 text-white font-bold micro-tilt"
             data-testid="button-login"
           >
             Sign In

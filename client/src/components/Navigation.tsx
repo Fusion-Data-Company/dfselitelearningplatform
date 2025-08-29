@@ -12,14 +12,14 @@ export default function Navigation() {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 ultra-glass border-b border-border/30 particle-field micro-shimmer">
+    <nav className="fixed top-0 left-0 right-0 z-50 ultra-glass border-b border-border/30 particle-field micro-shimmer holographic-interface quantum-tunnel">
       <div className="container mx-auto px-6 py-3 flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 morphing-bg rounded-2xl flex items-center justify-center shadow-lg animate-divine micro-bounce">
+          <div className="w-12 h-12 morphing-bg rounded-2xl flex items-center justify-center shadow-lg animate-divine micro-bounce neural-pulse">
             <GraduationCap className="w-7 h-7 text-white drop-shadow-lg animate-quantum" />
           </div>
           <div>
-            <h1 className="cinzel text-2xl font-bold holographic-text" data-text="DFS-215 Elite">DFS-215 Elite</h1>
+            <h1 className="cinzel text-2xl font-bold transcendent-text" data-text="DFS-215 Elite">DFS-215 Elite</h1>
             <p className="text-sm text-muted-foreground geist font-medium tracking-wide animate-particle">Premium Learning Platform</p>
           </div>
         </div>
@@ -28,7 +28,7 @@ export default function Navigation() {
           <Button 
             variant="ghost" 
             size="icon"
-            className="ultra-glass p-3 rounded-2xl micro-glow micro-tilt animate-cosmic"
+            className="ultra-glass p-3 rounded-2xl micro-glow micro-tilt animate-cosmic hyper-interactive"
             data-testid="button-notifications"
           >
             <Bell className="w-5 h-5 text-accent animate-quantum" />
@@ -51,7 +51,7 @@ export default function Navigation() {
           <Button 
             variant="ghost"
             onClick={() => window.location.href = '/api/logout'}
-            className="divine-button px-6 py-3 text-white font-bold micro-tilt"
+            className="ultimate-button px-6 py-3 text-white font-bold micro-tilt"
             data-testid="button-logout"
           >
             Sign Out
