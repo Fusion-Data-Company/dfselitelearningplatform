@@ -290,7 +290,7 @@ export default function Sidebar() {
               return (
                 <Link key={track.id} href="/lesson/hmo-balance-billing">
                   <div 
-                    className={`p-6 education-card border ${trackColor.border} transition-all duration-300 group cursor-pointer hover:shadow-lg relative overflow-hidden academic-course-card`}
+                    className={`p-8 education-card border ${trackColor.border} transition-all duration-300 group cursor-pointer hover:shadow-lg relative overflow-hidden academic-course-card`}
                     title={`Course Description: ${courseDescription}`}
                     style={{
                       boxShadow: `0 0 15px ${trackColor.hex}15, 0 0 25px ${trackColor.hex}08, inset 0 1px 0 rgba(255,255,255,0.05)`
@@ -307,36 +307,36 @@ export default function Sidebar() {
                       <div className="flex justify-between items-start mb-4">
                         <div className="flex-1 min-w-0">
                           {/* Academic Course Header */}
-                          <div className="flex items-center space-x-2 mb-2">
-                            <div className={`w-2 h-2 rounded-full bg-gradient-to-r ${trackColor.dot}`}></div>
-                            <span className="text-xs font-mono text-muted-foreground bg-muted/20 px-2 py-1 rounded border border-border/30 hover:bg-muted/30 transition-colors" title={`Course ID: ${courseId}`}>
+                          <div className="flex items-center space-x-3 mb-3">
+                            <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${trackColor.dot} flex-shrink-0`}></div>
+                            <span className="text-sm font-mono text-muted-foreground bg-muted/20 px-3 py-2 rounded-lg border border-border/30 hover:bg-muted/30 transition-colors" title={`Course ID: ${courseId}`}>
                               {courseId}
                             </span>
                           </div>
                           
                           {/* Course Title */}
-                          <h3 className={`text-lg font-bold ${trackColor.text} cinzel tracking-wide leading-tight mb-2 hover:${trackColor.text.replace('text-', 'text-').replace('-100', '-50')} transition-colors cursor-pointer`} title={courseDescription}>
+                          <h3 className={`text-xl font-bold ${trackColor.text} cinzel tracking-wide leading-snug mb-3 hover:${trackColor.text.replace('text-', 'text-').replace('-100', '-50')} transition-colors cursor-pointer`} title={courseDescription} style={{fontFamily: 'Cinzel, serif'}}>
                             {track.title}
                           </h3>
                           
                           {/* Course Metadata */}
-                          <div className="flex items-center space-x-4 text-xs text-muted-foreground">
-                            <span className="flex items-center space-x-1">
-                              <div className="w-1 h-1 rounded-full bg-current opacity-60"></div>
+                          <div className="flex items-center space-x-6 text-sm text-muted-foreground mb-4">
+                            <span className="flex items-center space-x-2 cinzel font-medium">
+                              <div className="w-2 h-2 rounded-full bg-current opacity-60 flex-shrink-0"></div>
                               <span>{track.ceHours || 0} CE Hours</span>
                             </span>
-                            <span className="flex items-center space-x-1">
-                              <div className="w-1 h-1 rounded-full bg-current opacity-60"></div>
+                            <span className="flex items-center space-x-2 cinzel font-medium">
+                              <div className="w-2 h-2 rounded-full bg-current opacity-60 flex-shrink-0"></div>
                               <span>{track.completedLessons}/{track.totalLessons} Lessons</span>
                             </span>
                           </div>
                         </div>
                         
-                        <div className="flex flex-col items-end space-y-2">
-                          <Badge className={`bg-gradient-to-r ${trackColor.badge} text-xs font-bold border backdrop-blur-sm`}>
+                        <div className="flex flex-col items-end space-y-3">
+                          <Badge className={`bg-gradient-to-r ${trackColor.badge} text-sm font-bold border backdrop-blur-sm px-3 py-1.5 cinzel`} style={{fontFamily: 'Cinzel, serif'}}>
                             {track.progress}%
                           </Badge>
-                          <span className="text-xs text-muted-foreground geist">
+                          <span className="text-sm text-muted-foreground cinzel font-medium" style={{fontFamily: 'Cinzel, serif'}}>
                             {track.progress === 100 ? 'Complete' : 'In Progress'}
                           </span>
                         </div>
@@ -350,19 +350,19 @@ export default function Sidebar() {
                         </div>
                       </div>
                       <div className="mt-3 flex justify-between items-center">
-                        <div className="flex items-center space-x-3">
-                          <span className={`text-xs ${trackColor.text} bg-gradient-to-r from-black/50 to-black/30 px-3 py-1.5 rounded-md border border-${trackColor.name === 'primary' ? 'cyan' : trackColor.name === 'secondary' ? 'emerald' : 'violet'}-500/20 geist font-medium flex items-center space-x-2`}>
+                        <div className="flex items-center space-x-4">
+                          <span className={`text-sm ${trackColor.text} bg-gradient-to-r from-black/50 to-black/30 px-4 py-2 rounded-lg border border-${trackColor.name === 'primary' ? 'cyan' : trackColor.name === 'secondary' ? 'emerald' : 'violet'}-500/20 cinzel font-medium flex items-center space-x-3`} style={{fontFamily: 'Cinzel, serif'}}>
                             <span className="opacity-70">Status:</span>
                             <span className="font-semibold">
                               {enrollmentStatus}
                             </span>
                           </span>
                         </div>
-                        <div className="flex items-center space-x-2 text-xs">
-                          <span className={`${trackColor.text} cinzel font-semibold opacity-80 group-hover:opacity-100 transition-opacity`}>
+                        <div className="flex items-center space-x-3 text-sm">
+                          <span className={`${trackColor.text} cinzel font-semibold opacity-80 group-hover:opacity-100 transition-opacity`} style={{fontFamily: 'Cinzel, serif'}}>
                             Enter Course
                           </span>
-                          <ChevronRight className={`w-4 h-4 ${trackColor.text} opacity-60 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300`} />
+                          <ChevronRight className={`w-5 h-5 ${trackColor.text} opacity-60 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300 flex-shrink-0`} />
                         </div>
                       </div>
                     </div>
