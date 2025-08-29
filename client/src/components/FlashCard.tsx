@@ -31,17 +31,15 @@ export default function FlashCard({ card, onReview, cardNumber, totalCards }: Fl
   // Normalize legacy MCQ cards on-the-fly
   const normalizedCard = useMemo(() => {
     if (card.type === 'mcq' && !card.options && card.front) {
-      // Apply normalizer logic for legacy MCQ format
       try {
         const text = card.front;
         
-        // Try line-by-line format first: "Question:\nA) Option A\nB) Option B..."
+        // Try line-by-line format first
         const multilineMatches = text.match(/^(.*?)(?:\r?\n|\r)\s*[ABCD]\)/m);
         
         if (multilineMatches) {
-          // Line-by-line format
           const lines = text.split(/\r?\n/).map(line => line.trim()).filter(line => line.length > 0);
-          const prompt = lines[0].replace(/:?\s*$/, ':');
+          const prompt = lines[0].replace(/:?\s*$/, '');
           
           const options: string[] = [];
           const optionRegex = /^([ABCD])\)\s*(.+)$/;
@@ -74,13 +72,13 @@ export default function FlashCard({ card, onReview, cardNumber, totalCards }: Fl
           }
         }
         
-        // Fallback to inline format: "Question stem A) Option A B) Option B..."
+        // Fallback to inline format
         const optionRegex = /\s*([ABCD])\)\s*([^A-D]*?)(?=\s*[ABCD]\)|$)/gi;
         const matches = Array.from(text.matchAll(optionRegex));
         
         if (matches.length >= 2) {
           const firstMatch = matches[0];
-          const prompt = text.substring(0, firstMatch.index || 0).trim().replace(/:?\s*$/, ':');
+          const prompt = text.substring(0, firstMatch.index || 0).trim().replace(/:?\s*$/, '');
           const options = matches.map(match => match[2].trim());
           
           let answerIndex: number | null = null;
@@ -109,7 +107,7 @@ export default function FlashCard({ card, onReview, cardNumber, totalCards }: Fl
   }, [card]);
 
   const handleFlip = () => {
-    if (card.type === 'mcq' && card.options && !selectedOption !== null) {
+    if (normalizedCard.type === 'mcq' && normalizedCard.options && selectedOption === null) {
       return; // Don't flip MCQ until option is selected
     }
     setIsFlipped(!isFlipped);
@@ -141,100 +139,136 @@ export default function FlashCard({ card, onReview, cardNumber, totalCards }: Fl
     }
   };
 
-  // MCQ Renderer
+  // Premium MCQ Renderer
   const renderMCQCard = () => {
     if (!normalizedCard.options || !normalizedCard.prompt) {
-      // Fallback to legacy format
       return renderLegacyCard();
     }
 
     return (
-      <Card 
-        className="glassmorphism border-border"
-        data-testid="flashcard"
-      >
-        <CardContent className="p-8">
-          <div className="space-y-6">
-            {/* Question */}
-            <div className="text-center">
-              <Badge variant="outline" className="mb-4">
-                {card.type.toUpperCase()}
+      <div className="space-y-8">
+        {/* Question Card */}
+        <Card className="glassmorphism border-border bg-gradient-to-br from-card/80 to-card/60 backdrop-blur-xl">
+          <CardContent className="p-8">
+            <div className="text-center space-y-6">
+              <Badge variant="outline" className="bg-primary/10 border-primary/20 text-primary font-medium px-4 py-2">
+                Multiple Choice Question
               </Badge>
-              <h3 className="cinzel text-xl font-bold mb-6">{normalizedCard.prompt}</h3>
+              <h2 className="cinzel text-2xl font-bold leading-relaxed text-foreground">
+                {normalizedCard.prompt}
+              </h2>
             </div>
+          </CardContent>
+        </Card>
 
-            {/* Options */}
-            <div className="space-y-3">
-              {normalizedCard.options!.map((option, index) => {
-                const isSelected = selectedOption === index;
-                const isCorrect = normalizedCard.answerIndex === index;
-                const showResult = isFlipped;
-                
-                let buttonClass = "w-full text-left p-4 transition-all duration-200 ";
-                
-                if (!showResult) {
-                  buttonClass += isSelected 
-                    ? "bg-primary/20 border-primary text-primary" 
-                    : "bg-card hover:bg-muted border-border";
-                } else {
-                  if (isCorrect) {
-                    buttonClass += "bg-green-500/20 border-green-500 text-green-700";
-                  } else if (isSelected && !isCorrect) {
-                    buttonClass += "bg-red-500/20 border-red-500 text-red-700";
-                  } else {
-                    buttonClass += "bg-muted border-border text-muted-foreground";
-                  }
-                }
+        {/* Options Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {normalizedCard.options!.map((option, index) => {
+            const isSelected = selectedOption === index;
+            const isCorrect = normalizedCard.answerIndex === index;
+            const showResult = isFlipped;
+            
+            let cardClass = "group relative overflow-hidden transition-all duration-300 transform hover:scale-[1.02] cursor-pointer ";
+            let iconColor = "";
+            let textColor = "text-foreground";
+            let bgClass = "";
+            
+            if (!showResult) {
+              if (isSelected) {
+                cardClass += "bg-gradient-to-br from-primary/20 to-primary/10 border-primary/40 shadow-lg shadow-primary/20";
+                textColor = "text-primary";
+              } else {
+                cardClass += "glassmorphism border-border bg-gradient-to-br from-card/60 to-card/40 hover:from-card/80 hover:to-card/60 hover:border-border/60";
+              }
+            } else {
+              if (isCorrect) {
+                cardClass += "bg-gradient-to-br from-green-500/20 to-green-400/10 border-green-500/40 shadow-lg shadow-green-500/20";
+                textColor = "text-green-700 dark:text-green-300";
+                iconColor = "text-green-600";
+              } else if (isSelected && !isCorrect) {
+                cardClass += "bg-gradient-to-br from-red-500/20 to-red-400/10 border-red-500/40 shadow-lg shadow-red-500/20";
+                textColor = "text-red-700 dark:text-red-300";
+                iconColor = "text-red-600";
+              } else {
+                cardClass += "glassmorphism border-border bg-gradient-to-br from-muted/40 to-muted/20";
+                textColor = "text-muted-foreground";
+              }
+              cardClass = cardClass.replace("cursor-pointer", "cursor-default");
+            }
 
-                return (
-                  <Button
-                    key={index}
-                    variant="outline"
-                    className={buttonClass}
-                    onClick={() => !showResult && handleOptionSelect(index)}
-                    disabled={showResult}
-                    data-testid={`mcq-option-${index}`}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-background border flex items-center justify-center text-sm font-medium">
-                        {String.fromCharCode(65 + index)}
-                      </div>
-                      <span className="flex-1">{option}</span>
-                      {showResult && isCorrect && <CheckCircle className="w-5 h-5 text-green-600" />}
-                      {showResult && isSelected && !isCorrect && <XCircle className="w-5 h-5 text-red-600" />}
+            return (
+              <Card
+                key={index}
+                className={cardClass}
+                onClick={() => !showResult && handleOptionSelect(index)}
+                data-testid={`mcq-option-${index}`}
+              >
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-4">
+                    {/* Option Letter */}
+                    <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg border-2 transition-all duration-300 ${
+                      showResult && isCorrect 
+                        ? "bg-green-500 border-green-500 text-white"
+                        : showResult && isSelected && !isCorrect
+                          ? "bg-red-500 border-red-500 text-white"
+                          : isSelected && !showResult
+                            ? "bg-primary border-primary text-primary-foreground"
+                            : "bg-background border-border text-muted-foreground group-hover:border-foreground/20"
+                    }`}>
+                      {String.fromCharCode(65 + index)}
                     </div>
-                  </Button>
-                );
-              })}
-            </div>
+                    
+                    {/* Option Text */}
+                    <span className={`flex-1 text-base font-medium leading-relaxed ${textColor}`}>
+                      {option}
+                    </span>
+                    
+                    {/* Result Icons */}
+                    {showResult && (
+                      <div className="flex-shrink-0">
+                        {isCorrect && (
+                          <CheckCircle className={`w-6 h-6 ${iconColor}`} />
+                        )}
+                        {isSelected && !isCorrect && (
+                          <XCircle className={`w-6 h-6 ${iconColor}`} />
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
 
-            {/* Rationale (shown after selection) */}
-            {isFlipped && normalizedCard.rationale && (
-              <div className="mt-6 p-4 bg-muted/50 rounded-lg border">
-                <h4 className="font-semibold mb-2 text-primary">Explanation:</h4>
-                <p className="text-sm">{normalizedCard.rationale}</p>
-              </div>
-            )}
-
-            {/* Source info */}
-            {normalizedCard.sourceId && (
-              <div className="flex justify-center">
-                <div className="inline-flex items-center space-x-2 text-xs bg-card px-3 py-2 rounded-lg">
-                  <Book className="w-3 h-3 text-secondary" />
-                  <span>Source: Lesson Content</span>
+        {/* Explanation */}
+        {isFlipped && normalizedCard.rationale && (
+          <Card className="glassmorphism border-border bg-gradient-to-br from-blue-500/10 to-blue-400/5">
+            <CardContent className="p-6">
+              <div className="flex items-start space-x-3">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center">
+                  <Book className="w-4 h-4 text-blue-600" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-semibold text-blue-700 dark:text-blue-300 mb-2">
+                    Explanation
+                  </h4>
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    {normalizedCard.rationale}
+                  </p>
                 </div>
               </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        )}
+      </div>
     );
   };
 
   // Legacy Term/Cloze Renderer
   const renderLegacyCard = () => (
     <Card 
-      className={`glassmorphism border-border cursor-pointer flashcard ${isFlipped ? 'flipped' : ''}`}
+      className={`glassmorphism border-border cursor-pointer flashcard ${isFlipped ? 'flipped' : ''} bg-gradient-to-br from-card/80 to-card/60`}
       onClick={handleFlip}
       data-testid="flashcard"
     >
@@ -244,7 +278,7 @@ export default function FlashCard({ card, onReview, cardNumber, totalCards }: Fl
           <div className="flashcard-front absolute inset-0 flex items-center justify-center text-center">
             <div>
               <div className="mb-4">
-                <Badge variant="outline" className="mb-2">
+                <Badge variant="outline" className="mb-2 bg-primary/10 border-primary/20 text-primary">
                   {card.type.toUpperCase()}
                 </Badge>
               </div>
@@ -259,7 +293,7 @@ export default function FlashCard({ card, onReview, cardNumber, totalCards }: Fl
           <div className="flashcard-back absolute inset-0 flex items-center justify-center text-center">
             <div>
               <h3 className="cinzel text-xl font-bold mb-4 text-primary">{card.back}</h3>
-              {card.sourceId && (
+              {normalizedCard.sourceId && (
                 <div className="inline-flex items-center space-x-2 text-xs bg-card px-3 py-2 rounded-lg">
                   <Book className="w-3 h-3 text-secondary" />
                   <span>Source: Lesson Content</span>
@@ -273,61 +307,86 @@ export default function FlashCard({ card, onReview, cardNumber, totalCards }: Fl
   );
 
   return (
-    <div className="space-y-6">
-      {/* Card Info */}
-      <div className="text-center">
-        <h2 className="cinzel text-3xl font-bold mb-2">iFlash Review Session</h2>
-        <p className="text-muted-foreground">
-          Card {cardNumber} of {totalCards} • 
-          {card.reviewCount === 0 ? ' New card' : ` Reviewed ${card.reviewCount} times`}
-        </p>
-      </div>
-
-      {/* Flashcard - MCQ or Legacy */}
-      {normalizedCard.type === 'mcq' && normalizedCard.options ? renderMCQCard() : renderLegacyCard()}
-
-      {/* Card Stats */}
-      <div className="flex items-center justify-between text-sm text-muted-foreground glassmorphism p-4 rounded-xl">
-        <div>
-          <p>Ease Factor: {card.difficulty.toFixed(1)}</p>
-          <p>Current Interval: {card.interval} days</p>
+    <div className="min-h-screen education-bg">
+      <div className="max-w-4xl mx-auto p-8 space-y-8">
+        {/* Header */}
+        <div className="text-center space-y-4">
+          <h1 className="cinzel text-4xl font-bold text-shimmer">
+            iFlash Review Session
+          </h1>
+          <div className="flex items-center justify-center space-x-6 text-sm text-muted-foreground">
+            <span className="flex items-center space-x-2">
+              <div className="w-2 h-2 rounded-full bg-primary"></div>
+              <span>Card {cardNumber} of {totalCards}</span>
+            </span>
+            <span className="flex items-center space-x-2">
+              <div className="w-2 h-2 rounded-full bg-secondary"></div>
+              <span>{card.reviewCount === 0 ? 'New card' : `Reviewed ${card.reviewCount} times`}</span>
+            </span>
+          </div>
         </div>
-        {normalizedCard.type !== 'mcq' && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleFlip}
-            className="text-muted-foreground hover:text-foreground"
-            data-testid="button-flip-card"
-          >
-            <RotateCcw className="w-4 h-4 mr-2" />
-            Flip Card
-          </Button>
+
+        {/* Flashcard */}
+        {normalizedCard.type === 'mcq' && normalizedCard.options ? renderMCQCard() : renderLegacyCard()}
+
+        {/* Card Stats */}
+        <Card className="glassmorphism border-border bg-gradient-to-br from-card/40 to-card/20">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between text-sm text-muted-foreground">
+              <div className="flex items-center space-x-6">
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 rounded-full bg-chart-2/60"></div>
+                  <span>Ease Factor: {card.difficulty.toFixed(1)}</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 rounded-full bg-chart-3/60"></div>
+                  <span>Current Interval: {card.interval} days</span>
+                </div>
+              </div>
+              {normalizedCard.type !== 'mcq' && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleFlip}
+                  className="text-muted-foreground hover:text-foreground"
+                  data-testid="button-flip-card"
+                >
+                  <RotateCcw className="w-4 h-4 mr-2" />
+                  Flip Card
+                </Button>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Response Buttons */}
+        {isFlipped && (
+          <Card className="glassmorphism border-border bg-gradient-to-br from-card/40 to-card/20">
+            <CardContent className="p-6">
+              <h3 className="text-lg font-semibold text-center mb-6 cinzel">How did you do?</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[0, 1, 2, 3].map((grade) => {
+                  const info = getGradeInfo(grade);
+                  return (
+                    <Button
+                      key={grade}
+                      onClick={() => handleGrade(grade)}
+                      className="h-auto p-6 flex-col space-y-2 bg-gradient-to-br from-background/60 to-background/40 hover:from-background/80 hover:to-background/60 border border-border hover:border-primary/40 transition-all duration-300"
+                      variant="outline"
+                      data-testid={`button-grade-${grade}`}
+                    >
+                      <div className="text-center">
+                        <p className="font-semibold text-base">{info.label}</p>
+                        <p className="text-xs opacity-75 mt-1">{info.time}</p>
+                      </div>
+                    </Button>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
         )}
       </div>
-
-      {/* Response Buttons - Only show when flipped */}
-      {isFlipped && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[0, 1, 2, 3].map((grade) => {
-            const info = getGradeInfo(grade);
-            return (
-              <Button
-                key={grade}
-                onClick={() => handleGrade(grade)}
-                className={`p-4 h-auto bg-${info.color}/20 text-${info.color} border-${info.color}/50 hover:bg-${info.color}/30`}
-                variant="outline"
-                data-testid={`button-grade-${grade}`}
-              >
-                <div className="text-center">
-                  <p className="font-semibold">{info.label}</p>
-                  <p className="text-xs opacity-75">{info.time}</p>
-                </div>
-              </Button>
-            );
-          })}
-        </div>
-      )}
     </div>
   );
 }
