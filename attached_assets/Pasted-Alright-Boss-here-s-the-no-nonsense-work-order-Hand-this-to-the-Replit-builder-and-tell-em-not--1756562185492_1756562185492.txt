@@ -1,0 +1,123 @@
+Alright, Boss — here’s the no-nonsense work order. Hand this to the Replit builder and tell ’em not to improvise.
+
+Replit Builder – DFS-215 Lesson Player & Import Fix (Do This Now)
+
+0) Branch + Env
+	•	Create branch: feature/dfs215-lesson-player.
+	•	Ensure env vars exist:
+	•	DATABASE_URL (Postgres)
+	•	OPENAI_API_KEY (for embeddings) — or set EMBED=false to ingest without vectors.
+	•	EMBED_MODEL=text-embedding-3-small (fallback ok), EMBED_BATCH=64, EMBED_RATE_LIMIT=3500 TPM.
+
+1) Data Model (Prisma or SQL — match current stack)
+
+Tables (or Prisma models) — don’t rename fields without updating import + API:
+	•	Course(id, slug, title)
+	•	Module(id, courseId, order, title, slug)
+	•	Lesson(id, moduleId, order, title, slug, html, plain, summary)
+	•	Stage(id, lessonId, order, title, gateRule JSONB DEFAULT '{}' )
+	•	Checkpoint(id, stageId, order, type ENUM('quiz','ack','task'), prompt, correct JSONB)
+	•	UserProgress(id, userId, lessonId, stageId, checkpointId, status ENUM('pending','passed','failed'), updatedAt)
+	•	LessonEmbedding(lessonId FK, chunkIndex INT, content TEXT, embedding VECTOR)
+
+Run migrations.
+
+2) Import Pipeline (fix what’s “trying” to work)
+
+Create/replace server/commands/import-dfs215.ts with:
+	•	Parse the uploaded DOCX (use mammoth → HTML, then cheerio).
+	•	Chunking:
+	•	Split by H1/H2 into Module → Lesson → Stage using headings in the DFS-215 doc (e.g., “iPower Moves LIVE…”, “Florida Insurance Law QUIZ”, etc.).
+	•	For each Stage, build Checkpoints:
+	•	Any line starting with [ Identify ], [ Define ], [ Contrast ], [ Note ] → type='ack'.
+	•	“QUIZ” sections → type='quiz' with Q/A pairs (simple MC or T/F if options detected).
+	•	Embeddings (optional on first pass):
+	•	If process.env.EMBED !== 'false', batch 800–1,200 token chunks, backoff on 429, store in LessonEmbedding.
+	•	Idempotent: use UPSERT on slugs.
+	•	Flags:
+	•	--clear wipes course content (same courseId), keeps user progress.
+	•	--embed-only recomputes embeddings.
+	•	--dry parses and logs without writing.
+
+Commands:
+
+cd server
+npx tsx commands/import-dfs215.ts --source ./uploads/dfs-215.docx --dry
+npx tsx commands/import-dfs215.ts --source ./uploads/dfs-215.docx --clear
+# later if needed
+npx tsx commands/import-dfs215.ts --embed-only
+
+Source of truth for the content structure is the DFS-215 document we just added.  ￼
+
+3) API Endpoints (REST; mirror in GraphQL if present)
+	•	GET /api/courses/:slug → course + modules + lessons (id, title, slug, order).
+	•	GET /api/lessons/:slug → lesson + stages + checkpoints + next/prev slugs.
+	•	POST /api/progress body { lessonId, stageId, checkpointId, status } → upsert.
+	•	POST /api/checkpoint/grade (for quizzes) → grade server-side.
+
+4) Frontend — Make the damn lessons open & gate properly
+
+Framework assumptions: Next.js/React + Tailwind (adjust paths if different).
+
+Routes
+	•	/course/[courseSlug] — dashboard outline (modules/lessons).
+	•	/course/[courseSlug]/lesson/[lessonSlug] — Lesson Player.
+
+Dashboard
+	•	Replace inert cards with <Link href={/course/${course.slug}/lesson/${firstLesson.slug}}>.
+	•	Each lesson card click navigates — no JS anti-patterns; use semantic anchors.
+
+Lesson Player Layout
+	•	Left: collapsible outline (modules → lessons). Current lesson highlighted; completed lessons ticked (derive from UserProgress).
+	•	Center: lesson content (render html), Stage stepper at top (Stage 1…N).
+	•	Right: Checkpoint panel:
+	•	ack: checkbox “Got it” → enables Continue.
+	•	task: short textarea or toggle.
+	•	quiz: radio/checkbox, call grade API; on pass → mark passed.
+	•	“Continue” disabled until all checkpoints in current stage are passed. On continue: advance to next stage; if last stage, show “Mark Lesson Complete” and auto-advance to next lesson.
+
+Keyboard & Persist
+	•	← previous stage/lesson, → next stage/lesson.
+	•	Autosave progress on every interaction.
+
+Empty States
+	•	If a lesson has 0 stages (bad parse), show banner “Lesson pending parse” with slug; do not block app.
+
+5) Vector Search (optional, but wire it cleanly)
+
+Endpoint: POST /api/search { q, lessonId? }
+	•	If lessonId, retrieve top-k chunks from that lesson; else course-wide.
+	•	Use cosine similarity on LessonEmbedding with pgvector (or your vector store).
+	•	Return snippet + anchor offsets; front-end highlights matches.
+
+6) QA / E2E (Playwright)
+
+Write tests under e2e/dfs215.spec.ts:
+	•	Loads course dashboard, clicks first lesson → URL changes, content renders H1.
+	•	Stage gating: Continue disabled until checkpoint passed; becomes enabled after.
+	•	Progress persists after reload.
+	•	Next/Prev lesson nav works.
+
+7) Ops & Safety
+	•	Hide EMBED behind feature flag in .env (default false in Preview, true in Prod once limits confirmed).
+	•	Add scripts/check-health.ts that pings:
+	•	DB connection
+	•	/api/courses/:slug (200)
+	•	/api/lessons/:slug (contains stages)
+	•	Add a seed script commands/seed-admin.ts to create an admin user if none.
+
+8) Visual polish (fast wins)
+	•	Add a cinematic hero background to the lesson player header (dark navy / metallic, subtle grid + glow). File path: web/public/hero/dfs215-cinematic.jpg (use the asset I provided as reference). Apply bg-fixed bg-cover with a dark overlay.
+	•	Keep typography consistent; no neon clown show. Clean enterprise vibes.
+
+9) Acceptance Criteria (ship checklist)
+	•	Every lesson card on the dashboard navigates to a playable lesson route.
+	•	Lessons render parsed content (headings, lists, callouts) with correct order.
+	•	Stage stepper enforces checkpoint gating; Continue behaves correctly.
+	•	User progress writes and reloads reliably.
+	•	Import script ingests the DFS-215 DOCX end-to-end without manual fixes; --dry, --clear, --embed-only all operational.
+	•	Health check passes; Playwright tests green.
+
+⸻
+
+You get me, Boss? This turns the dead-fish dashboard into a working academy with proper gatekeeping and search — no smoke, no mirrors. If they hit friction on the parser or embeddings, they flip EMBED=false, ship the UI, and add vectors after.

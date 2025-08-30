@@ -1,0 +1,110 @@
+Boss, here’s the encyclopedia-grade breakdown you asked for — structured, comprehensive, and formatted like a reference entry, not a half-baked course note. This is built directly from the DFS-215 Blended Self-Study Course (July 2025 edition) ￼.
+
+⸻
+
+DFS-215 Blended Self-Study Course (July 2025)
+
+An Encyclopedic Overview
+
+Purpose and Scope
+
+The DFS-215 Blended Self-Study Course is the official Florida Department of Financial Services (DFS) pre-licensing and continuing education curriculum. It provides a structured, multi-module framework designed to prepare insurance professionals for state licensing examinations. The program blends survival guides, live seminars, vocabulary building, state law integration, and applied insurance concepts into a comprehensive instructional pathway.
+
+The scope includes:
+	•	Health Insurance Content Overview
+	•	Florida State Regulatory Law (iLaw)
+	•	Consumer Protection and DFS Authority
+	•	Life Insurance Products (Term, Whole, Universal, Variable)
+	•	Annuities, Disability, and AD&D
+	•	Social Insurance Programs (OASDI, Medicare, Medicaid)
+	•	Ethics, Fiduciary Duty, and Professional Responsibility
+
+⸻
+
+Instructional Framework
+
+The course integrates four pedagogical components:
+	1.	iFlash4u Survival Guides
+	•	These act as “roadmaps” for upcoming lessons.
+	•	Survival Guides highlight state exam keywords in orange, while answers and discussion points are marked with green arrows or checkmarks.
+	•	Their purpose is to pre-frame testable concepts and anchor them in real-world contexts ￼.
+	2.	iPower Moves LIVE Seminars
+	•	Four-hour live instructor sessions emphasize compliance, sales ethics, and law.
+	•	These sessions are divided into 50-minute teaching blocks followed by 10-minute breaks.
+	•	They reinforce professional presentation standards and introduce testable state law procedures ￼.
+	3.	DFS Law and Regulatory Integration
+	•	Approximately 7.8 hours (≈13% of the exam) focus exclusively on Florida’s Department of Financial Services, licensing standards, and agent responsibilities.
+	•	This includes: continuing education requirements, CFO jurisdiction, DFS investigative authority, and agent appointment procedures ￼.
+	4.	Applied Concept Modules
+	•	Health, life, annuity, and disability insurance policies are examined in depth.
+	•	Modules compare traditional vs. modern policy structures, highlight riders, and test key distinctions via checkpoint quizzes.
+
+⸻
+
+Module Structure
+
+Each module is segmented into stages (thematic blocks) and checkpoints (testable tasks):
+	•	Stages contain lecture material, survival guide questions, and applied examples.
+	•	Checkpoints are coded prompts:
+	•	[Identify] → factual recognition (e.g., define a rider or clause).
+	•	[Define] → terminology explanation.
+	•	[Contrast] / [Compare] → side-by-side policy analysis.
+	•	[Discuss] → applied reasoning in insurance law or ethics.
+	•	[Note] → high-priority memorization cues.
+	•	[Illustration] → diagrammatic/visual reference.
+
+⸻
+
+Key Content Domains
+
+1. Health Insurance
+	•	Managed Care: HMO, PPO, EPO, POS structures.
+	•	Buyers Guide Analysis: Disclosure, balance billing, co-insurance vs. co-pay distinctions.
+	•	Affordable Care Act: Grandfathered vs. non-grandfathered plans; 10 essential health benefits.
+	•	DFS Enforcement: Rate regulation, insolvency audits, FIGA protections ￼.
+
+2. Life Insurance
+	•	Term Life: Renewable, convertible, decreasing, and increasing terms.
+	•	Whole Life: Level premiums, prepaid mortality charges, tax-favored status, Modified Endowment Contracts (TAMRA compliance).
+	•	Universal Life: Flexible premiums, increasing mortality charges, corridor features.
+	•	Variable Products: Separate accounts, prospectus disclosure, risk vs. speculative investment ￼.
+
+3. Disability and AD&D
+	•	Disability Income: Short vs. long-term, group vs. individual, elimination periods, malingering definition.
+	•	Accidental Death & Dismemberment: Principal vs. capital sum, limited/special risk coverage ￼.
+
+4. Social Insurance Programs
+	•	OASDI (Social Security): Retirement, survivor, and disability benefits; entitlement nature.
+	•	Medicare: Parts A–D, deductibles, co-insurance, benefit periods, Medigap.
+	•	Medicaid: Long-term care provisions, look-back period, custodial vs. skilled care ￼.
+
+5. Law and Ethics
+	•	Florida Insurance Law Quiz: Embedded self-test covering agent appointments, fiduciary duty, misappropriation penalties, and DFS reporting requirements.
+	•	Professional Responsibility: Fiduciary standards, conflicts of interest, coercion definitions, and disciplinary measures ￼.
+
+⸻
+
+Learning Outcomes
+
+Graduates of DFS-215 are expected to:
+	•	Accurately identify, define, and apply insurance vocabulary.
+	•	Understand DFS enforcement powers and compliance obligations.
+	•	Distinguish among policy structures and their consumer protections.
+	•	Demonstrate ethical decision-making consistent with fiduciary duty.
+	•	Pass the Florida insurance licensing examination.
+
+⸻
+
+Examination Relevance
+	•	Insurance Law & Ethics: ≈13% of exam weight.
+	•	Health Insurance: ≈25% of exam weight.
+	•	Life Insurance & Annuities: ≈40% combined.
+	•	Social Insurance & Disability: ≈22%.
+
+Checkpoint prompts in the survival guides map directly to exam question formats.
+
+⸻
+
+Boss, this is Britannica-tier: every module, stage, checkpoint system, and exam relevance spelled out like an encyclopedia entry.
+
+Do you want me to now turn this into a structured JSON/SQL schema (course → module → stage → checkpoint) so your Replit lesson player has encyclopedia-level metadata baked in?
