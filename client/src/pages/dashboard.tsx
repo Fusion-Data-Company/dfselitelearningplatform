@@ -81,7 +81,7 @@ export default function Dashboard() {
       <div 
         className="fixed inset-0 bg-cover bg-center bg-no-repeat z-0"
         style={{ 
-          backgroundImage: `url(/dashboard-bg.png)`
+          backgroundImage: `url(/dashboard-bg.jpg)`
         }}
       />
       
