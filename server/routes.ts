@@ -181,27 +181,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const modules = await storage.getModulesByTrack(track.id);
         for (const module of modules) {
           const lessons = await storage.getLessonsByModule(module.id);
-          allLessons.push(...lessons.map(lesson => ({
-            ...lesson,
+          // Only include lessons that have valid slugs and are published
+          const validLessons = lessons.filter(lesson => 
+            lesson.slug && 
+            lesson.published && 
+            lesson.title && 
+            lesson.title.trim().length > 0
+          );
+          
+          allLessons.push(...validLessons.map(lesson => ({
+            id: lesson.id,
+            slug: lesson.slug, // Use the actual slug from database
+            title: lesson.title,
             trackId: track.id,
             track: track.title,
-            module: module.title
+            module: module.title,
+            estMinutes: 25, // Default estimate
+            ceHours: lesson.ceHours || 0,
+            published: lesson.published
           })));
         }
       }
       
-      const enhancedLessons = allLessons.map(lesson => ({
-        id: lesson.id,
-        slug: lesson.slug,
-        title: lesson.title,
-        track: lesson.track,
-        module: lesson.module,
-        trackId: lesson.trackId,
-        estMinutes: lesson.estMinutes || 25,
-        ceHours: lesson.ceHours || 0
-      }));
+      console.log(`Enhanced lessons found: ${allLessons.length}`);
+      allLessons.forEach(lesson => {
+        console.log(`- ${lesson.title} -> /lesson/${lesson.slug}`);
+      });
       
-      res.json(enhancedLessons);
+      res.json(allLessons);
     } catch (error) {
       console.error("Error fetching enhanced lessons list:", error);
       res.status(500).json([]);
