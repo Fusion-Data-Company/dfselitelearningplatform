@@ -136,10 +136,72 @@ export default function LessonPage() {
   const queryClient = useQueryClient();
   const checkpointTimerRef = useRef<Record<string, number>>({});
 
-  const { data: lesson, isLoading, error } = useQuery<LessonDTO>({
+  const { data: rawLesson, isLoading, error } = useQuery<LessonDTO>({
     queryKey: ['/api/lessons/slug', slug],
     enabled: !!slug,
   });
+
+  // Add default checkpoints if lesson has none
+  const lesson = rawLesson ? {
+    ...rawLesson,
+    checkpoints: rawLesson.checkpoints.length > 0 ? rawLesson.checkpoints : [
+      {
+        id: 'intro-1',
+        type: 'intro' as const,
+        title: 'Welcome',
+        bodyMd: undefined,
+        orderIndex: 0
+      },
+      {
+        id: 'objectives-2',
+        type: 'objectives' as const,
+        title: 'Learning Objectives',
+        bodyMd: `<h3>Upon completion of this lesson, you will understand:</h3>
+        <ul>
+          <li>Key concepts related to ${rawLesson.title}</li>
+          <li>Important regulatory requirements and guidelines</li>
+          <li>Practical applications in Florida insurance</li>
+          <li>Compliance considerations and best practices</li>
+        </ul>`,
+        orderIndex: 1
+      },
+      {
+        id: 'reading-3',
+        type: 'reading' as const,
+        title: 'Core Content',
+        bodyMd: `<h2>${rawLesson.title}</h2>
+        
+        <h3>Overview</h3>
+        <p>This section covers the fundamental concepts and principles related to ${rawLesson.title}. Understanding these concepts is essential for Florida insurance professionals and compliance with state regulations.</p>
+        
+        <h3>Key Points</h3>
+        <ul>
+          <li><strong>Regulatory Framework:</strong> Understanding the Florida Department of Financial Services oversight and requirements</li>
+          <li><strong>Consumer Protection:</strong> Ensuring fair treatment and proper disclosure to insurance consumers</li>
+          <li><strong>Professional Standards:</strong> Maintaining ethical practices and continuing education requirements</li>
+          <li><strong>Practical Application:</strong> Real-world scenarios and case studies relevant to Florida insurance</li>
+        </ul>
+        
+        <h3>Compliance Requirements</h3>
+        <p>All insurance professionals must maintain current knowledge of Florida insurance laws and regulations. This includes understanding DFS guidelines, consumer protection requirements, and professional conduct standards.</p>
+        
+        <h3>Best Practices</h3>
+        <p>Successful insurance professionals consistently apply ethical practices, maintain continuing education, and stay current with regulatory changes affecting the industry.</p>`,
+        gate: {
+          type: 'time' as const,
+          value: 180
+        },
+        orderIndex: 2
+      },
+      {
+        id: 'completion-4',
+        type: 'completion' as const,
+        title: 'Lesson Complete',
+        bodyMd: undefined,
+        orderIndex: 3
+      }
+    ]
+  } : undefined;
 
   const progressMutation = useMutation({
     mutationFn: async (data: {
