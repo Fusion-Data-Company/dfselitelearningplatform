@@ -82,12 +82,9 @@ export default function Dashboard() {
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ 
-          backgroundImage: `url(${dashboardBg})`,
-          filter: 'brightness(0.3) contrast(1.2)' // Make it darker/more subtle
+          backgroundImage: `url(${dashboardBg})`
         }}
       />
-      {/* Cyan overlay to reduce pink/purple and brighten */}
-      <div className="absolute inset-0 bg-gradient-to-br from-cyan-900/40 via-blue-900/30 to-slate-900/50" />
       
       <Navigation />
       <Sidebar />
