@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
 import { Link } from "wouter";
-import dashboardBg from "@/assets/dashboard-bg.png";
 import { 
   BookOpen, 
   Brain, 
@@ -82,7 +81,7 @@ export default function Dashboard() {
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ 
-          backgroundImage: `url(${dashboardBg})`
+          backgroundImage: `url(/dashboard-bg.png)`
         }}
       />
       
