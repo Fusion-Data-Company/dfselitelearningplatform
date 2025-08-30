@@ -107,24 +107,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/lessons/recent', async (req, res) => {
     try {
-      // Get recent lessons with content
-      const tracks = await storage.getTracks();
-      const allLessons: any[] = [];
+      // Query database directly to ensure we get correct slugs
+      const lessonsData = await db
+        .select({
+          id: lessons.id,
+          title: lessons.title,
+          slug: lessons.slug,
+          content: lessons.content,
+          description: lessons.description,
+          duration: lessons.duration,
+          ceHours: lessons.ceHours,
+          published: lessons.published
+        })
+        .from(lessons)
+        .where(eq(lessons.published, true))
+        .limit(20);
       
-      for (const track of tracks) {
-        const modules = await storage.getModulesByTrack(track.id);
-        for (const module of modules) {
-          const lessons = await storage.getLessonsByModule(module.id);
-          allLessons.push(...lessons);
-        }
-      }
+      const validLessons = lessonsData.filter(lesson => 
+        lesson.slug && 
+        lesson.slug.trim().length > 0 &&
+        lesson.title && 
+        lesson.title.trim().length > 0
+      );
       
-      // Sort by id (newest first) and return top 5 with content
-      const recentLessons = allLessons
-        .filter(lesson => lesson.content && lesson.content.length > 0)
-        .slice(0, 5);
+      const formattedLessons = validLessons.map(lesson => ({
+        id: lesson.id,
+        title: lesson.title,
+        slug: lesson.slug, // Use the actual database slug
+        content: lesson.content || '',
+        description: lesson.description || '',
+        duration: lesson.duration || 25,
+        ceHours: lesson.ceHours || 0
+      }));
       
-      res.json(recentLessons);
+      console.log(`Recent lessons found with slugs:`, formattedLessons.slice(0, 5).map(l => `${l.title} -> /lesson/${l.slug}`));
+      
+      res.json(formattedLessons);
     } catch (error) {
       console.error("Error fetching recent lessons:", error);
       res.status(500).json({ message: "Failed to fetch recent lessons" });
