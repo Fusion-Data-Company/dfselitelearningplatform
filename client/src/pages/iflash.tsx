@@ -122,10 +122,21 @@ export default function IFlashPage() {
 
   if (cardsLoading || statsLoading) {
     return (
-      <div className="min-h-screen education-bg">
+      <div className="min-h-screen relative overflow-hidden">
+        {/* Hexagonal Glowing Background */}
+        <div 
+          className="fixed inset-0 z-0"
+          style={{ 
+            backgroundImage: `url(/iflash-bg.jpg)`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center center',
+            backgroundRepeat: 'no-repeat'
+          }}
+        />
+        
         <Navigation />
         <Sidebar />
-        <main className="ml-96 pt-16 min-h-screen">
+        <main className="ml-96 pt-16 min-h-screen relative z-10">
           <div className="p-8">
             <div className="max-w-5xl mx-auto">
               <div className="animate-pulse space-y-6">
@@ -141,10 +152,21 @@ export default function IFlashPage() {
 
   if (!flashcards.length && !sessionActive) {
     return (
-      <div className="min-h-screen education-bg">
+      <div className="min-h-screen relative overflow-hidden">
+        {/* Hexagonal Glowing Background */}
+        <div 
+          className="fixed inset-0 z-0"
+          style={{ 
+            backgroundImage: `url(/iflash-bg.jpg)`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center center',
+            backgroundRepeat: 'no-repeat'
+          }}
+        />
+        
         <Navigation />
         <Sidebar />
-        <main className="ml-96 pt-16 min-h-screen">
+        <main className="ml-96 pt-16 min-h-screen relative z-10">
           <div className="p-8">
             <div className="max-w-5xl mx-auto text-center">
               <div className="mb-8">
@@ -178,11 +200,22 @@ export default function IFlashPage() {
   }
 
   return (
-    <div className="min-h-screen education-bg">
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Hexagonal Glowing Background */}
+      <div 
+        className="fixed inset-0 z-0"
+        style={{ 
+          backgroundImage: `url(/iflash-bg.jpg)`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      />
+      
       <Navigation />
       <Sidebar />
       
-      <main className="ml-96 pt-16 min-h-screen">
+      <main className="ml-96 pt-16 min-h-screen relative z-10">
         <div className="p-8">
           <div className="max-w-5xl mx-auto">
             
