@@ -34,18 +34,23 @@ interface LessonItem {
 }
 
 export default function InstructorPage() {
-  // Query enhanced lessons for comprehensive display
+  // Query lessons for comprehensive display
   const { data: lessons, isLoading } = useQuery<LessonItem[]>({
-    queryKey: ['/api/lessons/enhanced-list'],
+    queryKey: ['/api/lessons/recent'],
     queryFn: async () => {
-      const response = await fetch('/api/lessons/enhanced-list');
-      if (!response.ok) {
-        // Fallback to regular lessons
-        const fallbackResponse = await fetch('/api/lessons/recent');
-        if (!fallbackResponse.ok) throw new Error('Failed to fetch lessons');
-        return fallbackResponse.json();
-      }
-      return response.json();
+      const response = await fetch('/api/lessons/recent');
+      if (!response.ok) throw new Error('Failed to fetch lessons');
+      const lessonsData = await response.json();
+      
+      // Add missing fields for display
+      return lessonsData.map((lesson: any) => ({
+        ...lesson,
+        trackId: lesson.trackId || 'default',
+        track: lesson.track || 'DFS-215 Course Content',
+        module: lesson.module || 'Professional Content',
+        estMinutes: 25,
+        ceHours: lesson.ceHours || 0
+      }));
     }
   });
 

@@ -12,6 +12,9 @@ import { z } from "zod";
 import { checkpointsService } from "./services/lessons/checkpoints.service";
 import { progressService } from "./services/lessons/progress.service";
 import { lessonDTOSchema } from "../shared/schemas/lesson";
+import { db } from "./db";
+import { lessons } from "@shared/schema";
+import { eq } from "drizzle-orm";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware - disabled
@@ -174,41 +177,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Enhanced lessons list must be before :id route
   app.get('/api/lessons/enhanced-list', async (req, res) => {
     try {
-      const tracks = await storage.getTracks();
-      const allLessons: any[] = [];
+      // Get all published lessons directly with a simple query
+      const allLessons = await db
+        .select({
+          id: lessons.id,
+          slug: lessons.slug,
+          title: lessons.title,
+          ceHours: lessons.ceHours,
+          published: lessons.published
+        })
+        .from(lessons)
+        .where(eq(lessons.published, true))
+        .limit(50); // Limit for performance
       
-      for (const track of tracks) {
-        const modules = await storage.getModulesByTrack(track.id);
-        for (const module of modules) {
-          const lessons = await storage.getLessonsByModule(module.id);
-          // Only include lessons that have valid slugs and are published
-          const validLessons = lessons.filter(lesson => 
-            lesson.slug && 
-            lesson.published && 
-            lesson.title && 
-            lesson.title.trim().length > 0
-          );
-          
-          allLessons.push(...validLessons.map(lesson => ({
-            id: lesson.id,
-            slug: lesson.slug, // Use the actual slug from database
-            title: lesson.title,
-            trackId: track.id,
-            track: track.title,
-            module: module.title,
-            estMinutes: 25, // Default estimate
-            ceHours: lesson.ceHours || 0,
-            published: lesson.published
-          })));
-        }
-      }
+      // Add basic metadata for display
+      const enhancedLessons = allLessons.map(lesson => ({
+        id: lesson.id,
+        slug: lesson.slug,
+        title: lesson.title,
+        track: "DFS-215 Course Content", // Simplified track info
+        module: "Professional Content",
+        trackId: "default",
+        estMinutes: 25,
+        ceHours: lesson.ceHours || 0,
+        published: lesson.published
+      }));
       
-      console.log(`Enhanced lessons found: ${allLessons.length}`);
-      allLessons.forEach(lesson => {
-        console.log(`- ${lesson.title} -> /lesson/${lesson.slug}`);
-      });
-      
-      res.json(allLessons);
+      res.json(enhancedLessons);
     } catch (error) {
       console.error("Error fetching enhanced lessons list:", error);
       res.status(500).json([]);
