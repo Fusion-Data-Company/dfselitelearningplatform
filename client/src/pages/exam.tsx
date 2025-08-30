@@ -216,11 +216,22 @@ export default function ExamPage() {
   // Show exam selection if no exam is active
   if (!examSession && !examResults && !examStarted) {
     return (
-      <div className="min-h-screen education-bg">
+      <div className="min-h-screen relative overflow-hidden">
+        {/* Flowing Cyan Background */}
+        <div 
+          className="fixed inset-0 z-0"
+          style={{ 
+            backgroundImage: `url(/exam-bg.jpg)`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center center',
+            backgroundRepeat: 'no-repeat'
+          }}
+        />
+        
         <Navigation />
         <Sidebar />
         
-        <main className="ml-64 pt-16 min-h-screen">
+        <main className="ml-64 pt-16 min-h-screen relative z-10">
           <div className="p-8">
             <div className="max-w-4xl mx-auto">
               {/* Header */}
@@ -330,11 +341,22 @@ export default function ExamPage() {
   // Show exam results
   if (examResults) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen relative overflow-hidden">
+        {/* Flowing Cyan Background */}
+        <div 
+          className="fixed inset-0 z-0"
+          style={{ 
+            backgroundImage: `url(/exam-bg.jpg)`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center center',
+            backgroundRepeat: 'no-repeat'
+          }}
+        />
+        
         <Navigation />
         <Sidebar />
         
-        <main className="ml-64 pt-16 min-h-screen">
+        <main className="ml-64 pt-16 min-h-screen relative z-10">
           <div className="p-8">
             <div className="max-w-4xl mx-auto">
               <Card className="glassmorphism border-border">
@@ -412,7 +434,18 @@ export default function ExamPage() {
     const isFlagged = flaggedQuestions.has(currentQuestion.id);
 
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen relative overflow-hidden">
+        {/* Flowing Cyan Background */}
+        <div 
+          className="fixed inset-0 z-0"
+          style={{ 
+            backgroundImage: `url(/exam-bg.jpg)`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center center',
+            backgroundRepeat: 'no-repeat'
+          }}
+        />
+        
         <Navigation />
         <Sidebar />
         
