@@ -229,7 +229,7 @@ export default function Sidebar() {
 
   const navItems = [
     { href: "/", icon: BarChart3, label: "Dashboard", color: "text-primary" },
-    { href: "/lesson/hmo-balance-billing", icon: BookOpen, label: "Instructor", color: "text-secondary" },
+    { href: "/instructor", icon: BookOpen, label: "Instructor", color: "text-secondary" },
     { href: "/quiz", icon: HelpCircle, label: "Practice Quiz", color: "text-accent" },
     { href: "/exam", icon: Clock, label: "Timed Exam", color: "text-destructive" },
     { href: "/iflash", icon: Layers3, label: "iFlash Review", color: "text-chart-2" },
