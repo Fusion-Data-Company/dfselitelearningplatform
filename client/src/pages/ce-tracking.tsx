@@ -83,11 +83,22 @@ export default function CETrackingPage() {
   const overallProgress = Math.round((totalCompleted / totalRequired) * 100);
 
   return (
-    <div className="min-h-screen education-bg">
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Hexagonal Red Glow Background */}
+      <div 
+        className="fixed inset-0 z-0"
+        style={{ 
+          backgroundImage: `url(/ce-bg.jpg)`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      />
+      
       <Navigation />
       <Sidebar />
       
-      <main className="ml-96 pt-16 min-h-screen">
+      <main className="ml-96 pt-16 min-h-screen relative z-10">
         <div className="p-8">
           <div className="max-w-7xl mx-auto">
             {/* Header */}
