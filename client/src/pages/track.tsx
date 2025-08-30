@@ -11,7 +11,9 @@ import {
   ChevronRight, 
   Clock,
   Award,
-  Play
+  Play,
+  Target,
+  CheckCircle
 } from "lucide-react";
 
 interface Track {
@@ -35,10 +37,46 @@ interface Lesson {
   title: string;
   slug: string;
   description: string;
-  duration: number;
+  estMinutes: number;
   ceHours: number;
-  content: string;
+  trackId: string;
+  track: string;
+  module: string;
 }
+
+// Parse messy track titles into clean academic format
+const parseTrackTitle = (messyTitle: string) => {
+  const cleanPatterns = {
+    'Table.*Contents': 'Course Overview & Table of Contents',
+    'Identify.*Disability.*INCOME|Disability.*INCOME.*Insurance': 'Disability Income Insurance',
+    'iPower|Instructor.*Seminar|LIVE.*Day': 'Professional Sales Training',
+    'Law.*Ethics|Ethics.*Law|Professional.*Responsibility': 'Professional Ethics & Law',
+    'Health.*Insurance.*Content|DFS.*Health': 'Health Insurance Fundamentals',
+    'Managed.*Care|HMO|PPO|EPO': 'Managed Care Organizations',
+    'Social.*Insurance|OASDI|Medicare': 'Social Insurance & Medicare',
+    'AD&D|Accidental.*Death.*Dismemberment': 'Accidental Death & Dismemberment',
+    'HOSPITAL.*Indemnity|Medical.*Expense': 'Medical Expense Insurance',
+    'Life.*Insurance|Term.*Life|Whole.*Life': 'Life Insurance Products',
+    'Annuities|Variable.*Products': 'Annuities & Variable Products',
+    'FIGA|DFS|CFO|Florida.*Guaranty': 'Florida Insurance Regulation'
+  };
+  
+  for (const [pattern, cleanTitle] of Object.entries(cleanPatterns)) {
+    if (new RegExp(pattern, 'i').test(messyTitle)) {
+      return cleanTitle;
+    }
+  }
+  
+  // Fallback: extract first meaningful part and clean it
+  if (messyTitle.length > 50) {
+    let clean = messyTitle.split(/[\[\]|\d+]/)[0]?.trim();
+    if (clean && clean.length > 10 && clean.length < 60) {
+      return clean.replace(/BEGIN|NEXT|LIVE|Identify/gi, '').trim();
+    }
+  }
+  
+  return messyTitle.length > 40 ? 'Professional Course' : messyTitle;
+};
 
 export default function TrackPage() {
   const [match, params] = useRoute("/track/:trackId");
@@ -55,6 +93,19 @@ export default function TrackPage() {
     },
     enabled: !!trackId
   });
+  
+  // Query lessons directly for this track
+  const { data: lessons } = useQuery<Lesson[]>({
+    queryKey: ['/api/lessons/recent'],
+    queryFn: async () => {
+      const response = await fetch('/api/lessons/recent');
+      if (!response.ok) throw new Error('Failed to fetch lessons');
+      return response.json();
+    }
+  });
+  
+  // Filter lessons for this track
+  const trackLessons = lessons?.filter(lesson => lesson.trackId === trackId || lesson.track.includes(track?.title?.substring(0, 20) || '')) || [];
 
   if (isLoading) {
     return (
@@ -87,7 +138,7 @@ export default function TrackPage() {
                 <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-destructive to-destructive/80 flex items-center justify-center mx-auto mb-6">
                   <BookOpen className="w-10 h-10 text-white" />
                 </div>
-                <h1 className="cinzel text-3xl font-bold mb-4 text-foreground">Track Not Found</h1>
+                <h1 className="text-3xl font-bold mb-4 text-foreground" style={{fontFamily: 'Cinzel, serif'}}>Track Not Found</h1>
                 <p className="text-muted-foreground mb-6">The requested track could not be found.</p>
                 <Button onClick={() => window.location.href = '/'} className="floating-action px-6 py-3">
                   Return to Dashboard
@@ -116,96 +167,93 @@ export default function TrackPage() {
                     <BookOpen className="w-8 h-8 text-white drop-shadow-lg" />
                   </div>
                   <div>
-                    <h1 className="cinzel text-4xl font-bold text-shimmer mb-2">
-                      {track.title}
+                    <h1 className="text-4xl font-bold text-shimmer mb-2" style={{fontFamily: 'Cinzel, serif'}}>
+                      {parseTrackTitle(track.title)}
                     </h1>
-                    <p className="text-lg text-muted-foreground geist">
+                    <p className="text-lg text-muted-foreground" style={{fontFamily: 'Cinzel, serif'}}>
                       {track.description}
                     </p>
                   </div>
                 </div>
                 
                 <div className="flex items-center space-x-6 text-sm text-muted-foreground">
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2" style={{fontFamily: 'Cinzel, serif'}}>
                     <Clock className="w-4 h-4 text-primary" />
-                    <span>{track.modules?.reduce((total, module) => total + module.lessons.length, 0)} lessons</span>
+                    <span>{trackLessons.length} lessons</span>
                   </div>
                   {track.ceHours > 0 && (
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-2" style={{fontFamily: 'Cinzel, serif'}}>
                       <Award className="w-4 h-4 text-accent" />
                       <span>{track.ceHours} CE Hours</span>
                     </div>
                   )}
+                  <div className="flex items-center space-x-2" style={{fontFamily: 'Cinzel, serif'}}>
+                    <Target className="w-4 h-4 text-secondary" />
+                    <span>Est. {trackLessons.reduce((total, lesson) => total + (lesson.estMinutes || 0), 0)} minutes</span>
+                  </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Modules and Lessons */}
-            <div className="space-y-8">
-              {track.modules?.map((module, moduleIndex) => (
-                <Card key={module.id} className="education-card border-secondary/20">
-                  <CardContent className="p-8">
-                    <h2 className="cinzel text-2xl font-bold text-elite mb-6">
-                      Module {moduleIndex + 1}: {module.title}
-                    </h2>
-                    <p className="text-muted-foreground mb-6">{module.description}</p>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {module.lessons?.map((lesson, lessonIndex) => {
-                        // Extract first 3 lines of content for preview
-                        const contentLines = lesson.content ? 
-                          lesson.content.split('\n').filter(line => line.trim().length > 0).slice(0, 3) : 
-                          [lesson.description || 'No content available'];
-                        const preview = contentLines.join(' ').substring(0, 150) + '...';
-                        
-                        return (
-                          <Link key={lesson.id} href={`/lesson/${lesson.slug}`}>
-                            <Card className="education-card p-4 cursor-pointer group hover:border-primary/40 transition-all duration-300 h-full">
-                              <div className="space-y-3">
-                                <div className="flex items-center justify-between">
-                                  <Badge className="bg-primary/20 text-primary border-primary/30 text-xs">
-                                    Lesson {lessonIndex + 1}
+            {/* Lessons */}
+            <div className="space-y-6">
+              <Card className="education-card border-primary/20">
+                <CardContent className="p-8">
+                  <h2 className="text-2xl font-bold text-elite mb-6 flex items-center space-x-3" style={{fontFamily: 'Cinzel, serif'}}>
+                    <BookOpen className="w-6 h-6" />
+                    <span>Course Lessons</span>
+                  </h2>
+                  
+                  {trackLessons.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {trackLessons.map((lesson, index) => (
+                        <Link key={lesson.id} href={`/lesson/${lesson.slug}`}>
+                          <Card className="education-card academic-course-card p-6 cursor-pointer group hover:border-primary/40 transition-all duration-300 h-full min-h-[200px]">
+                            <div className="space-y-4 h-full flex flex-col">
+                              <div className="flex items-center justify-between">
+                                <Badge className="bg-primary/20 text-primary border-primary/30" style={{fontFamily: 'Cinzel, serif'}}>
+                                  Lesson {index + 1}
+                                </Badge>
+                                {lesson.ceHours > 0 && (
+                                  <Badge className="bg-accent/20 text-accent border-accent/30" style={{fontFamily: 'Cinzel, serif'}}>
+                                    {lesson.ceHours} CE
                                   </Badge>
-                                  {lesson.ceHours > 0 && (
-                                    <Badge className="bg-accent/20 text-accent border-accent/30 text-xs">
-                                      {lesson.ceHours} CE
-                                    </Badge>
-                                  )}
-                                </div>
-                                
-                                <h4 className="font-bold text-sm group-hover:text-primary transition-colors line-clamp-2">
-                                  {lesson.title}
-                                </h4>
-                                
-                                <p className="text-xs text-muted-foreground line-clamp-3">
-                                  {preview}
-                                </p>
-                                
-                                <div className="flex items-center justify-between pt-2">
-                                  <div className="flex items-center space-x-2 text-xs text-muted-foreground">
-                                    <Clock className="w-3 h-3" />
-                                    <span>{lesson.duration} min</span>
-                                  </div>
-                                  <Button size="sm" variant="ghost" className="h-6 px-2 text-xs">
-                                    <Play className="w-3 h-3 mr-1" />
-                                    Start
-                                  </Button>
-                                </div>
+                                )}
                               </div>
-                            </Card>
-                          </Link>
-                        );
-                      })}
+                              
+                              <h4 className="font-bold text-lg group-hover:text-primary transition-colors line-clamp-2 flex-grow" style={{fontFamily: 'Cinzel, serif'}}>
+                                {lesson.title}
+                              </h4>
+                              
+                              <div className="flex items-center justify-between pt-4 mt-auto">
+                                <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                                  <Clock className="w-4 h-4" />
+                                  <span style={{fontFamily: 'Cinzel, serif'}}>{lesson.estMinutes || 5} min</span>
+                                </div>
+                                <Button size="sm" className="floating-action text-xs px-4 py-2" style={{fontFamily: 'Cinzel, serif'}}>
+                                  <Play className="w-4 h-4 mr-2" />
+                                  Start
+                                </Button>
+                              </div>
+                            </div>
+                          </Card>
+                        </Link>
+                      ))}
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
-              
-              {!track.modules?.length && (
-                <Card className="education-card p-8 text-center">
-                  <p className="text-muted-foreground">No modules available for this track.</p>
-                </Card>
-              )}
+                  ) : (
+                    <div className="text-center py-12">
+                      <BookOpen className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                      <h3 className="text-xl font-bold text-muted-foreground mb-2" style={{fontFamily: 'Cinzel, serif'}}>Course Content Loading</h3>
+                      <p className="text-muted-foreground" style={{fontFamily: 'Cinzel, serif'}}>Lessons will appear here once available.</p>
+                      <Link href="/">
+                        <Button className="floating-action mt-4" style={{fontFamily: 'Cinzel, serif'}}>
+                          Return to Dashboard
+                        </Button>
+                      </Link>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>
