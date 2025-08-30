@@ -1,6 +1,7 @@
 #!/usr/bin/env tsx
 
 import { encyclopediaGenerator } from '../services/encyclopedia-content-generator';
+import { enhancedDFS215Generator } from '../services/enhanced-dfs215-generator';
 import { storage } from '../storage';
 
 async function main() {
@@ -26,6 +27,22 @@ async function main() {
         }
         console.log(`📖 Generating content for track: ${trackTitle}`);
         await encyclopediaGenerator.generateSpecificTrackContent(trackTitle);
+        break;
+        
+      case 'enhance-dfs215':
+        console.log('🏛️ Enhancing ALL tracks with DFS-215 structured framework...');
+        await enhancedDFS215Generator.generateEnhancedContent();
+        break;
+        
+      case 'enhance-track':
+        const enhanceTrackTitle = args[1];
+        if (!enhanceTrackTitle) {
+          console.error('❌ Please specify a track title');
+          console.log('Usage: npm run populate-content enhance-track "Law & Ethics"');
+          process.exit(1);
+        }
+        console.log(`🏛️ Enhancing track with DFS-215 framework: ${enhanceTrackTitle}`);
+        await enhancedDFS215Generator.enhanceSpecificTrack(enhanceTrackTitle);
         break;
         
       case 'regenerate-track':
@@ -71,13 +88,16 @@ async function main() {
         console.log('Available commands:');
         console.log('  generate-all           - Generate comprehensive content for all tracks');
         console.log('  generate-track <name>  - Generate content for specific track');
+        console.log('  enhance-dfs215         - 🏛️ Enhance ALL with DFS-215 structured framework');
+        console.log('  enhance-track <name>   - 🏛️ Enhance specific track with DFS-215 structure');
         console.log('  regenerate-track <id>  - Regenerate content for specific track');
         console.log('  list-tracks           - List all available tracks');
         console.log('  check-content         - Check existing content status');
         console.log('');
         console.log('Examples:');
         console.log('  npm run populate-content generate-all');
-        console.log('  npm run populate-content generate-track "Law & Ethics"');
+        console.log('  npm run populate-content enhance-dfs215');
+        console.log('  npm run populate-content enhance-track "Law & Ethics"');
         console.log('  npm run populate-content check-content');
         break;
     }

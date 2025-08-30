@@ -105,7 +105,10 @@ export default function TrackPage() {
   });
   
   // Filter lessons for this track
-  const trackLessons = lessons?.filter(lesson => lesson.trackId === trackId || lesson.track.includes(track?.title?.substring(0, 20) || '')) || [];
+  const trackLessons = lessons?.filter(lesson => 
+    lesson.trackId === trackId || 
+    (lesson.track && track?.title && lesson.track.includes(track.title.substring(0, 20)))
+  ) || [];
 
   if (isLoading) {
     return (

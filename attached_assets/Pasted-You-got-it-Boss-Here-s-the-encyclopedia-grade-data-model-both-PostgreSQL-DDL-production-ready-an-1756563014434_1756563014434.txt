@@ -1,0 +1,309 @@
+You got it, Boss. Here’s the encyclopedia-grade data model—both PostgreSQL DDL (production ready) and a JSON Schema + a concrete example you can ingest today. It bakes in the checkpoint taxonomy your course uses—[Identify], [Define], [Contrast], [Discuss], [Note], [Illustration], plus quiz blocks—straight from the DFS-215 material. Survival Guide structure and the notations are explicitly represented so the lesson player gates correctly and maps to testable items.
+
+⸻
+
+A) PostgreSQL (pgvector-ready) — DDL
+
+-- ENUMS
+CREATE TYPE checkpoint_kind AS ENUM ('ack', 'task', 'quiz', 'short_answer');
+CREATE TYPE progress_status AS ENUM ('pending','passed','failed');
+
+-- CORE ENTITIES
+CREATE TABLE track (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  slug        TEXT UNIQUE NOT NULL,
+  title       TEXT NOT NULL,
+  description TEXT,
+  meta        JSONB DEFAULT '{}'::jsonb
+);
+
+CREATE TABLE module (
+  id       UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  track_id UUID NOT NULL REFERENCES track(id) ON DELETE CASCADE,
+  "order"  INTEGER,
+  slug     TEXT NOT NULL,
+  title    TEXT NOT NULL,
+  summary  TEXT,
+  UNIQUE (track_id, slug)
+);
+
+CREATE TABLE lesson (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  module_id   UUID NOT NULL REFERENCES module(id) ON DELETE CASCADE,
+  "order"     INTEGER,
+  slug        TEXT NOT NULL,
+  title       TEXT NOT NULL,
+  html        TEXT,      -- rich rendering content
+  plain       TEXT,      -- text-only for search
+  summary     TEXT,
+  meta        JSONB DEFAULT '{}'::jsonb,
+  UNIQUE (module_id, slug)
+);
+
+-- STAGES & CHECKPOINTS (maps Survival Guide “blocks” and quiz items)
+CREATE TABLE stage (
+  id        UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  lesson_id UUID NOT NULL REFERENCES lesson(id) ON DELETE CASCADE,
+  "order"   INTEGER NOT NULL,
+  title     TEXT,
+  gate_rule JSONB NOT NULL DEFAULT '{"require_all": true}', -- gating policy
+  UNIQUE (lesson_id, "order")
+);
+
+CREATE TABLE checkpoint (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  stage_id    UUID NOT NULL REFERENCES stage(id) ON DELETE CASCADE,
+  "order"     INTEGER NOT NULL,
+  kind        checkpoint_kind NOT NULL, -- ack|task|quiz|short_answer
+  label       TEXT,  -- e.g., "[Identify] Premium", "[Define] Hazard"
+  prompt      TEXT,  -- body/question/instruction
+  choices     JSONB, -- for quiz: [{id, text, correct}]
+  answer_key  JSONB, -- for short_answer/rubric, or normalized correct set
+  explain     TEXT,  -- rationale/teaching moment
+  tags        TEXT[] DEFAULT '{}',
+  UNIQUE (stage_id, "order")
+);
+
+-- USER PROGRESS
+CREATE TABLE user_progress (
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id       TEXT NOT NULL, -- map to your auth system
+  lesson_id     UUID NOT NULL REFERENCES lesson(id) ON DELETE CASCADE,
+  stage_id      UUID REFERENCES stage(id) ON DELETE CASCADE,
+  checkpoint_id UUID REFERENCES checkpoint(id) ON DELETE CASCADE,
+  status        progress_status NOT NULL DEFAULT 'pending',
+  score         NUMERIC,       -- for quiz items
+  updated_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (user_id, checkpoint_id)
+);
+
+-- OPTIONAL: pgvector for semantic search over lessons
+-- CREATE EXTENSION IF NOT EXISTS vector;
+-- Adjust dimension to your embedding model
+CREATE TABLE lesson_embedding (
+  lesson_id   UUID NOT NULL REFERENCES lesson(id) ON DELETE CASCADE,
+  chunk_index INT NOT NULL,
+  content     TEXT NOT NULL,
+  embedding   vector(1536), -- or 3072 etc., match your model
+  PRIMARY KEY (lesson_id, chunk_index)
+);
+
+-- INDEXES
+CREATE INDEX idx_module_track_order   ON module(track_id, "order");
+CREATE INDEX idx_lesson_module_order  ON lesson(module_id, "order");
+CREATE INDEX idx_stage_lesson_order   ON stage(lesson_id, "order");
+CREATE INDEX idx_checkpoint_stage_ord ON checkpoint(stage_id, "order");
+CREATE INDEX idx_progress_user_lesson ON user_progress(user_id, lesson_id);
+
+Why these fields?
+	•	stage + checkpoint model your Survival Guide blocks and quizzes: [Identify], [Define], [Contrast], [Discuss], [Note], [Illustration] become labels/prompts and map to actionable checkpoints that must be acknowledged or passed before advancing.
+	•	Quizzes from the Florida Insurance Law and Buyers Guide sections fit naturally into kind='quiz' with choices and answer_key.
+	•	Survival Guides provide the roadmap and test vocabulary; we keep both renderable html and searchable plain for precision and retrieval.
+
+⸻
+
+B) JSON Schema (Draft 2020-12) — Course → Module → Lesson → Stage → Checkpoint
+
+Use this to validate imported content before writing to DB.
+
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fusiondataco.com/schemas/course.json",
+  "title": "Track (Course) Package",
+  "type": "object",
+  "required": ["slug", "title", "modules"],
+  "properties": {
+    "slug": { "type": "string", "minLength": 1 },
+    "title": { "type": "string", "minLength": 1 },
+    "description": { "type": "string" },
+    "meta": { "type": "object" },
+    "modules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["slug", "title", "lessons"],
+        "properties": {
+          "slug": { "type": "string" },
+          "title": { "type": "string" },
+          "order": { "type": "integer" },
+          "summary": { "type": "string" },
+          "lessons": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["slug", "title", "stages"],
+              "properties": {
+                "slug": { "type": "string" },
+                "title": { "type": "string" },
+                "order": { "type": "integer" },
+                "html": { "type": "string" },
+                "plain": { "type": "string" },
+                "summary": { "type": "string" },
+                "meta": { "type": "object" },
+                "stages": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "object",
+                    "required": ["order", "gateRule", "checkpoints"],
+                    "properties": {
+                      "title": { "type": "string" },
+                      "order": { "type": "integer", "minimum": 1 },
+                      "gateRule": {
+                        "type": "object",
+                        "properties": {
+                          "require_all": { "type": "boolean", "default": true },
+                          "min_passed": { "type": "integer", "minimum": 0 }
+                        },
+                        "additionalProperties": true
+                      },
+                      "checkpoints": {
+                        "type": "array",
+                        "minItems": 1,
+                        "items": {
+                          "type": "object",
+                          "required": ["order", "kind", "prompt"],
+                          "properties": {
+                            "order": { "type": "integer", "minimum": 1 },
+                            "kind": {
+                              "type": "string",
+                              "enum": ["ack","task","quiz","short_answer"]
+                            },
+                            "label": { "type": "string" },
+                            "prompt": { "type": "string" },
+                            "choices": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "required": ["id", "text"],
+                                "properties": {
+                                  "id": { "type": "string" },
+                                  "text": { "type": "string" },
+                                  "correct": { "type": "boolean" }
+                                }
+                              }
+                            },
+                            "answer_key": {},
+                            "explain": { "type": "string" },
+                            "tags": {
+                              "type": "array",
+                              "items": { "type": "string" }
+                            }
+                          },
+                          "allOf": [
+                            {
+                              "if": { "properties": { "kind": { "const": "quiz" } } },
+                              "then": { "required": ["choices"] }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
+⸻
+
+C) Concrete JSON Example (fits the Schema)
+
+This shows one module with one lesson and two stages. The checkpoint labels mirror the Survival Guide cueing ([Identify], [Define], [Contrast]).
+
+{
+  "slug": "dfs-215",
+  "title": "DFS-215 Blended – Florida Pre-Licensing",
+  "modules": [
+    {
+      "slug": "health-insurance-overview",
+      "title": "Health Insurance Overview",
+      "order": 1,
+      "lessons": [
+        {
+          "slug": "managed-care-fundamentals",
+          "title": "Managed Care Fundamentals (HMO, PPO, EPO, POS)",
+          "order": 1,
+          "summary": "Structures, cost-sharing, balance billing, essential benefits.",
+          "stages": [
+            {
+              "title": "Network Structures",
+              "order": 1,
+              "gateRule": { "require_all": true },
+              "checkpoints": [
+                {
+                  "order": 1,
+                  "kind": "ack",
+                  "label": "[Identify] Four Managed Care Types",
+                  "prompt": "Identify HMO, PPO, EPO, POS and their defining traits."
+                },
+                {
+                  "order": 2,
+                  "kind": "short_answer",
+                  "label": "[Define] Balance Billing",
+                  "prompt": "Define 'balance billing' and explain why it is restricted in network contexts.",
+                  "answer_key": { "contains": ["difference between provider charge and allowed amount", "prohibited in many managed care claims"] }
+                }
+              ]
+            },
+            {
+              "title": "Cost Sharing & ACA Terms",
+              "order": 2,
+              "gateRule": { "require_all": true },
+              "checkpoints": [
+                {
+                  "order": 1,
+                  "kind": "quiz",
+                  "label": "Coinsurance vs Copay",
+                  "prompt": "Choose the correct statements.",
+                  "choices": [
+                    { "id": "a", "text": "Coinsurance is a percentage paid after deductible.", "correct": true },
+                    { "id": "b", "text": "Copay is a fixed amount per service.", "correct": true },
+                    { "id": "c", "text": "Coinsurance applies before deductible.", "correct": false }
+                  ],
+                  "explain": "Coinsurance kicks in after the deductible; copays are flat fees at service."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+
+
+⸻
+
+D) ETL Mapping Notes (from the DFS-215 DOCX → your DB)
+	•	Heading hierarchy
+	•	Map H1/H2 to module/lesson boundaries.
+	•	Sub-head blocks that begin with the bracketed verbs become stages/checkpoints with appropriate kind and label.
+	•	QUIZ blocks
+	•	Sections explicitly labeled “Quiz” (e.g., Florida Insurance Law QUIZ) → kind='quiz', with choices parsed into {id, text, correct}.
+	•	Survival Guide cues
+	•	The Survival Guide roadmap and colored emphasis (orange keywords, green arrows for answers) define what becomes a checkpoint and what explanation to store in explain.
+	•	Content duplication
+	•	Store full renderable HTML in lesson.html and a text-only in lesson.plain for exact match search and clean embedding.
+
+⸻
+
+E) Minimal API surface (for the player)
+	•	GET /api/tracks/:slug/outline → { modules: [{ lessons: [...] }] } synthesizes modules if the canonical list is empty by grouping lessons on module.title. (Keeps your Track page alive regardless.)
+	•	GET /api/lessons/:slug → lesson + stages + checkpoints.
+	•	POST /api/progress → upsert { userId, checkpointId, status, score? }.
+	•	POST /api/checkpoint/grade → server-grade quiz using answer_key.
+
+⸻
+
+Say the word and I’ll package this as:
+	1.	a Prisma schema mirror (if you want ORM), and
+	2.	a validator (AJV) that enforces the JSON Schema at import time.
+
+You want it like a capo signs off: we gate, track, and advance — no wiggle, no jam.
