@@ -208,11 +208,22 @@ export default function QuizPage() {
   // Show quiz selection if no quiz is active
   if (!quizSession && !quizResults) {
     return (
-      <div className="min-h-screen education-bg">
+      <div className="min-h-screen relative overflow-hidden">
+        {/* 3D Spheres Background */}
+        <div 
+          className="fixed inset-0 z-0"
+          style={{ 
+            backgroundImage: `url(/quiz-bg.jpg)`,
+            backgroundSize: 'auto',
+            backgroundPosition: 'center center',
+            backgroundRepeat: 'repeat'
+          }}
+        />
+        
         <Navigation />
         <Sidebar />
         
-        <main className="ml-96 pt-16 min-h-screen">
+        <main className="ml-96 pt-16 min-h-screen relative z-10">
           <div className="p-8">
             <div className="max-w-5xl mx-auto">
               {/* Header */}
@@ -325,11 +336,22 @@ export default function QuizPage() {
   // Show quiz results
   if (quizResults) {
     return (
-      <div className="min-h-screen education-bg">
+      <div className="min-h-screen relative overflow-hidden">
+        {/* 3D Spheres Background */}
+        <div 
+          className="fixed inset-0 z-0"
+          style={{ 
+            backgroundImage: `url(/quiz-bg.jpg)`,
+            backgroundSize: 'auto',
+            backgroundPosition: 'center center',
+            backgroundRepeat: 'repeat'
+          }}
+        />
+        
         <Navigation />
         <Sidebar />
         
-        <main className="ml-96 pt-16 min-h-screen">
+        <main className="ml-96 pt-16 min-h-screen relative z-10">
           <div className="p-8">
             <div className="max-w-4xl mx-auto">
               <Card className="glassmorphism border-border">
@@ -401,11 +423,22 @@ export default function QuizPage() {
     const isFlagged = flaggedQuestions.has(currentQuestion.id);
 
     return (
-      <div className="min-h-screen education-bg">
+      <div className="min-h-screen relative overflow-hidden">
+        {/* 3D Spheres Background */}
+        <div 
+          className="fixed inset-0 z-0"
+          style={{ 
+            backgroundImage: `url(/quiz-bg.jpg)`,
+            backgroundSize: 'auto',
+            backgroundPosition: 'center center',
+            backgroundRepeat: 'repeat'
+          }}
+        />
+        
         <Navigation />
         <Sidebar />
         
-        <main className="ml-96 pt-16 min-h-screen">
+        <main className="ml-96 pt-16 min-h-screen relative z-10">
           <div className="p-8">
             <div className="max-w-5xl mx-auto">
               <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
