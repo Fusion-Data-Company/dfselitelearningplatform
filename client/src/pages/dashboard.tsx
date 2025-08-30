@@ -82,9 +82,9 @@ export default function Dashboard() {
         className="fixed inset-0 z-0"
         style={{ 
           backgroundImage: `url(/dashboard-bg.jpg)`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center center',
-          backgroundRepeat: 'no-repeat',
+          backgroundSize: 'contain',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'repeat',
           backgroundAttachment: 'fixed'
         }}
       />
