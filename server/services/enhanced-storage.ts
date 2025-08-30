@@ -1,5 +1,5 @@
 import { db } from '../db';
-import { eq, and, sql } from 'drizzle-orm';
+import { eq, and, sql, inArray } from 'drizzle-orm';
 import { 
   stages, 
   checkpoints, 
@@ -60,7 +60,7 @@ export class EnhancedStorageService {
     const stageCheckpoints = await db
       .select()
       .from(checkpoints)
-      .where(sql`${checkpoints.stageId} = ANY(${stageIds})`)
+      .where(inArray(checkpoints.stageId, stageIds))
       .orderBy(checkpoints.order);
 
     // Group checkpoints by stage

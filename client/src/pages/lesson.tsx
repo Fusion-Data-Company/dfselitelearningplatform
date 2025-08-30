@@ -753,7 +753,9 @@ export default function LessonPage() {
     );
   }
 
-  const overallProgress = Math.round((currentCheckpointIndex / lesson.checkpoints.length) * 100);
+  const overallProgress = lesson.checkpoints && lesson.checkpoints.length > 0 
+    ? Math.round((currentCheckpointIndex / lesson.checkpoints.length) * 100)
+    : 0;
 
   return (
     <div className="min-h-screen education-bg">

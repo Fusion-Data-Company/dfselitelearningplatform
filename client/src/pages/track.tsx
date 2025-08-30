@@ -103,12 +103,37 @@ export default function TrackPage() {
       return response.json();
     }
   });
+
+  // Query enhanced lessons for better content display
+  const { data: enhancedLessons } = useQuery<any[]>({
+    queryKey: ['/api/lessons/enhanced-list'],
+    queryFn: async () => {
+      try {
+        // Try to get enhanced lessons first
+        const response = await fetch('/api/lessons/enhanced-list');
+        if (!response.ok) {
+          // Fall back to regular lessons if enhanced endpoint doesn't exist
+          return [];
+        }
+        return response.json();
+      } catch (error) {
+        return [];
+      }
+    }
+  });
   
-  // Filter lessons for this track
-  const trackLessons = lessons?.filter(lesson => 
-    lesson.trackId === trackId || 
-    (lesson.track && track?.title && lesson.track.includes(track.title.substring(0, 20)))
-  ) || [];
+  // Filter lessons for this track, prioritizing enhanced lessons if available
+  const trackLessons = enhancedLessons && enhancedLessons.length > 0 
+    ? enhancedLessons.filter(lesson => 
+        lesson.trackId === trackId || 
+        (lesson.track && track?.title && lesson.track.includes(track.title.substring(0, 20))) ||
+        (track?.title && track.title.toLowerCase().includes('health') && lesson.slug?.includes('managed-care')) ||
+        (track?.title && track.title.toLowerCase().includes('dfs') && lesson.slug?.includes('figa'))
+      )
+    : lessons?.filter(lesson => 
+        lesson.trackId === trackId || 
+        (lesson.track && track?.title && lesson.track.includes(track.title.substring(0, 20)))
+      ) || [];
 
   if (isLoading) {
     return (

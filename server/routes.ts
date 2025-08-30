@@ -128,6 +128,86 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Enhanced lessons list endpoint (must be before slug route)
+  app.get('/api/lessons/enhanced-list', async (req, res) => {
+    try {
+      // Get all lessons from storage
+      const tracks = await storage.getTracks();
+      const allLessons: any[] = [];
+      
+      for (const track of tracks) {
+        const modules = await storage.getModulesByTrack(track.id);
+        for (const module of modules) {
+          const lessons = await storage.getLessonsByModule(module.id);
+          // Add track info to each lesson
+          allLessons.push(...lessons.map(lesson => ({
+            ...lesson,
+            trackId: track.id,
+            track: track.title,
+            module: module.title
+          })));
+        }
+      }
+      
+      // For now, return regular lessons with enhanced structure flag
+      const enhancedLessons = allLessons.map(lesson => ({
+        id: lesson.id,
+        slug: lesson.slug,
+        title: lesson.title,
+        track: lesson.track,
+        module: lesson.module,
+        trackId: lesson.trackId,
+        estMinutes: lesson.estMinutes || 25,
+        ceHours: lesson.ceHours || 0,
+        hasDFS215Structure: false, // Will be true when enhanced structure is working
+        stageCount: 0,
+        checkpointCount: 0
+      }));
+      
+      res.json(enhancedLessons);
+    } catch (error) {
+      console.error("Error fetching enhanced lessons list:", error);
+      res.status(500).json({ message: "Failed to fetch enhanced lessons" });
+    }
+  });
+
+  // Enhanced lessons list must be before :id route
+  app.get('/api/lessons/enhanced-list', async (req, res) => {
+    try {
+      const tracks = await storage.getTracks();
+      const allLessons: any[] = [];
+      
+      for (const track of tracks) {
+        const modules = await storage.getModulesByTrack(track.id);
+        for (const module of modules) {
+          const lessons = await storage.getLessonsByModule(module.id);
+          allLessons.push(...lessons.map(lesson => ({
+            ...lesson,
+            trackId: track.id,
+            track: track.title,
+            module: module.title
+          })));
+        }
+      }
+      
+      const enhancedLessons = allLessons.map(lesson => ({
+        id: lesson.id,
+        slug: lesson.slug,
+        title: lesson.title,
+        track: lesson.track,
+        module: lesson.module,
+        trackId: lesson.trackId,
+        estMinutes: lesson.estMinutes || 25,
+        ceHours: lesson.ceHours || 0
+      }));
+      
+      res.json(enhancedLessons);
+    } catch (error) {
+      console.error("Error fetching enhanced lessons list:", error);
+      res.status(500).json([]);
+    }
+  });
+
   app.get('/api/lessons/:id', async (req, res) => {
     try {
       const lesson = await storage.getLesson(req.params.id);
@@ -211,6 +291,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch lesson" });
     }
   });
+
 
   // Enhanced DFS-215 lesson endpoint with structured stages and checkpoints
   app.get('/api/lessons/enhanced/:slug', async (req, res) => {
