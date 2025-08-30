@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
 import { Link } from "wouter";
+import dashboardBg from "@/assets/dashboard-bg.png";
 import { 
   BookOpen, 
   Brain, 
@@ -76,40 +77,51 @@ export default function Dashboard() {
   });
 
   return (
-    <div className="min-h-screen education-bg">
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Futuristic Tech Background */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ 
+          backgroundImage: `url(${dashboardBg})`,
+          filter: 'brightness(0.3) contrast(1.2)' // Make it darker/more subtle
+        }}
+      />
+      {/* Cyan overlay to reduce pink/purple and brighten */}
+      <div className="absolute inset-0 bg-gradient-to-br from-cyan-900/40 via-blue-900/30 to-slate-900/50" />
+      
       <Navigation />
       <Sidebar />
       
-      <main className="ml-96 pt-16 min-h-screen">
+      <main className="ml-96 pt-16 min-h-screen relative z-10">
         <div className="p-8">
           <div className="max-w-7xl mx-auto">
             {/* Header */}
-            <div className="glassmorphism-card rounded-2xl p-8 mb-8">
+            <div className="bg-slate-900/80 backdrop-blur-xl border border-cyan-500/30 rounded-2xl p-8 mb-8 shadow-2xl shadow-cyan-500/20">
               <div className="flex items-center space-x-4 mb-6">
-                <div className="w-16 h-16 bg-gradient-to-br from-primary via-secondary to-accent rounded-2xl flex items-center justify-center animate-elite-glow">
+                <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 via-blue-600 to-slate-700 rounded-2xl flex items-center justify-center shadow-lg shadow-cyan-500/30">
                   <BarChart3 className="w-8 h-8 text-white drop-shadow-lg" />
                 </div>
                 <div>
-                  <h1 className="cinzel text-4xl font-bold text-shimmer mb-2">
+                  <h1 className="cinzel text-4xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent mb-2">
                     Elite Dashboard
                   </h1>
-                  <p className="text-lg text-muted-foreground geist">
+                  <p className="text-lg text-cyan-100/80 geist">
                     Welcome back, {user?.firstName || 'Student'}! Track your progress through the DFS-215 curriculum
                   </p>
                 </div>
               </div>
               
-              <div className="flex items-center space-x-6 text-sm text-muted-foreground">
+              <div className="flex items-center space-x-6 text-sm text-cyan-200/70">
                 <div className="flex items-center space-x-2">
-                  <TrendingUp className="w-4 h-4 text-primary" />
+                  <TrendingUp className="w-4 h-4 text-cyan-400" />
                   <span>Real-time Progress</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Brain className="w-4 h-4 text-secondary" />
+                  <Brain className="w-4 h-4 text-blue-400" />
                   <span>AI-Powered Learning</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Shield className="w-4 h-4 text-accent" />
+                  <Shield className="w-4 h-4 text-cyan-300" />
                   <span>Certification Ready</span>
                 </div>
               </div>
@@ -121,7 +133,7 @@ export default function Dashboard() {
                 title="Overall Progress"
                 value={`${courseProgress?.overallProgress || 0}%`}
                 icon={TrendingUp}
-                gradient="from-primary to-primary/80"
+                gradient="from-cyan-500 to-cyan-600"
                 testId="card-overall-progress"
               />
               
@@ -129,7 +141,7 @@ export default function Dashboard() {
                 title="Study Streak"
                 value="12 days"
                 icon={Flame}
-                gradient="from-secondary to-secondary/80"
+                gradient="from-blue-500 to-blue-600"
                 testId="card-study-streak"
               />
               
@@ -137,7 +149,7 @@ export default function Dashboard() {
                 title="iFlash Due"
                 value="27"
                 icon={Layers3}
-                gradient="from-accent to-accent/80"
+                gradient="from-cyan-500 to-cyan-600"
                 testId="card-iflash-due"
               />
               
@@ -145,76 +157,76 @@ export default function Dashboard() {
                 title="CE Hours"
                 value="4.5/24"
                 icon={Award}
-                gradient="from-chart-4 to-chart-4/80"
+                gradient="from-slate-600 to-slate-700"
                 testId="card-ce-hours"
               />
             </div>
 
             {/* Performance Analytics */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <Card className="education-card border-accent/20">
+              <Card className="bg-slate-900/70 backdrop-blur-xl border-cyan-500/20 shadow-lg shadow-cyan-500/10">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="cinzel text-lg font-bold">Study Time Today</h3>
-                    <Clock className="w-5 h-5 text-accent" />
+                    <h3 className="cinzel text-lg font-bold text-cyan-100">Study Time Today</h3>
+                    <Clock className="w-5 h-5 text-cyan-400" />
                   </div>
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Active Learning</span>
-                      <span className="font-bold text-accent">2h 35m</span>
+                      <span className="text-sm text-cyan-200/70">Active Learning</span>
+                      <span className="font-bold text-cyan-400">2h 35m</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Goal</span>
-                      <span className="text-sm text-muted-foreground">3h 00m</span>
+                      <span className="text-sm text-cyan-200/70">Goal</span>
+                      <span className="text-sm text-cyan-200/70">3h 00m</span>
                     </div>
-                    <div className="w-full bg-muted/30 rounded-full h-2">
-                      <div className="bg-accent h-2 rounded-full" style={{ width: '87%' }}></div>
+                    <div className="w-full bg-slate-700/50 rounded-full h-2">
+                      <div className="bg-cyan-400 h-2 rounded-full shadow-lg shadow-cyan-400/30" style={{ width: '87%' }}></div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
               
-              <Card className="education-card border-chart-2/20">
+              <Card className="bg-slate-900/70 backdrop-blur-xl border-blue-500/20 shadow-lg shadow-blue-500/10">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="cinzel text-lg font-bold">This Week</h3>
-                    <Activity className="w-5 h-5 text-chart-2" />
+                    <h3 className="cinzel text-lg font-bold text-blue-100">This Week</h3>
+                    <Activity className="w-5 h-5 text-blue-400" />
                   </div>
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Lessons</span>
-                      <span className="font-bold text-chart-2">8 completed</span>
+                      <span className="text-sm text-blue-200/70">Lessons</span>
+                      <span className="font-bold text-blue-400">8 completed</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Quizzes</span>
-                      <span className="font-bold text-chart-2">3 passed</span>
+                      <span className="text-sm text-blue-200/70">Quizzes</span>
+                      <span className="font-bold text-blue-400">3 passed</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Average Score</span>
-                      <span className="font-bold text-chart-2">89%</span>
+                      <span className="text-sm text-blue-200/70">Average Score</span>
+                      <span className="font-bold text-blue-400">89%</span>
                     </div>
                   </div>
                 </CardContent>
               </Card>
               
-              <Card className="education-card border-chart-4/20">
+              <Card className="bg-slate-900/70 backdrop-blur-xl border-slate-500/20 shadow-lg shadow-slate-500/10">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="cinzel text-lg font-bold">Achievements</h3>
-                    <Trophy className="w-5 h-5 text-chart-4" />
+                    <h3 className="cinzel text-lg font-bold text-slate-100">Achievements</h3>
+                    <Trophy className="w-5 h-5 text-yellow-400" />
                   </div>
                   <div className="space-y-3">
                     <div className="flex items-center space-x-3">
-                      <Star className="w-4 h-4 text-primary" />
-                      <span className="text-sm font-medium">Quiz Master</span>
+                      <Star className="w-4 h-4 text-cyan-400" />
+                      <span className="text-sm font-medium text-cyan-100">Quiz Master</span>
                     </div>
                     <div className="flex items-center space-x-3">
-                      <Star className="w-4 h-4 text-primary" />
-                      <span className="text-sm font-medium">Study Streak</span>
+                      <Star className="w-4 h-4 text-cyan-400" />
+                      <span className="text-sm font-medium text-cyan-100">Study Streak</span>
                     </div>
                     <div className="flex items-center space-x-3">
-                      <Star className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-sm text-muted-foreground">Speed Learner</span>
+                      <Star className="w-4 h-4 text-slate-400" />
+                      <span className="text-sm text-slate-400">Speed Learner</span>
                     </div>
                   </div>
                 </CardContent>
@@ -224,9 +236,9 @@ export default function Dashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Course Tracks */}
               <div className="space-y-6">
-                <Card className="education-card border-primary/20 hover:border-primary/40 transition-all duration-300">
+                <Card className="bg-slate-900/70 backdrop-blur-xl border-cyan-500/20 hover:border-cyan-500/40 transition-all duration-300 shadow-lg shadow-cyan-500/10">
                   <CardContent className="p-8">
-                    <h3 className="text-2xl font-bold mb-6 text-elite" style={{fontFamily: 'Cinzel, serif'}}>Course Tracks</h3>
+                    <h3 className="text-2xl font-bold mb-6 bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent" style={{fontFamily: 'Cinzel, serif'}}>Course Tracks</h3>
                     <div className="space-y-4">
                       {progressLoading ? (
                         <div className="space-y-4">
