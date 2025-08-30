@@ -89,8 +89,8 @@ export default function Dashboard() {
         }}
       />
       
-      {/* Subtle overlay for better card contrast */}
-      <div className="fixed inset-0 z-10 bg-slate-900/20 backdrop-blur-[0.5px]" />
+      {/* Subtle overlay for better card contrast - excludes sidebar */}
+      <div className="fixed top-0 right-0 bottom-0 left-96 z-10 bg-slate-900/20 backdrop-blur-[0.5px]" />
       
       <Navigation />
       <Sidebar />
