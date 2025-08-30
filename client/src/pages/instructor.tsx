@@ -128,9 +128,9 @@ export default function InstructorPage() {
           className="fixed inset-0 z-0"
           style={{ 
             backgroundImage: `url(/instructor-bg.jpg)`,
-            backgroundSize: 'cover',
+            backgroundSize: 'auto',
             backgroundPosition: 'center center',
-            backgroundRepeat: 'no-repeat'
+            backgroundRepeat: 'repeat'
           }}
         />
         
@@ -157,9 +157,9 @@ export default function InstructorPage() {
         className="fixed inset-0 z-0"
         style={{ 
           backgroundImage: `url(/instructor-bg.jpg)`,
-          backgroundSize: 'cover',
+          backgroundSize: 'auto',
           backgroundPosition: 'center center',
-          backgroundRepeat: 'no-repeat'
+          backgroundRepeat: 'repeat'
         }}
       />
       
