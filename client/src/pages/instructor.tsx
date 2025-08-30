@@ -35,27 +35,42 @@ interface LessonItem {
 
 export default function InstructorPage() {
   // Query lessons for comprehensive display
-  const { data: lessons, isLoading } = useQuery<LessonItem[]>({
+  const { data: lessons = [], isLoading } = useQuery<LessonItem[]>({
     queryKey: ['/api/lessons/recent'],
     queryFn: async () => {
-      const response = await fetch('/api/lessons/recent');
-      if (!response.ok) throw new Error('Failed to fetch lessons');
-      const lessonsData = await response.json();
-      
-      // Add missing fields for display
-      return lessonsData.map((lesson: any) => ({
-        ...lesson,
-        trackId: lesson.trackId || 'default',
-        track: lesson.track || 'DFS-215 Course Content',
-        module: lesson.module || 'Professional Content',
-        estMinutes: 25,
-        ceHours: lesson.ceHours || 0
-      }));
+      try {
+        const response = await fetch('/api/lessons/recent');
+        if (!response.ok) throw new Error('Failed to fetch lessons');
+        const lessonsData = await response.json();
+        
+        // Ensure we have an array
+        if (!Array.isArray(lessonsData)) {
+          console.warn('Lessons data is not an array:', lessonsData);
+          return [];
+        }
+        
+        // Add missing fields for display
+        return lessonsData.map((lesson: any) => ({
+          ...lesson,
+          trackId: lesson.trackId || 'default',
+          track: lesson.track || 'DFS-215 Course Content',
+          module: lesson.module || 'Professional Content',
+          estMinutes: 25,
+          ceHours: lesson.ceHours || 0
+        }));
+      } catch (error) {
+        console.error('Error fetching lessons:', error);
+        return [];
+      }
     }
   });
 
   // Parse messy track titles into clean academic format
-  const parseTrackTitle = (messyTitle: string) => {
+  const parseTrackTitle = (messyTitle: string = '') => {
+    if (!messyTitle || typeof messyTitle !== 'string') {
+      return 'Professional Course';
+    }
+    
     const cleanPatterns = {
       'Table.*Contents': 'Course Overview & Table of Contents',
       'Identify.*Disability.*INCOME|Disability.*INCOME.*Insurance': 'Disability Income Insurance',
@@ -89,20 +104,21 @@ export default function InstructorPage() {
   };
 
   // Group lessons by track for organized display
-  const groupedLessons = lessons?.reduce((groups, lesson) => {
+  const groupedLessons = (lessons && Array.isArray(lessons)) ? lessons.reduce((groups, lesson) => {
+    if (!lesson) return groups;
     const trackTitle = parseTrackTitle(lesson.track);
     if (!groups[trackTitle]) {
       groups[trackTitle] = [];
     }
     groups[trackTitle].push(lesson);
     return groups;
-  }, {} as Record<string, LessonItem[]>) || {};
+  }, {} as Record<string, LessonItem[]>) : {};
 
   // Calculate summary statistics
-  const totalLessons = lessons?.length || 0;
-  const totalCEHours = lessons?.reduce((sum, lesson) => sum + (lesson.ceHours || 0), 0) || 0;
-  const totalMinutes = lessons?.reduce((sum, lesson) => sum + (lesson.estMinutes || 0), 0) || 0;
-  const dfs215Lessons = lessons?.filter(lesson => lesson.hasDFS215Structure).length || 0;
+  const totalLessons = (lessons && Array.isArray(lessons)) ? lessons.length : 0;
+  const totalCEHours = (lessons && Array.isArray(lessons)) ? lessons.reduce((sum, lesson) => sum + (lesson?.ceHours || 0), 0) : 0;
+  const totalMinutes = (lessons && Array.isArray(lessons)) ? lessons.reduce((sum, lesson) => sum + (lesson?.estMinutes || 0), 0) : 0;
+  const dfs215Lessons = (lessons && Array.isArray(lessons)) ? lessons.filter(lesson => lesson?.hasDFS215Structure).length : 0;
 
   if (isLoading) {
     return (
