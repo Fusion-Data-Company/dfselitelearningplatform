@@ -82,16 +82,10 @@ export default function Dashboard() {
         className="fixed inset-0 z-0"
         style={{ 
           backgroundImage: `url(/dashboard-bg.jpg)`,
-          backgroundSize: 'cover',
+          backgroundSize: 'contain',
           backgroundPosition: 'center center',
-          backgroundRepeat: 'no-repeat',
-          imageRendering: 'crisp-edges',
-          WebkitBackfaceVisibility: 'hidden',
-          WebkitPerspective: 1000,
-          WebkitTransform: 'translate3d(0,0,0)',
-          filter: 'none',
-          backfaceVisibility: 'hidden'
-        } as React.CSSProperties}
+          backgroundRepeat: 'no-repeat'
+        }}
       />
       
       <Navigation />
