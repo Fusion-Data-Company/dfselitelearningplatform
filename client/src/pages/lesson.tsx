@@ -383,9 +383,21 @@ export default function LessonPage() {
       });
     }
 
+    // Check if this is a default checkpoint (doesn't exist in database)
+    const isDefaultCheckpoint = checkpoint.id.includes('-') && (
+      checkpoint.id.startsWith('intro-') || 
+      checkpoint.id.startsWith('objectives-') || 
+      checkpoint.id.startsWith('reading-') || 
+      checkpoint.id.startsWith('completion-')
+    );
+
     try {
-      await progressMutation.mutateAsync(progressData);
+      // Only save to database if this is a real checkpoint
+      if (!isDefaultCheckpoint && rawLesson?.checkpoints?.length > 0) {
+        await progressMutation.mutateAsync(progressData);
+      }
       
+      // Always update local state
       setCheckpointProgress(prev => ({
         ...prev,
         [checkpoint.id]: {
@@ -407,11 +419,30 @@ export default function LessonPage() {
         setReflection("");
       }
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to save checkpoint progress.",
-        variant: "destructive",
-      });
+      // If database save fails, still advance locally for default checkpoints
+      if (isDefaultCheckpoint) {
+        setCheckpointProgress(prev => ({
+          ...prev,
+          [checkpoint.id]: {
+            ...prev[checkpoint.id],
+            ...progressData,
+          }
+        }));
+
+        // Auto-advance to next checkpoint
+        if (currentCheckpointIndex < lesson!.checkpoints.length - 1) {
+          setCurrentCheckpointIndex(prev => prev + 1);
+          setQuizAnswers({});
+          setQuizSubmitted(false);
+          setReflection("");
+        }
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to save checkpoint progress.",
+          variant: "destructive",
+        });
+      }
     }
   };
 
