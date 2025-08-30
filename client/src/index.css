@@ -1227,7 +1227,17 @@
   }
   
   .cinzel {
+    font-family: 'Cinzel', serif !important;
     letter-spacing: 0.015em;
+  }
+  
+  /* Force Cinzel on lesson page elements */
+  .lesson-content h1,
+  .lesson-content h2,
+  .lesson-content h3,
+  .lesson-content p,
+  .lesson-content span {
+    font-family: 'Cinzel', serif !important;
   }
   
   .sidebar-nav:hover {

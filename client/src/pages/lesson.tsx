@@ -89,6 +89,39 @@ interface CheckpointProgress {
 export default function LessonPage() {
   const { slug } = useParams<{ slug: string }>();
   const [currentCheckpointIndex, setCurrentCheckpointIndex] = useState(0);
+  
+  // Parse messy track titles into clean academic format
+  const parseTrackTitle = (messyTitle: string) => {
+    const cleanPatterns = {
+      'Identify.*Disability.*INCOME|Disability.*INCOME.*Insurance': 'Disability Income Insurance',
+      'iPower|Instructor.*Seminar|LIVE.*Day': 'Professional Sales Training',
+      'Law.*Ethics|Ethics.*Law|Professional.*Responsibility': 'Professional Ethics & Law',
+      'Health.*Insurance.*Content|DFS.*Health': 'Health Insurance Fundamentals',
+      'Managed.*Care|HMO|PPO|EPO': 'Managed Care Organizations',
+      'Social.*Insurance|OASDI|Medicare': 'Social Insurance & Medicare',
+      'AD&D|Accidental.*Death.*Dismemberment': 'Accidental Death & Dismemberment',
+      'HOSPITAL.*Indemnity|Medical.*Expense': 'Medical Expense Insurance',
+      'Life.*Insurance|Term.*Life|Whole.*Life': 'Life Insurance Products',
+      'Annuities|Variable.*Products': 'Annuities & Variable Products',
+      'FIGA|DFS|CFO|Florida.*Guaranty': 'Florida Insurance Regulation'
+    };
+    
+    for (const [pattern, cleanTitle] of Object.entries(cleanPatterns)) {
+      if (new RegExp(pattern, 'i').test(messyTitle)) {
+        return cleanTitle;
+      }
+    }
+    
+    // Fallback: extract first meaningful part and clean it
+    if (messyTitle.length > 50) {
+      let clean = messyTitle.split(/[\[\]|\d+]/)[0]?.trim();
+      if (clean && clean.length > 10 && clean.length < 60) {
+        return clean.replace(/BEGIN|NEXT|LIVE|Identify/gi, '').trim();
+      }
+    }
+    
+    return messyTitle.length > 40 ? 'Professional Course' : messyTitle;
+  };
   const [checkpointProgress, setCheckpointProgress] = useState<Record<string, CheckpointProgress>>({});
   const [coachBotOpen, setCoachBotOpen] = useState(false);
   const [sessionStartTime] = useState(Date.now());
@@ -341,7 +374,7 @@ export default function LessonPage() {
                 <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center mx-auto mb-6">
                   <BookOpen className="w-10 h-10 text-white" />
                 </div>
-                <h2 className="cinzel text-2xl font-bold mb-4">Welcome to the Lesson</h2>
+                <h2 className="text-2xl font-bold mb-4" style={{fontFamily: 'Cinzel, serif'}}>Welcome to the Lesson</h2>
                 <p className="text-muted-foreground mb-6">
                   You're about to begin "{lesson!.title}". This lesson will take approximately {lesson!.estMinutes} minutes to complete.
                 </p>
@@ -395,7 +428,7 @@ export default function LessonPage() {
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center space-x-3">
                   <BookOpen className="w-8 h-8 text-primary" />
-                  <h2 className="cinzel text-2xl font-bold">Reading Material</h2>
+                  <h2 className="text-2xl font-bold" style={{fontFamily: 'Cinzel, serif'}}>Reading Material</h2>
                 </div>
                 {checkpoint.gate?.type === 'time' && (
                   <div className="flex items-center space-x-2 text-sm">
@@ -442,7 +475,7 @@ export default function LessonPage() {
             <CardContent className="p-8">
               <div className="flex items-center space-x-3 mb-6">
                 <Play className="w-8 h-8 text-primary" />
-                <h2 className="cinzel text-2xl font-bold">Video Content</h2>
+                <h2 className="text-2xl font-bold" style={{fontFamily: 'Cinzel, serif'}}>Video Content</h2>
               </div>
               
               {checkpoint.videoUrl ? (
@@ -490,7 +523,7 @@ export default function LessonPage() {
             <CardContent className="p-8">
               <div className="flex items-center space-x-3 mb-6">
                 <HelpCircle className="w-8 h-8 text-primary" />
-                <h2 className="cinzel text-2xl font-bold">Knowledge Check</h2>
+                <h2 className="text-2xl font-bold" style={{fontFamily: 'Cinzel, serif'}}>Knowledge Check</h2>
               </div>
               
               <p className="text-muted-foreground mb-6">
@@ -727,7 +760,7 @@ export default function LessonPage() {
       <Navigation />
       <Sidebar />
       
-      <main className="ml-64 pt-16 min-h-screen">
+      <main className="ml-64 pt-16 min-h-screen lesson-content">
         <div className="p-8">
           <div className="max-w-4xl mx-auto">
             {/* Lesson Header */}
@@ -754,12 +787,12 @@ export default function LessonPage() {
                         Ask CoachBot
                       </Button>
                     </div>
-                    <h1 className="cinzel text-3xl font-bold text-shimmer mb-2" data-testid="lesson-title">
+                    <h1 className="text-3xl font-bold text-shimmer mb-2" data-testid="lesson-title" style={{fontFamily: 'Cinzel, serif'}}>
                       {lesson.title}
                     </h1>
                     <div className="flex items-center space-x-4">
-                      <p className="text-lg text-muted-foreground">
-                        {lesson.track} • {lesson.module}
+                      <p className="text-lg text-muted-foreground" style={{fontFamily: 'Cinzel, serif'}}>
+                        {parseTrackTitle(lesson.track)} • {lesson.module}
                       </p>
                       <Badge className="bg-primary/20 text-primary border-primary/30">
                         <Clock className="w-3 h-3 mr-1" />
