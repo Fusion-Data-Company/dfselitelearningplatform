@@ -214,9 +214,9 @@ export default function QuizPage() {
           className="fixed inset-0 z-0"
           style={{ 
             backgroundImage: `url(/quiz-bg.jpg)`,
-            backgroundSize: 'auto',
+            backgroundSize: 'cover',
             backgroundPosition: 'center center',
-            backgroundRepeat: 'repeat'
+            backgroundRepeat: 'no-repeat'
           }}
         />
         
@@ -342,9 +342,9 @@ export default function QuizPage() {
           className="fixed inset-0 z-0"
           style={{ 
             backgroundImage: `url(/quiz-bg.jpg)`,
-            backgroundSize: 'auto',
+            backgroundSize: 'cover',
             backgroundPosition: 'center center',
-            backgroundRepeat: 'repeat'
+            backgroundRepeat: 'no-repeat'
           }}
         />
         
@@ -429,9 +429,9 @@ export default function QuizPage() {
           className="fixed inset-0 z-0"
           style={{ 
             backgroundImage: `url(/quiz-bg.jpg)`,
-            backgroundSize: 'auto',
+            backgroundSize: 'cover',
             backgroundPosition: 'center center',
-            backgroundRepeat: 'repeat'
+            backgroundRepeat: 'no-repeat'
           }}
         />
         
