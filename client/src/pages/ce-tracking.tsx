@@ -88,10 +88,10 @@ export default function CETrackingPage() {
       <div 
         className="fixed inset-0 z-0"
         style={{ 
-          backgroundImage: `url(/ce-bg.jpg)`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center center',
-          backgroundRepeat: 'no-repeat'
+          backgroundImage: `url(/ce-tracking-bg.jpg)`,
+          backgroundSize: 'contain',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'repeat'
         }}
       />
       

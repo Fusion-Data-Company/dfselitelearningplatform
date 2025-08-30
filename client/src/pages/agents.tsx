@@ -155,9 +155,9 @@ export default function AgentsPage() {
         className="fixed inset-0 z-0"
         style={{ 
           backgroundImage: `url(/agents-bg.jpg)`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center center',
-          backgroundRepeat: 'no-repeat'
+          backgroundSize: 'contain',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'repeat'
         }}
       />
       
