@@ -77,21 +77,25 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Futuristic Tech Background */}
+      {/* Flowing Abstract Background */}
       <div 
         className="fixed inset-0 z-0"
         style={{ 
           backgroundImage: `url(/dashboard-bg.jpg)`,
-          backgroundSize: 'auto',
-          backgroundPosition: 'top left',
-          backgroundRepeat: 'repeat'
+          backgroundSize: 'cover',
+          backgroundPosition: 'center center',
+          backgroundRepeat: 'no-repeat',
+          backgroundAttachment: 'fixed'
         }}
       />
+      
+      {/* Subtle overlay for better card contrast */}
+      <div className="fixed inset-0 z-10 bg-slate-900/20 backdrop-blur-[0.5px]" />
       
       <Navigation />
       <Sidebar />
       
-      <main className="ml-96 pt-16 min-h-screen relative z-20">
+      <main className="ml-96 pt-16 min-h-screen relative z-30">
         <div className="p-8">
           <div className="max-w-7xl mx-auto">
             {/* Header */}
