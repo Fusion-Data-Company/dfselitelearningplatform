@@ -54,15 +54,128 @@ export default function IFlashPage() {
     queryKey: ['/api/iflash/cards'],
   });
 
+  // Placeholder flashcards for demonstration when no real cards are loaded
+  const placeholderCards: Flashcard[] = [
+    {
+      id: 'demo-1',
+      type: 'basic',
+      front: 'What does HMO stand for?',
+      back: 'Health Maintenance Organization - A type of managed care plan that provides healthcare services through a network of doctors and hospitals.',
+      difficulty: 1,
+      interval: 1,
+      reviewCount: 0,
+      nextReview: new Date().toISOString()
+    },
+    {
+      id: 'demo-2', 
+      type: 'basic',
+      front: 'What is the primary purpose of Florida DFS regulation?',
+      back: 'To protect consumers by ensuring insurance companies operate fairly, maintain adequate reserves, and comply with state insurance laws.',
+      difficulty: 2,
+      interval: 1,
+      reviewCount: 0,
+      nextReview: new Date().toISOString()
+    },
+    {
+      id: 'demo-3',
+      type: 'multiple_choice',
+      prompt: 'Which of the following is NOT a type of managed care organization?',
+      options: ['HMO', 'PPO', 'EPO', 'FFS'],
+      answerIndex: 3,
+      rationale: 'FFS (Fee-For-Service) is a traditional payment model, not a managed care organization. HMO, PPO, and EPO are all types of managed care.',
+      difficulty: 2,
+      interval: 1,
+      reviewCount: 0,
+      nextReview: new Date().toISOString()
+    },
+    {
+      id: 'demo-4',
+      type: 'basic',
+      front: 'What does PPO stand for and what is its main characteristic?',
+      back: 'Preferred Provider Organization - Allows members to see out-of-network providers but at higher cost, offering more flexibility than HMOs.',
+      difficulty: 1,
+      interval: 1,
+      reviewCount: 0,
+      nextReview: new Date().toISOString()
+    },
+    {
+      id: 'demo-5',
+      type: 'basic',
+      front: 'What is HIPAA and why is it important in healthcare?',
+      back: 'Health Insurance Portability and Accountability Act - Protects patient privacy and ensures confidentiality of medical information.',
+      difficulty: 2,
+      interval: 1,
+      reviewCount: 0,
+      nextReview: new Date().toISOString()
+    },
+    {
+      id: 'demo-6',
+      type: 'multiple_choice',
+      prompt: 'What is the minimum continuing education requirement for Florida insurance agents?',
+      options: ['20 hours every 2 years', '24 hours every 2 years', '30 hours every 2 years', '40 hours every 2 years'],
+      answerIndex: 1,
+      rationale: '24 hours every 2 years is the standard CE requirement, including specific ethics and law components.',
+      difficulty: 1,
+      interval: 1,
+      reviewCount: 0,
+      nextReview: new Date().toISOString()
+    },
+    {
+      id: 'demo-7',
+      type: 'basic',
+      front: 'What is the difference between Medicare Part A and Part B?',
+      back: 'Part A covers hospital insurance (inpatient care), while Part B covers medical insurance (outpatient care, doctor visits, preventive services).',
+      difficulty: 2,
+      interval: 1,
+      reviewCount: 0,
+      nextReview: new Date().toISOString()
+    },
+    {
+      id: 'demo-8',
+      type: 'basic',
+      front: 'What does "grandfathered plan" mean under the ACA?',
+      back: 'Health plans that existed before March 23, 2010, and have maintained certain characteristics, exempt from some ACA requirements.',
+      difficulty: 3,
+      interval: 1,
+      reviewCount: 0,
+      nextReview: new Date().toISOString()
+    },
+    {
+      id: 'demo-9',
+      type: 'multiple_choice',
+      prompt: 'Which entity regulates insurance in Florida?',
+      options: ['Florida Department of Health', 'Florida Department of Financial Services', 'Florida Insurance Commission', 'Florida Department of Commerce'],
+      answerIndex: 1,
+      rationale: 'The Florida Department of Financial Services (DFS) regulates insurance companies and agents in Florida.',
+      difficulty: 1,
+      interval: 1,
+      reviewCount: 0,
+      nextReview: new Date().toISOString()
+    },
+    {
+      id: 'demo-10',
+      type: 'basic',
+      front: 'What is an Essential Health Benefit under the ACA?',
+      back: 'Required coverage categories including ambulatory care, emergency services, hospitalization, maternity care, mental health, prescription drugs, preventive care, pediatric services, rehabilitation, and laboratory services.',
+      difficulty: 3,
+      interval: 1,
+      reviewCount: 0,
+      nextReview: new Date().toISOString()
+    }
+  ];
+
+  // Use real flashcards if available, otherwise use placeholders
+  const activeCards = flashcards.length > 0 ? flashcards : placeholderCards;
+
   // Auto-start session when cards are loaded (for immediate testing)
   useEffect(() => {
-    if (flashcards.length > 0 && !sessionActive && currentCardIndex === 0 && reviewedCount === 0) {
-      console.log('Auto-starting session with', flashcards.length, 'cards');
+    if (activeCards.length > 0 && !sessionActive && currentCardIndex === 0 && reviewedCount === 0) {
+      console.log('Auto-starting session with', activeCards.length, 'cards');
       setSessionActive(true);
     }
-  }, [flashcards.length, sessionActive, currentCardIndex, reviewedCount]);
+  }, [activeCards.length, sessionActive, currentCardIndex, reviewedCount]);
 
-  const shouldAutoStart = flashcards.length > 0 && !sessionActive && currentCardIndex === 0;
+  const shouldAutoStart = activeCards.length > 0 && !sessionActive && currentCardIndex === 0;
 
   const { data: stats, isLoading: statsLoading } = useQuery<StudyStats>({
     queryKey: ['/api/iflash/stats'],
@@ -75,7 +188,7 @@ export default function IFlashPage() {
     onSuccess: () => {
       setReviewedCount(prev => prev + 1);
       
-      if (currentCardIndex < flashcards.length - 1) {
+      if (currentCardIndex < activeCards.length - 1) {
         setCurrentCardIndex(prev => prev + 1);
       } else {
         // Session complete
@@ -84,7 +197,7 @@ export default function IFlashPage() {
         setReviewedCount(0);
         toast({
           title: "Review Session Complete!",
-          description: `You reviewed ${flashcards.length} cards. Great work!`,
+          description: `You reviewed ${activeCards.length} cards. Great work!`,
         });
       }
       
@@ -102,7 +215,7 @@ export default function IFlashPage() {
   });
 
   const handleReview = (grade: number) => {
-    const currentCard = flashcards[currentCardIndex];
+    const currentCard = activeCards[currentCardIndex];
     if (currentCard) {
       reviewMutation.mutate({ cardId: currentCard.id, grade });
     }
@@ -150,7 +263,7 @@ export default function IFlashPage() {
     );
   }
 
-  if (!flashcards.length && !sessionActive) {
+  if (!activeCards.length && !sessionActive) {
     return (
       <div className="min-h-screen relative overflow-hidden">
         {/* Hexagonal Glowing Background */}
@@ -173,7 +286,7 @@ export default function IFlashPage() {
                 <Layers3 className="w-20 h-20 mx-auto mb-4 text-muted-foreground" />
                 <h2 className="cinzel text-3xl font-bold mb-2">No Flashcards Available</h2>
                 <p className="text-muted-foreground">
-                  Generate flashcards from lesson content to start your spaced repetition learning.
+                  Generate activeCards from lesson content to start your spaced repetition learning.
                 </p>
               </div>
               
@@ -301,7 +414,7 @@ export default function IFlashPage() {
                   <CardContent className="p-8">
                     <h3 className="cinzel text-xl font-bold mb-4">Ready to Review?</h3>
                     <p className="text-muted-foreground mb-6">
-                      You have {flashcards.length} cards ready for review. 
+                      You have {activeCards.length} cards ready for review. 
                       Let's strengthen your knowledge with spaced repetition.
                     </p>
                     
@@ -328,11 +441,11 @@ export default function IFlashPage() {
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                         <div className="p-3 bg-card rounded-lg">
                           <p className="font-medium">Session Length</p>
-                          <p className="text-muted-foreground">{flashcards.length} cards</p>
+                          <p className="text-muted-foreground">{activeCards.length} cards</p>
                         </div>
                         <div className="p-3 bg-card rounded-lg">
                           <p className="font-medium">Est. Time</p>
-                          <p className="text-muted-foreground">{Math.ceil(flashcards.length * 0.5)} minutes</p>
+                          <p className="text-muted-foreground">{Math.ceil(activeCards.length * 0.5)} minutes</p>
                         </div>
                         <div className="p-3 bg-card rounded-lg">
                           <p className="font-medium">Algorithm</p>
@@ -352,18 +465,18 @@ export default function IFlashPage() {
                     <h2 className="cinzel text-2xl font-bold">Review Session</h2>
                     <div className="text-right">
                       <p className="text-sm text-muted-foreground">Progress</p>
-                      <p className="font-semibold">{reviewedCount} / {flashcards.length}</p>
+                      <p className="font-semibold">{reviewedCount} / {activeCards.length}</p>
                     </div>
                   </div>
                   
                   <Progress 
-                    value={(reviewedCount / flashcards.length) * 100} 
+                    value={(reviewedCount / activeCards.length) * 100} 
                     className="h-2 mb-2"
                   />
                   
                   <div className="flex justify-between items-center">
                     <Badge variant="outline">
-                      Card {currentCardIndex + 1} of {flashcards.length}
+                      Card {currentCardIndex + 1} of {activeCards.length}
                     </Badge>
                     <Button
                       variant="ghost"
@@ -379,12 +492,12 @@ export default function IFlashPage() {
                 </div>
 
                 {/* Current Flashcard */}
-                {flashcards[currentCardIndex] && (
+                {activeCards[currentCardIndex] && (
                   <FlashCard
-                    card={flashcards[currentCardIndex]}
+                    card={activeCards[currentCardIndex]}
                     onReview={handleReview}
                     cardNumber={currentCardIndex + 1}
-                    totalCards={flashcards.length}
+                    totalCards={activeCards.length}
                   />
                 )}
 
@@ -394,12 +507,12 @@ export default function IFlashPage() {
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="cinzel font-bold">Session Progress</h3>
                       <span className="text-sm text-muted-foreground">
-                        {reviewedCount} / {flashcards.length} completed
+                        {reviewedCount} / {activeCards.length} completed
                       </span>
                     </div>
                     
                     <Progress 
-                      value={(reviewedCount / flashcards.length) * 100} 
+                      value={(reviewedCount / activeCards.length) * 100} 
                       className="h-3 mb-4"
                     />
                     
@@ -409,7 +522,7 @@ export default function IFlashPage() {
                         <p className="text-xs text-muted-foreground">Reviewed</p>
                       </div>
                       <div className="text-center">
-                        <p className="text-lg font-bold text-secondary">{flashcards.length - reviewedCount}</p>
+                        <p className="text-lg font-bold text-secondary">{activeCards.length - reviewedCount}</p>
                         <p className="text-xs text-muted-foreground">Remaining</p>
                       </div>
                     </div>
