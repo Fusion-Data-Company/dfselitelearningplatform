@@ -79,10 +79,19 @@ export default function Dashboard() {
     <div className="min-h-screen relative overflow-hidden">
       {/* Futuristic Tech Background */}
       <div 
-        className="fixed inset-0 bg-cover bg-center bg-no-repeat z-0"
+        className="fixed inset-0 z-0"
         style={{ 
-          backgroundImage: `url(/dashboard-bg.jpg)`
-        }}
+          backgroundImage: `url(/dashboard-bg.jpg)`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center center',
+          backgroundRepeat: 'no-repeat',
+          imageRendering: 'crisp-edges',
+          WebkitBackfaceVisibility: 'hidden',
+          WebkitPerspective: 1000,
+          WebkitTransform: 'translate3d(0,0,0)',
+          filter: 'none',
+          backfaceVisibility: 'hidden'
+        } as React.CSSProperties}
       />
       
       <Navigation />
