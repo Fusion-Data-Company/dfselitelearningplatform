@@ -122,10 +122,21 @@ export default function InstructorPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen education-bg">
+      <div className="min-h-screen relative overflow-hidden">
+        {/* Futuristic Tech Background */}
+        <div 
+          className="fixed inset-0 z-0"
+          style={{ 
+            backgroundImage: `url(/instructor-bg.jpg)`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center center',
+            backgroundRepeat: 'no-repeat'
+          }}
+        />
+        
         <Navigation />
         <Sidebar />
-        <main className="ml-96 pt-16 min-h-screen">
+        <main className="ml-96 pt-16 min-h-screen relative z-10">
           <div className="p-8">
             <div className="max-w-6xl mx-auto">
               <div className="space-y-6">
@@ -140,11 +151,22 @@ export default function InstructorPage() {
   }
 
   return (
-    <div className="min-h-screen education-bg">
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Futuristic Tech Background */}
+      <div 
+        className="fixed inset-0 z-0"
+        style={{ 
+          backgroundImage: `url(/instructor-bg.jpg)`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      />
+      
       <Navigation />
       <Sidebar />
       
-      <main className="ml-96 pt-16 min-h-screen">
+      <main className="ml-96 pt-16 min-h-screen relative z-10">
         <div className="p-8">
           <div className="max-w-6xl mx-auto">
             {/* Instructor Portal Header */}
