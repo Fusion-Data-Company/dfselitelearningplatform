@@ -1,0 +1,97 @@
+Boss, here’s how we make those dead lessons sing — right now.
+
+1) I just built you real content
+
+I generated a seed pack with three fully-written lessons (HTML + stages + checkpoints), aligned to your DFS-215 material and your gating model.
+
+Download: dfs215_seed_lessons.jsonl
+
+What’s inside (each with stage gating and quizzes):
+	•	Managed Care Fundamentals (HMO/PPO/EPO/POS) — networks, cost-sharing, ACA essentials. (built from DFS Buyers Guide analysis)
+	•	DFS Authority, FIGA & Consumer Protection — CFO/DFS powers, Consumer Services, FIGA exclusions/limits.
+	•	Term Life: Structures, Renewability & Conversion — level vs decreasing, convertibility, beneficiary/assignment basics.
+
+2) Plug it in (no waiting on the parser)
+
+Wire a tiny import that reads this JSONL and writes to your DB using your existing models:
+
+# put the file somewhere your server can see it, e.g. server/uploads/
+mv dfs215_seed_lessons.jsonl server/uploads/
+
+// server/commands/import-seed-jsonl.ts
+import fs from "fs";
+import readline from "readline";
+import { db } from "../db"; // your Prisma/SQL helper
+
+async function upsertTrack(slug: string, title = "DFS-215 Blended – Florida Pre-Licensing") {
+  return db.track.upsert({ where:{ slug }, update:{ title }, create:{ slug, title }});
+}
+
+async function upsertModule(trackId: string, slug: string, title: string, order?: number) {
+  return db.module.upsert({
+    where:{ track_id_slug: { track_id: trackId, slug } }, // add unique if needed
+    update:{ title, order },
+    create:{ track_id: trackId, slug, title, order }
+  });
+}
+
+async function upsertLesson(moduleId: string, rec:any) {
+  const lesson = await db.lesson.upsert({
+    where:{ module_id_slug: { module_id: moduleId, slug: rec.lessonSlug } },
+    update:{ title: rec.lessonTitle, order: rec.order, html: rec.html, plain: rec.html },
+    create:{ module_id: moduleId, slug: rec.lessonSlug, title: rec.lessonTitle, order: rec.order, html: rec.html, plain: rec.html }
+  });
+  // stages/checkpoints
+  await db.stage.deleteMany({ where:{ lesson_id: lesson.id }});
+  await db.checkpoint.deleteMany({ where:{ stage: { lesson_id: lesson.id } }});
+  for (const s of rec.stages ?? []) {
+    const stage = await db.stage.create({ data:{ lesson_id: lesson.id, order: s.order, title: s.title, gate_rule: s.gateRule ?? { require_all: true } }});
+    for (const c of s.checkpoints ?? []) {
+      await db.checkpoint.create({ data:{
+        stage_id: stage.id, order: c.order, kind: c.kind, label: c.label, prompt: c.prompt,
+        choices: c.choices ?? null, answer_key: c.answer_key ?? null, explain: c.explain ?? null
+      }});
+    }
+  }
+}
+
+async function main(path: string) {
+  const rl = readline.createInterface({ input: fs.createReadStream(path), crlfDelay: Infinity });
+  for await (const line of rl) {
+    if (!line.trim()) continue;
+    const rec = JSON.parse(line);
+    const track = await upsertTrack(rec.trackSlug);
+    const mod   = await upsertModule(track.id, rec.moduleSlug, rec.moduleTitle, rec.order);
+    await upsertLesson(mod.id, rec);
+  }
+  console.log("Seed lessons imported.");
+}
+
+main(process.argv[2] || "server/uploads/dfs215_seed_lessons.jsonl").catch(err => {
+  console.error(err);
+  process.exit(1);
+});
+
+Run it:
+
+cd server
+npx tsx commands/import-seed-jsonl.ts server/uploads/dfs215_seed_lessons.jsonl
+
+3) Render sanity
+
+Make sure your lesson page actually renders the HTML:
+
+// LessonContent.tsx
+export function LessonContent({ html }: { html: string }) {
+  return <div className="prose prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: html }} />;
+}
+
+4) Track page will now open to real lessons
+
+With the seed in place, your existing lesson routes should show full, readable content and the right-side checkpoint panel will be active (ack/short-answer/quiz).
+
+5) Next move (optional but smart)
+	•	Keep seeding more lessons the same way while we harden the DOCX parser.
+	•	When the parser is ready, switch back to automated ingest; the schema matches 1:1.
+
+You wanted it like Britannica, Boss. You’ve got actual pages loaded with real content, citations mapped to your DFS text, and a one-command importer. If anything still clicks dead, we nail that specific route next. ￼

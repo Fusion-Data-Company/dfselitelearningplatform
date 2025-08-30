@@ -212,6 +212,132 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Enhanced DFS-215 lesson endpoint with structured stages and checkpoints
+  app.get('/api/lessons/enhanced/:slug', async (req, res) => {
+    try {
+      const lesson = await storage.getLessonBySlug(req.params.slug);
+      if (!lesson) {
+        return res.status(404).json({ message: 'Lesson not found' });
+      }
+
+      // Check if lesson is published
+      if (!lesson.published || lesson.visibility !== 'public') {
+        return res.status(404).json({ message: 'Lesson not found' });
+      }
+
+      // Import enhanced storage service
+      const { enhancedStorage } = await import('./services/enhanced-storage');
+      
+      // Get lesson overview with DFS-215 structure
+      const userId = 'guest'; // Use guest user for now
+      const lessonOverview = await enhancedStorage.getLessonOverview(lesson.id, userId);
+
+      // Get module and track information
+      const module = await storage.getModule(lesson.moduleId!);
+      if (!module) {
+        return res.status(500).json({ message: 'Module not found for lesson' });
+      }
+
+      const track = await storage.getTrack(module.trackId!);
+      if (!track) {
+        return res.status(500).json({ message: 'Track not found for lesson' });
+      }
+
+      // Calculate estimated minutes based on stages and checkpoints
+      const totalCheckpoints = lessonOverview.stages.reduce((sum, stage) => sum + stage.checkpoints.length, 0);
+      const contentLength = lesson.content?.length || 0;
+      const baseMinutes = Math.max(5, Math.ceil(contentLength / 1000));
+      const checkpointMinutes = totalCheckpoints * 3; // ~3 minutes per DFS-215 checkpoint
+      const estMinutes = baseMinutes + checkpointMinutes;
+
+      // Build CE metadata
+      const ce = lesson.ceHours && lesson.ceHours > 0 ? {
+        hours: lesson.ceHours,
+        seatTimeMin: lesson.ceHours * 60
+      } : undefined;
+
+      // Build enhanced lesson response
+      const enhancedLessonDTO = {
+        id: lesson.id,
+        slug: lesson.slug,
+        title: lesson.title,
+        track: track.title,
+        module: module.title,
+        order: lesson.orderIndex,
+        content: lesson.content || '',
+        description: lesson.description || '',
+        stages: lessonOverview.stages.map(stage => ({
+          id: stage.id,
+          title: stage.title,
+          order: stage.order,
+          gateRule: stage.gateRule,
+          canAccess: stage.canAccess,
+          checkpoints: stage.checkpoints.map(cp => ({
+            id: cp.id,
+            order: cp.order,
+            kind: cp.kind,
+            label: cp.label,
+            prompt: cp.prompt,
+            choices: cp.choices,
+            answerKey: cp.answerKey,
+            explain: cp.explain,
+            tags: cp.tags || []
+          })),
+          userProgress: stage.userProgress || []
+        })),
+        estMinutes,
+        published: lesson.published,
+        ce,
+        overallProgress: lessonOverview.overallProgress,
+        hasDFS215Structure: lessonOverview.stages.length > 0
+      };
+
+      res.json(enhancedLessonDTO);
+    } catch (error) {
+      console.error("Error fetching enhanced lesson:", error);
+      res.status(500).json({ message: "Failed to fetch enhanced lesson" });
+    }
+  });
+
+  // Enhanced checkpoint progress endpoint
+  app.post('/api/lessons/:id/enhanced-progress', async (req: any, res) => {
+    try {
+      const userId = 'guest'; // Use guest user for now
+      const { checkpointId, status, score, attempt } = req.body;
+      
+      const { enhancedStorage } = await import('./services/enhanced-storage');
+      
+      const progress = await enhancedStorage.updateUserProgress(userId, checkpointId, {
+        lessonId: req.params.id,
+        status,
+        score,
+        attempt
+      });
+      
+      res.json({ success: true, progress });
+    } catch (error) {
+      console.error("Error updating enhanced progress:", error);
+      res.status(500).json({ message: "Failed to update enhanced progress" });
+    }
+  });
+
+  // Grade quiz checkpoint endpoint
+  app.post('/api/lessons/:id/grade-quiz', async (req: any, res) => {
+    try {
+      const userId = 'guest'; // Use guest user for now
+      const { checkpointId, userAnswers } = req.body;
+      
+      const { enhancedStorage } = await import('./services/enhanced-storage');
+      
+      const result = await enhancedStorage.gradeQuizCheckpoint(userId, checkpointId, userAnswers);
+      
+      res.json(result);
+    } catch (error) {
+      console.error("Error grading quiz:", error);
+      res.status(500).json({ message: "Failed to grade quiz" });
+    }
+  });
+
   app.post('/api/lessons/:id/progress', async (req: any, res) => {
     try {
       const userId = 'guest'; // Use guest user for now

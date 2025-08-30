@@ -276,6 +276,60 @@ export const videoAttendance = pgTable("video_attendance", {
   duration: integer("duration"), // in seconds
 });
 
+// Enhanced DFS-215 Structure - Production-Ready Checkpoint System
+
+// Enums for enhanced schema
+export const enhancedCheckpointKindEnum = pgEnum("enhanced_checkpoint_kind", ["ack", "task", "quiz", "short_answer"]);
+export const enhancedProgressStatusEnum = pgEnum("enhanced_progress_status", ["pending", "passed", "failed"]);
+
+// Stages - Structured learning blocks within lessons (compatible with existing schema)
+export const stages = pgTable("stages", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  lessonId: varchar("lesson_id").references(() => lessons.id, { onDelete: "cascade" }).notNull(),
+  order: integer("order").notNull(),
+  title: text("title"),
+  gateRule: jsonb("gate_rule").notNull().default(sql`'{"require_all": true}'::jsonb`),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  lessonOrderUnique: uniqueIndex("idx_stage_lesson_order_unique").on(table.lessonId, table.order),
+  orderIndex: index("idx_stage_lesson_order").on(table.lessonId, table.order),
+}));
+
+// Checkpoints - Individual learning tasks/assessments within stages
+export const checkpoints = pgTable("checkpoints", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  stageId: varchar("stage_id").references(() => stages.id, { onDelete: "cascade" }).notNull(),
+  order: integer("order").notNull(),
+  kind: enhancedCheckpointKindEnum("kind").notNull(),
+  label: text("label"), // [Identify], [Define], [Contrast], etc.
+  prompt: text("prompt"),
+  choices: jsonb("choices"), // For quiz: [{id, text, correct}]
+  answerKey: jsonb("answer_key"),
+  explain: text("explain"),
+  tags: text("tags").array().default(sql`'{}'::text[]`),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  stageOrderUnique: uniqueIndex("idx_checkpoint_stage_order_unique").on(table.stageId, table.order),
+  orderIndex: index("idx_checkpoint_stage_order").on(table.stageId, table.order),
+}));
+
+// Enhanced User Progress - Comprehensive progress tracking for checkpoints
+export const enhancedUserProgress = pgTable("enhanced_user_progress", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull(),
+  lessonId: varchar("lesson_id").references(() => lessons.id, { onDelete: "cascade" }).notNull(),
+  stageId: varchar("stage_id").references(() => stages.id, { onDelete: "cascade" }),
+  checkpointId: varchar("checkpoint_id").references(() => checkpoints.id, { onDelete: "cascade" }),
+  status: enhancedProgressStatusEnum("status").notNull().default("pending"),
+  score: real("score"),
+  attempt: jsonb("attempt"),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  userCheckpointUnique: uniqueIndex("idx_enhanced_progress_user_checkpoint").on(table.userId, table.checkpointId),
+  userLessonIndex: index("idx_enhanced_progress_user_lesson").on(table.userId, table.lessonId),
+}));
+
 // Type exports
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -297,6 +351,11 @@ export type AgentLog = typeof agentLogs.$inferSelect;
 export type CERecord = typeof ceRecords.$inferSelect;
 export type VideoAttendance = typeof videoAttendance.$inferSelect;
 
+// Enhanced DFS-215 types
+export type Stage = typeof stages.$inferSelect;
+export type Checkpoint = typeof checkpoints.$inferSelect;
+export type EnhancedUserProgress = typeof enhancedUserProgress.$inferSelect;
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertTrackSchema = createInsertSchema(tracks).omit({ id: true, createdAt: true });
@@ -311,6 +370,11 @@ export const insertQuizAttemptSchema = createInsertSchema(quizAttempts).omit({ i
 export const insertFlashcardSchema = createInsertSchema(flashcards).omit({ id: true, createdAt: true });
 export const insertAgentProfileSchema = createInsertSchema(agentProfiles).omit({ updatedAt: true });
 
+// Enhanced DFS-215 insert schemas
+export const insertStageSchema = createInsertSchema(stages).omit({ id: true, createdAt: true });
+export const insertCheckpointSchema = createInsertSchema(checkpoints).omit({ id: true, createdAt: true });
+export const insertEnhancedUserProgressSchema = createInsertSchema(enhancedUserProgress).omit({ id: true, createdAt: true, updatedAt: true });
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type InsertTrack = z.infer<typeof insertTrackSchema>;
 export type InsertModule = z.infer<typeof insertModuleSchema>;
@@ -323,3 +387,8 @@ export type InsertQuestion = z.infer<typeof insertQuestionSchema>;
 export type InsertQuizAttempt = z.infer<typeof insertQuizAttemptSchema>;
 export type InsertFlashcard = z.infer<typeof insertFlashcardSchema>;
 export type InsertAgentProfile = z.infer<typeof insertAgentProfileSchema>;
+
+// Enhanced DFS-215 insert types
+export type InsertStage = z.infer<typeof insertStageSchema>;
+export type InsertCheckpoint = z.infer<typeof insertCheckpointSchema>;
+export type InsertEnhancedUserProgress = z.infer<typeof insertEnhancedUserProgressSchema>;

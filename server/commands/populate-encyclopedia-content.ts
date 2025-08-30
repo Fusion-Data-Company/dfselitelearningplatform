@@ -2,6 +2,7 @@
 
 import { encyclopediaGenerator } from '../services/encyclopedia-content-generator';
 import { enhancedDFS215Generator } from '../services/enhanced-dfs215-generator';
+import { schemaMigration } from '../services/schema-migration';
 import { storage } from '../storage';
 
 async function main() {
@@ -43,6 +44,33 @@ async function main() {
         }
         console.log(`🏛️ Enhancing track with DFS-215 framework: ${enhanceTrackTitle}`);
         await enhancedDFS215Generator.enhanceSpecificTrack(enhanceTrackTitle);
+        break;
+        
+      case 'migrate-schema':
+        console.log('🔄 Migrating to enhanced DFS-215 schema...');
+        await schemaMigration.migrateToEnhancedSchema();
+        break;
+        
+      case 'validate-migration':
+        console.log('🔍 Validating schema migration...');
+        const isValid = await schemaMigration.validateMigration();
+        if (isValid) {
+          console.log('✅ Migration validation passed');
+        } else {
+          console.log('❌ Migration validation failed');
+          process.exit(1);
+        }
+        break;
+        
+      case 'populate-stages':
+        console.log('🏗️ Populating sample DFS-215 structured content...');
+        const { sampleDFS215Content } = await import('../services/sample-dfs215-content');
+        const candidates = await sampleDFS215Content.findLessonsForEnhancement();
+        if (candidates.length > 0) {
+          await sampleDFS215Content.populateMultipleLessons(candidates.slice(0, 5)); // Process first 5
+        } else {
+          console.log('No lessons found that need DFS-215 structure enhancement');
+        }
         break;
         
       case 'regenerate-track':
@@ -90,6 +118,9 @@ async function main() {
         console.log('  generate-track <name>  - Generate content for specific track');
         console.log('  enhance-dfs215         - 🏛️ Enhance ALL with DFS-215 structured framework');
         console.log('  enhance-track <name>   - 🏛️ Enhance specific track with DFS-215 structure');
+        console.log('  migrate-schema         - 🔄 Migrate to enhanced DFS-215 schema structure');
+        console.log('  validate-migration     - 🔍 Validate schema migration integrity');
+        console.log('  populate-stages        - 🏗️ Populate lessons with DFS-215 structured stages');
         console.log('  regenerate-track <id>  - Regenerate content for specific track');
         console.log('  list-tracks           - List all available tracks');
         console.log('  check-content         - Check existing content status');
@@ -97,6 +128,8 @@ async function main() {
         console.log('Examples:');
         console.log('  npm run populate-content generate-all');
         console.log('  npm run populate-content enhance-dfs215');
+        console.log('  npm run populate-content migrate-schema');
+        console.log('  npm run populate-content populate-stages');
         console.log('  npm run populate-content enhance-track "Law & Ethics"');
         console.log('  npm run populate-content check-content');
         break;
