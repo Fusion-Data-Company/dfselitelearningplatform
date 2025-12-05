@@ -1,0 +1,73 @@
+name: Neon Database Branch Management
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, closed]
+
+env:
+  NEON_PROJECT_ID: ${{ vars.NEON_PROJECT_ID }}
+
+jobs:
+  create-branch:
+    if: github.event.action != 'closed'
+    runs-on: ubuntu-latest
+    outputs:
+      db_url: ${{ steps.create-branch.outputs.db_url }}
+      branch_id: ${{ steps.create-branch.outputs.branch_id }}
+    steps:
+      - name: Create Neon Branch
+        id: create-branch
+        uses: neondatabase/create-branch-action@v5
+        with:
+          project_id: ${{ env.NEON_PROJECT_ID }}
+          branch_name: pr-${{ github.event.pull_request.number }}
+          api_key: ${{ secrets.NEON_API_KEY }}
+
+      - name: Comment on PR with branch info
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const branchUrl = `https://console.neon.tech/app/projects/${{ env.NEON_PROJECT_ID }}/branches/${{ steps.create-branch.outputs.branch_id }}`;
+            const body = `## 🗄️ Neon Database Branch Created
+
+            A preview database branch has been created for this PR.
+
+            **Branch Name:** \`pr-${{ github.event.pull_request.number }}\`
+            **Branch ID:** \`${{ steps.create-branch.outputs.branch_id }}\`
+
+            [View in Neon Console](${branchUrl})
+
+            This branch will be automatically deleted when the PR is closed.`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+  delete-branch:
+    if: github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete Neon Branch
+        uses: neondatabase/delete-branch-action@v3
+        with:
+          project_id: ${{ env.NEON_PROJECT_ID }}
+          branch: pr-${{ github.event.pull_request.number }}
+          api_key: ${{ secrets.NEON_API_KEY }}
+
+      - name: Comment on PR about branch deletion
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = `## 🗑️ Neon Database Branch Deleted
+
+            The preview database branch \`pr-${{ github.event.pull_request.number }}\` has been deleted.`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });

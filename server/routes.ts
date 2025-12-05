@@ -8,6 +8,7 @@ import { iflashService } from "./services/iflash";
 import { examService } from "./services/exam";
 import { contentService } from "./services/content";
 import { voiceQAService } from "./services/voice-qa";
+import { importService, DFS_DOCUMENTS } from "./services/import/import-service";
 import { z } from "zod";
 import { checkpointsService } from "./services/lessons/checkpoints.service";
 import { progressService } from "./services/lessons/progress.service";
@@ -707,6 +708,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin routes (basic)
+
+  // DFS-215 Content Import - Import all 5 compliance documents
+  app.get('/api/admin/import/status', async (_req: any, res: any) => {
+    try {
+      const { found, missing } = await importService.findAllDFSDocuments();
+      res.json({
+        documentsAvailable: DFS_DOCUMENTS.length,
+        documentsFound: found.length,
+        documentsMissing: missing.length,
+        found: found.map(d => ({ id: d.id, title: d.title, pages: d.pages })),
+        missing: missing.map(d => ({ id: d.id, filename: d.filename })),
+        ready: found.length === DFS_DOCUMENTS.length
+      });
+    } catch (error) {
+      console.error("Error checking import status:", error);
+      res.status(500).json({ message: "Failed to check import status" });
+    }
+  });
+
+  app.post('/api/admin/import/all', async (_req: any, res: any) => {
+    try {
+      console.log('Starting full DFS-215 content import...');
+      const result = await importService.importAllDFSDocuments();
+      res.json({
+        success: result.errors.length === 0,
+        ...result
+      });
+    } catch (error) {
+      console.error("Error during import:", error);
+      res.status(500).json({
+        success: false,
+        message: "Import failed",
+        error: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
+  app.post('/api/admin/import/clear', async (_req: any, res: any) => {
+    try {
+      console.log('Clearing all content...');
+      await importService.clearAllContent();
+      res.json({ success: true, message: "All content cleared" });
+    } catch (error) {
+      console.error("Error clearing content:", error);
+      res.status(500).json({
+        success: false,
+        message: "Failed to clear content",
+        error: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
   app.get('/api/admin/agents', async (req: any, res) => {
     try {
       // Allow all access for now (no auth)

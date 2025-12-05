@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as fs from 'fs/promises';
 import { fileURLToPath } from 'url';
-import { DocxParser } from './docx-parse';
+import { DocxParser, ParsedNode } from './docx-parse';
 import { OutlineMapper } from './outline-map';
 import { ChunkEmbedder } from './chunk-embed';
 import { QuestionExtractor } from './question-extract';
@@ -21,9 +21,58 @@ export interface ImportResult {
   banks: number;
   questions: number;
   exams: number;
+  flashcards: number;
   version: string;
   errors: string[];
+  documentsProcessed: string[];
 }
+
+// Document metadata for the 5 DFS-215 compliance documents
+export interface DFSDocument {
+  id: string;
+  filename: string;
+  title: string;
+  pages: number;
+  focus: string;
+}
+
+export const DFS_DOCUMENTS: DFSDocument[] = [
+  {
+    id: 'S1',
+    filename: '240 (S1) iLaw - Correspondence - 2026.docx',
+    title: 'Insurance Law & Regulations',
+    pages: 135,
+    focus: 'Insurance Law, DFS Authority, Licensing, Regulations'
+  },
+  {
+    id: 'S2',
+    filename: '240.(S2) Social Insurances - Correspondence - 2026.docx',
+    title: 'Social Insurances',
+    pages: 79,
+    focus: 'OASDI, Medicare, Medicaid, Long-Term Care'
+  },
+  {
+    id: 'S3',
+    filename: '240.(S3) Medical Expense - Correspondence - 2026.docx',
+    title: 'Medical Expense Insurance',
+    pages: 121,
+    focus: 'Basic & Major Medical, Healthcare Networks'
+  },
+  {
+    id: 'S4',
+    filename: '240.(S4) Disability Dismemberment - Correspondence - 2026.docx',
+    title: 'Disability & Dismemberment',
+    pages: 48,
+    focus: 'Disability Income, AD&D, Risk Classifications'
+  },
+  {
+    id: 'S5',
+    filename: '240.(S5) Replacement Groups - Correspondence - 2026.docx',
+    title: 'Replacement & Groups',
+    pages: 22,
+    focus: 'Group Insurance, Policy Replacement, COBRA'
+  }
+];
 
 export class DFS215ImportService {
   private parser: DocxParser;
@@ -49,8 +98,10 @@ export class DFS215ImportService {
       banks: 0,
       questions: 0,
       exams: 0,
+      flashcards: 0,
       version: `v1.0-dfs-215-${new Date().toISOString().split('T')[0]}`,
-      errors: []
+      errors: [],
+      documentsProcessed: []
     };
     
     try {
@@ -94,7 +145,7 @@ export class DFS215ImportService {
       
       // Phase 4: Create lesson checkpoints
       console.log('\nPhase 4: Creating lesson checkpoints...');
-      const allLessons = await storage.getLessons();
+      const allLessons = await storage.getAllLessons();
       let checkpointsCreated = 0;
       
       for (const lesson of allLessons) {
@@ -136,7 +187,7 @@ export class DFS215ImportService {
       }
       
       // Build mini exams for each topic
-      for (const [topicId] of banks.entries()) {
+      for (const [topicId] of Array.from(banks.entries())) {
         if (banks.get(topicId)!.length >= 5) {
           try {
             const miniExam = await this.examBuilder.createMiniExam(topicId, 10);
@@ -219,7 +270,7 @@ export class DFS215ImportService {
     try {
       const attachedDir = path.resolve(__dirname, '../../../attached_assets');
       const files = await fs.readdir(attachedDir);
-      const docxFile = files.find(f => f.endsWith('.docx') && f.includes('215'));
+      const docxFile = files.find((f: string) => f.endsWith('.docx') && f.includes('215'));
       if (docxFile) {
         const fullPath = path.join(attachedDir, docxFile);
         console.log(`Found DOCX at: ${fullPath}`);
@@ -298,7 +349,7 @@ export class DFS215ImportService {
   
   async clearAllContent(): Promise<void> {
     console.log('Clearing all existing content...');
-    
+
     // Clear in reverse order of dependencies
     await storage.clearAllFlashcards();
     await storage.clearAllQuestions();
@@ -308,8 +359,377 @@ export class DFS215ImportService {
     await storage.clearAllLessons();
     await storage.clearAllModules();
     await storage.clearAllTracks();
-    
+
     console.log('All content cleared successfully');
+  }
+
+  /**
+   * Import all 5 DFS-215 compliance documents
+   * This is the main entry point for full content integration
+   */
+  async importAllDFSDocuments(): Promise<ImportResult> {
+    const result: ImportResult = {
+      tracks: 0,
+      modules: 0,
+      lessons: 0,
+      chunks: 0,
+      banks: 0,
+      questions: 0,
+      exams: 0,
+      flashcards: 0,
+      version: `v2.0-dfs-215-full-${new Date().toISOString().split('T')[0]}`,
+      errors: [],
+      documentsProcessed: []
+    };
+
+    console.log('='.repeat(70));
+    console.log('DFS-215 FULL CONTENT INTEGRATION - ALL 5 DOCUMENTS');
+    console.log('='.repeat(70));
+    console.log(`Version: ${result.version}`);
+    console.log('');
+
+    // Find all DFS documents
+    const attachedDir = path.resolve(__dirname, '../../../attached_assets');
+    const foundDocs: { doc: DFSDocument; path: string }[] = [];
+
+    for (const doc of DFS_DOCUMENTS) {
+      const docPath = path.join(attachedDir, doc.filename);
+      try {
+        await fs.access(docPath);
+        foundDocs.push({ doc, path: docPath });
+        console.log(`✓ Found ${doc.id}: ${doc.title}`);
+      } catch {
+        console.log(`✗ Missing ${doc.id}: ${doc.filename}`);
+        result.errors.push(`Missing document: ${doc.filename}`);
+      }
+    }
+
+    console.log(`\nFound ${foundDocs.length} of ${DFS_DOCUMENTS.length} documents\n`);
+
+    if (foundDocs.length === 0) {
+      result.errors.push('No DFS documents found in attached_assets folder');
+      return result;
+    }
+
+    // Collect all nodes from all documents
+    const allNodes: ParsedNode[] = [];
+    const allFlashcardNodes: ParsedNode[] = [];
+
+    for (const { doc, path: docPath } of foundDocs) {
+      console.log(`\n${'─'.repeat(60)}`);
+      console.log(`Processing ${doc.id}: ${doc.title}`);
+      console.log(`${'─'.repeat(60)}`);
+      console.log(`  File: ${doc.filename}`);
+      console.log(`  Expected pages: ${doc.pages}`);
+      console.log(`  Focus: ${doc.focus}`);
+
+      try {
+        const nodes = await this.parser.parseToNodes(docPath);
+        console.log(`  ✓ Parsed ${nodes.length} nodes`);
+
+        // Tag nodes with document source
+        const taggedNodes = nodes.map(node => ({
+          ...node,
+          metadata: {
+            ...node.metadata,
+            documentId: doc.id,
+            documentTitle: doc.title
+          }
+        }));
+
+        allNodes.push(...taggedNodes);
+        allFlashcardNodes.push(...taggedNodes);
+        result.documentsProcessed.push(doc.id);
+      } catch (error) {
+        console.error(`  ✗ Failed to parse: ${error}`);
+        result.errors.push(`Failed to parse ${doc.id}: ${error}`);
+      }
+    }
+
+    console.log(`\n${'='.repeat(60)}`);
+    console.log(`Total nodes collected: ${allNodes.length}`);
+    console.log(`${'='.repeat(60)}\n`);
+
+    // Phase 2: Map all content to LMS structure
+    console.log('Phase 2: Mapping to LMS structure...');
+    try {
+      const structure = await this.mapper.mapToLMSStructure(allNodes);
+      const saveResult = await this.mapper.saveStructure(structure);
+      result.tracks = saveResult.tracks;
+      result.modules = saveResult.modules;
+      result.lessons = saveResult.lessons;
+      console.log(`  ✓ Created ${result.tracks} tracks, ${result.modules} modules, ${result.lessons} lessons`);
+    } catch (error) {
+      console.error(`  ✗ Mapping failed: ${error}`);
+      result.errors.push(`Mapping failed: ${error}`);
+    }
+
+    // Phase 3: Create lesson checkpoints
+    console.log('\nPhase 3: Creating lesson checkpoints...');
+    try {
+      const allLessons = await storage.getAllLessons();
+      let checkpointsCreated = 0;
+
+      for (const lesson of allLessons) {
+        try {
+          await checkpointsService.buildFromLesson(lesson.id, lesson.content);
+          await microquizService.processLessonMicroquiz(lesson.id);
+          checkpointsCreated++;
+        } catch (error) {
+          // Silent fail for individual lessons
+        }
+      }
+      console.log(`  ✓ Created checkpoints for ${checkpointsCreated} lessons`);
+    } catch (error) {
+      console.error(`  ✗ Checkpoint creation failed: ${error}`);
+      result.errors.push(`Checkpoint creation failed: ${error}`);
+    }
+
+    // Phase 4: Extract questions
+    console.log('\nPhase 4: Extracting questions from assessments...');
+    try {
+      const { banks } = await this.questionExtractor.extractQuestions(allNodes);
+      const bankSaveResult = await this.questionExtractor.saveQuestionBanks(banks);
+      result.banks = bankSaveResult.banksCreated;
+      result.questions = bankSaveResult.questionsCreated;
+      console.log(`  ✓ Created ${result.banks} question banks with ${result.questions} questions`);
+    } catch (error) {
+      console.error(`  ✗ Question extraction failed: ${error}`);
+      result.errors.push(`Question extraction failed: ${error}`);
+    }
+
+    // Phase 5: Build exam configurations
+    console.log('\nPhase 5: Building exam configurations...');
+    try {
+      const mainExam = await this.examBuilder.buildExamForm();
+      if (mainExam.questionIds.length > 0) {
+        await this.examBuilder.saveExamConfig(mainExam.config, mainExam.questionIds);
+        result.exams++;
+        console.log(`  ✓ Created main exam: ${mainExam.config.title}`);
+      }
+    } catch (error) {
+      console.error(`  ✗ Exam building failed: ${error}`);
+      result.errors.push(`Exam building failed: ${error}`);
+    }
+
+    // Phase 6: Generate flashcards with enhanced extraction
+    console.log('\nPhase 6: Generating flashcards...');
+    try {
+      const flashcardCount = await this.generateEnhancedFlashcards(allFlashcardNodes);
+      result.flashcards = flashcardCount;
+      console.log(`  ✓ Generated ${flashcardCount} flashcards`);
+    } catch (error) {
+      console.error(`  ✗ Flashcard generation failed: ${error}`);
+      result.errors.push(`Flashcard generation failed: ${error}`);
+    }
+
+    // Final Summary
+    console.log('\n' + '='.repeat(70));
+    console.log('DFS-215 FULL IMPORT COMPLETED');
+    console.log('='.repeat(70));
+    console.log('Summary:');
+    console.log(`  • Documents Processed: ${result.documentsProcessed.join(', ')}`);
+    console.log(`  • Tracks: ${result.tracks}`);
+    console.log(`  • Modules: ${result.modules}`);
+    console.log(`  • Lessons: ${result.lessons}`);
+    console.log(`  • Question Banks: ${result.banks}`);
+    console.log(`  • Questions: ${result.questions}`);
+    console.log(`  • Exams: ${result.exams}`);
+    console.log(`  • Flashcards: ${result.flashcards}`);
+    console.log(`  • Errors: ${result.errors.length}`);
+    console.log(`  • Version: ${result.version}`);
+    console.log('');
+
+    if (result.errors.length > 0) {
+      console.log('Errors encountered:');
+      result.errors.forEach((err, i) => console.log(`  ${i + 1}. ${err}`));
+    }
+
+    console.log('\n✅ Content import complete! Visit the application to see the results.\n');
+
+    return result;
+  }
+
+  /**
+   * Helper to extract all regex matches as an array
+   */
+  private getAllMatches(content: string, pattern: RegExp): RegExpExecArray[] {
+    const matches: RegExpExecArray[] = [];
+    let match: RegExpExecArray | null;
+    const regex = new RegExp(pattern.source, pattern.flags);
+    while ((match = regex.exec(content)) !== null) {
+      matches.push(match);
+    }
+    return matches;
+  }
+
+  /**
+   * Enhanced flashcard generation with DFS-specific markers
+   * Extracts: [ Define ], [ Identify ], [ Contrast ], [ Note ], iFlash4u
+   */
+  private async generateEnhancedFlashcards(nodes: ParsedNode[]): Promise<number> {
+    const flashcards: Array<{
+      type: 'term' | 'mcq';
+      front: string;
+      back: string;
+      prompt?: string;
+      options?: string[];
+      answerIndex?: number;
+      rationale?: string;
+      sourceId?: string;
+      tags: string[];
+    }> = [];
+
+    for (const node of nodes) {
+      if (node.type !== 'content') continue;
+
+      const content = node.content || node.text || '';
+      // Access metadata with type assertion for extended properties
+      const metadata = node.metadata as { documentId?: string; documentTitle?: string } | undefined;
+      const docId = metadata?.documentId || 'unknown';
+
+      // Pattern 1: [ Define ] markers
+      const defineMatches = this.getAllMatches(content, /\[\s*Define\s*\]\s*([^[\]]+?)(?:\s*[-–:]\s*|\n)([^[\]]+?)(?=\[|$)/gi);
+      for (const match of defineMatches) {
+        const term = match[1]?.trim() || '';
+        const definition = match[2]?.trim() || '';
+        if (term.length > 3 && definition.length > 10) {
+          flashcards.push({
+            type: 'term',
+            front: `Define: ${term}`,
+            back: definition,
+            sourceId: docId,
+            tags: ['define', ...this.extractTags(term + ' ' + definition)]
+          });
+        }
+      }
+
+      // Pattern 2: [ Identify ] markers
+      const identifyMatches = this.getAllMatches(content, /\[\s*Identify\s*\]\s*([^[\]]+?)(?:\s*[-–:]\s*|\n)([^[\]]+?)(?=\[|$)/gi);
+      for (const match of identifyMatches) {
+        const concept = match[1]?.trim() || '';
+        const explanation = match[2]?.trim() || '';
+        if (concept.length > 3 && explanation.length > 10) {
+          flashcards.push({
+            type: 'term',
+            front: `Identify: ${concept}`,
+            back: explanation,
+            sourceId: docId,
+            tags: ['identify', ...this.extractTags(concept + ' ' + explanation)]
+          });
+        }
+      }
+
+      // Pattern 3: [ Contrast ] markers
+      const contrastMatches = this.getAllMatches(content, /\[\s*Contrast\s*\]\s*([^[\]]+?)(?:\s*[-–:]\s*|\n)([^[\]]+?)(?=\[|$)/gi);
+      for (const match of contrastMatches) {
+        const items = match[1]?.trim() || '';
+        const comparison = match[2]?.trim() || '';
+        if (items.length > 3 && comparison.length > 10) {
+          flashcards.push({
+            type: 'term',
+            front: `Contrast: ${items}`,
+            back: comparison,
+            sourceId: docId,
+            tags: ['contrast', ...this.extractTags(items + ' ' + comparison)]
+          });
+        }
+      }
+
+      // Pattern 4: iFlash4u sections (pre-made flashcards)
+      const iflashMatches = this.getAllMatches(content, /iFlash4u[:\s]*([^?]+)\?\s*([^.!?\n]+[.!?]?)/gi);
+      for (const match of iflashMatches) {
+        const question = (match[1]?.trim() || '') + '?';
+        const answer = match[2]?.trim() || '';
+        if (question.length > 5 && answer.length > 5) {
+          flashcards.push({
+            type: 'term',
+            front: question,
+            back: answer,
+            sourceId: docId,
+            tags: ['iflash4u', ...this.extractTags(question + ' ' + answer)]
+          });
+        }
+      }
+
+      // Pattern 5: WHAT/WHO/WHEN question patterns
+      const questionPatterns = [
+        /WHAT\s+is\s+([^?]+)\?\s*([^.!?\n]+[.!?])/gi,
+        /WHO\s+(?:is|are|issues?)\s+([^?]+)\?\s*([^.!?\n]+[.!?])/gi,
+        /WHEN\s+(?:is|are|does?)\s+([^?]+)\?\s*([^.!?\n]+[.!?])/gi
+      ];
+
+      for (const pattern of questionPatterns) {
+        const matches = this.getAllMatches(content, pattern);
+        for (const match of matches) {
+          const question = match[0].split('?')[0] + '?';
+          const answer = match[2]?.trim() || match[0].split('?')[1]?.trim() || '';
+          if (question.length > 10 && answer.length > 5) {
+            flashcards.push({
+              type: 'term',
+              front: question,
+              back: answer,
+              sourceId: docId,
+              tags: this.extractTags(question + ' ' + answer)
+            });
+          }
+        }
+      }
+    }
+
+    // Deduplicate flashcards by front text
+    const uniqueFlashcards = Array.from(
+      new Map(flashcards.map(fc => [fc.front.toLowerCase(), fc])).values()
+    );
+
+    console.log(`    Found ${flashcards.length} potential flashcards, ${uniqueFlashcards.length} unique`);
+
+    // Save flashcards to database (no limit for full import)
+    let savedCount = 0;
+    for (const card of uniqueFlashcards) {
+      try {
+        await storage.createFlashcard({
+          type: card.type,
+          front: card.front,
+          back: card.back,
+          prompt: card.prompt,
+          options: card.options,
+          answerIndex: card.answerIndex,
+          rationale: card.rationale,
+          sourceId: card.sourceId,
+          difficulty: 2.5,
+          interval: 1,
+          nextReview: new Date(),
+          userId: 'system'
+        });
+        savedCount++;
+      } catch (error) {
+        // Ignore individual card errors
+      }
+    }
+
+    return savedCount;
+  }
+
+  /**
+   * Find all 5 DFS documents in attached_assets
+   */
+  async findAllDFSDocuments(): Promise<{ found: DFSDocument[]; missing: DFSDocument[] }> {
+    const attachedDir = path.resolve(__dirname, '../../../attached_assets');
+    const found: DFSDocument[] = [];
+    const missing: DFSDocument[] = [];
+
+    for (const doc of DFS_DOCUMENTS) {
+      const docPath = path.join(attachedDir, doc.filename);
+      try {
+        await fs.access(docPath);
+        found.push(doc);
+      } catch {
+        missing.push(doc);
+      }
+    }
+
+    return { found, missing };
   }
 }
 
