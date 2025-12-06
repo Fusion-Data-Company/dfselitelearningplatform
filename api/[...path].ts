@@ -1,18 +1,93 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import express from 'express';
-import { storage } from '../server/storage';
-import { contentService } from '../server/services/content';
-import { iflashService } from '../server/services/iflash';
-import { examService } from '../server/services/exam';
-import { agentService } from '../server/services/agents';
-import { voiceQAService } from '../server/services/voice-qa';
-import { importService } from '../server/services/import/import-service';
-import { enhancedStorage } from '../server/services/enhanced-storage';
-import { checkpointsService } from '../server/services/lessons/checkpoints.service';
-import { progressService } from '../server/services/lessons/progress.service';
-import { db } from '../server/db';
-import { lessons } from '../shared/schema';
-import { eq } from 'drizzle-orm';
+
+// Debug endpoint that doesn't require any other imports
+const debugApp = express();
+debugApp.use(express.json());
+debugApp.get('/api/debug', (_req, res) => {
+  res.json({ 
+    status: 'ok', 
+    env: {
+      hasDb: !!process.env.DATABASE_URL,
+      hasOpenRouter: !!process.env.OPENROUTER_API_KEY,
+      nodeEnv: process.env.NODE_ENV
+    }
+  });
+});
+
+// Lazy import services to get better error messages
+let storage: any;
+let contentService: any;
+let iflashService: any;
+let examService: any;
+let agentService: any;
+let voiceQAService: any;
+let importService: any;
+let enhancedStorage: any;
+let checkpointsService: any;
+let progressService: any;
+let db: any;
+let lessons: any;
+let eq: any;
+
+let initError: Error | null = null;
+
+try {
+  // @ts-ignore
+  const storageModule = require('../server/storage');
+  storage = storageModule.storage;
+  
+  // @ts-ignore
+  const contentModule = require('../server/services/content');
+  contentService = contentModule.contentService;
+  
+  // @ts-ignore
+  const iflashModule = require('../server/services/iflash');
+  iflashService = iflashModule.iflashService;
+  
+  // @ts-ignore
+  const examModule = require('../server/services/exam');
+  examService = examModule.examService;
+  
+  // @ts-ignore
+  const agentModule = require('../server/services/agents');
+  agentService = agentModule.agentService;
+  
+  // @ts-ignore
+  const voiceModule = require('../server/services/voice-qa');
+  voiceQAService = voiceModule.voiceQAService;
+  
+  // @ts-ignore
+  const importModule = require('../server/services/import/import-service');
+  importService = importModule.importService;
+  
+  // @ts-ignore
+  const enhancedModule = require('../server/services/enhanced-storage');
+  enhancedStorage = enhancedModule.enhancedStorage;
+  
+  // @ts-ignore
+  const checkpointsModule = require('../server/services/lessons/checkpoints.service');
+  checkpointsService = checkpointsModule.checkpointsService;
+  
+  // @ts-ignore
+  const progressModule = require('../server/services/lessons/progress.service');
+  progressService = progressModule.progressService;
+  
+  // @ts-ignore
+  const dbModule = require('../server/db');
+  db = dbModule.db;
+  
+  // @ts-ignore
+  const schemaModule = require('../shared/schema');
+  lessons = schemaModule.lessons;
+  
+  // @ts-ignore
+  const drizzleModule = require('drizzle-orm');
+  eq = drizzleModule.eq;
+} catch (error) {
+  initError = error as Error;
+  console.error('Service initialization failed:', error);
+}
 
 const app = express();
 app.use(express.json());
@@ -30,13 +105,23 @@ app.get('/api/auth/user', (_req, res) => {
 
 // Healthcheck
 app.get('/api/health', async (_req, res) => {
+  // Return any initialization error
+  if (initError) {
+    return res.status(500).json({ 
+      ok: false, 
+      error: 'Service initialization failed',
+      message: initError.message,
+      stack: initError.stack 
+    });
+  }
+  
   try {
     // Light DB touch to confirm connectivity
     await storage.getTracks();
     res.json({ ok: true });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Healthcheck failed:', error);
-    res.status(500).json({ ok: false, error: 'DB unavailable' });
+    res.status(500).json({ ok: false, error: 'DB unavailable', message: error?.message });
   }
 });
 
@@ -682,5 +767,9 @@ app.get('/api/dashboard/stats', async (_req, res) => {
 
 // Handler for Vercel
 export default function handler(req: VercelRequest, res: VercelResponse) {
+  // Try debug endpoint first (doesn't require services)
+  if (req.url?.startsWith('/api/debug')) {
+    return debugApp(req as any, res as any);
+  }
   return app(req as any, res as any);
 }
