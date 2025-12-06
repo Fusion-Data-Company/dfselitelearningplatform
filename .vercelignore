@@ -1,7 +1,7 @@
 # Ignore everything except what we need
 *
-!api/
-!api/index.js
+!functions/
+!functions/api.js
 !dist/
 !dist/public/
 !dist/public/**
