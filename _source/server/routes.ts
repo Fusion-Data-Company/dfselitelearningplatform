@@ -1,7 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-// import { setupAuth, isAuthenticated } from "./replitAuth";
 import { agentService } from "./services/agents";
 import { mcpServer } from "./services/mcp";
 import { iflashService } from "./services/iflash";

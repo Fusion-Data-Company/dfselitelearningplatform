@@ -3,25 +3,14 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist/public",
   "framework": null,
-  "installCommand": "npm install",
   "functions": {
-    "functions/api.js": {
+    "api/index.ts": {
       "maxDuration": 30,
-      "runtime": "nodejs20.x",
       "memory": 1024
     }
   },
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/functions/api.js"
-    },
-    {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "/api" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
