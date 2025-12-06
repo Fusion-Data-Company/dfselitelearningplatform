@@ -15,7 +15,7 @@ debugApp.get('/api/debug', (_req, res) => {
   });
 });
 
-// Lazy import services to get better error messages
+// Dynamic import services for ESM compatibility
 let storage: any;
 let contentService: any;
 let iflashService: any;
@@ -30,67 +30,87 @@ let db: any;
 let lessons: any;
 let eq: any;
 
+let initPromise: Promise<void> | null = null;
 let initError: Error | null = null;
 
-try {
-  // @ts-ignore
-  const storageModule = require('../server/storage');
-  storage = storageModule.storage;
+async function initServices() {
+  if (storage) return; // Already initialized
   
-  // @ts-ignore
-  const contentModule = require('../server/services/content');
-  contentService = contentModule.contentService;
-  
-  // @ts-ignore
-  const iflashModule = require('../server/services/iflash');
-  iflashService = iflashModule.iflashService;
-  
-  // @ts-ignore
-  const examModule = require('../server/services/exam');
-  examService = examModule.examService;
-  
-  // @ts-ignore
-  const agentModule = require('../server/services/agents');
-  agentService = agentModule.agentService;
-  
-  // @ts-ignore
-  const voiceModule = require('../server/services/voice-qa');
-  voiceQAService = voiceModule.voiceQAService;
-  
-  // @ts-ignore
-  const importModule = require('../server/services/import/import-service');
-  importService = importModule.importService;
-  
-  // @ts-ignore
-  const enhancedModule = require('../server/services/enhanced-storage');
-  enhancedStorage = enhancedModule.enhancedStorage;
-  
-  // @ts-ignore
-  const checkpointsModule = require('../server/services/lessons/checkpoints.service');
-  checkpointsService = checkpointsModule.checkpointsService;
-  
-  // @ts-ignore
-  const progressModule = require('../server/services/lessons/progress.service');
-  progressService = progressModule.progressService;
-  
-  // @ts-ignore
-  const dbModule = require('../server/db');
-  db = dbModule.db;
-  
-  // @ts-ignore
-  const schemaModule = require('../shared/schema');
-  lessons = schemaModule.lessons;
-  
-  // @ts-ignore
-  const drizzleModule = require('drizzle-orm');
-  eq = drizzleModule.eq;
-} catch (error) {
-  initError = error as Error;
-  console.error('Service initialization failed:', error);
+  try {
+    const [
+      storageModule,
+      contentModule,
+      iflashModule,
+      examModule,
+      agentModule,
+      voiceModule,
+      importModule,
+      enhancedModule,
+      checkpointsModule,
+      progressModule,
+      dbModule,
+      schemaModule,
+      drizzleModule
+    ] = await Promise.all([
+      import('../server/storage.js'),
+      import('../server/services/content.js'),
+      import('../server/services/iflash.js'),
+      import('../server/services/exam.js'),
+      import('../server/services/agents.js'),
+      import('../server/services/voice-qa.js'),
+      import('../server/services/import/import-service.js'),
+      import('../server/services/enhanced-storage.js'),
+      import('../server/services/lessons/checkpoints.service.js'),
+      import('../server/services/lessons/progress.service.js'),
+      import('../server/db.js'),
+      import('../shared/schema.js'),
+      import('drizzle-orm')
+    ]);
+    
+    storage = storageModule.storage;
+    contentService = contentModule.contentService;
+    iflashService = iflashModule.iflashService;
+    examService = examModule.examService;
+    agentService = agentModule.agentService;
+    voiceQAService = voiceModule.voiceQAService;
+    importService = importModule.importService;
+    enhancedStorage = enhancedModule.enhancedStorage;
+    checkpointsService = checkpointsModule.checkpointsService;
+    progressService = progressModule.progressService;
+    db = dbModule.db;
+    lessons = schemaModule.lessons;
+    eq = drizzleModule.eq;
+  } catch (error) {
+    initError = error as Error;
+    console.error('Service initialization failed:', error);
+    throw error;
+  }
 }
+
+// Start initialization immediately
+initPromise = initServices().catch(e => { initError = e; });
 
 const app = express();
 app.use(express.json());
+
+// Middleware to ensure services are initialized
+app.use(async (_req, res, next) => {
+  try {
+    await initPromise;
+    if (initError) {
+      return res.status(500).json({
+        error: 'Service initialization failed',
+        message: initError.message
+      });
+    }
+    next();
+  } catch (error: any) {
+    return res.status(500).json({
+      error: 'Service initialization failed',
+      message: error?.message
+    });
+  }
+});
 
 const ADMIN_SECRET = process.env.ADMIN_SECRET || process.env.MCP_SERVER_SECRET || 'dev-secret-key';
 const getAdminSecret = (req: express.Request) =>
@@ -105,16 +125,6 @@ app.get('/api/auth/user', (_req, res) => {
 
 // Healthcheck
 app.get('/api/health', async (_req, res) => {
-  // Return any initialization error
-  if (initError) {
-    return res.status(500).json({ 
-      ok: false, 
-      error: 'Service initialization failed',
-      message: initError.message,
-      stack: initError.stack 
-    });
-  }
-  
   try {
     // Light DB touch to confirm connectivity
     await storage.getTracks();
