@@ -5,7 +5,7 @@
   "functions": {
     "api/[...path].ts": {
       "maxDuration": 30,
-      "includeFiles": "server/**,shared/**,node_modules/@neondatabase/**,node_modules/drizzle-orm/**"
+      "includeFiles": "../server/**/*.ts,../server/**/*.js,../shared/**/*.ts,../shared/**/*.js"
     }
   },
   "rewrites": [
