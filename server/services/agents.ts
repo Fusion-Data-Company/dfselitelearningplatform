@@ -1,7 +1,7 @@
 import { storage } from "../storage";
 import { mcpServer } from "./mcp";
 import { callAgent, type AgentResponse } from "./openai";
-import type { AgentProfile } from "@shared/schema";
+import type { AgentProfile } from "../../shared/schema";
 
 export class AgentService {
   private agentCache = new Map<string, AgentProfile>();

@@ -1,7 +1,7 @@
 import { eq, and } from "drizzle-orm";
 import { db } from "../../db";
-import { lessons, lessonCheckpoints } from "../../../shared/schema";
-import type { QuizItem } from "../../../shared/schemas/lesson";
+import { lessons, lessonCheckpoints } from "../../../../../shared/schema";
+import type { QuizItem } from "../../../../../shared/schemas/lesson";
 import { checkpointsService } from "./checkpoints.service";
 
 interface MicroquizExtraction {

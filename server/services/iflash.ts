@@ -1,6 +1,6 @@
 import { storage } from "../storage";
 import { generateFlashcards } from "./openai";
-import type { Flashcard, InsertFlashcard } from "@shared/schema";
+import type { Flashcard, InsertFlashcard } from "../../shared/schema";
 
 export interface SRSCalculation {
   interval: number;

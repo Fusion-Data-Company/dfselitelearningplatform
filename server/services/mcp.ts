@@ -1,5 +1,5 @@
 import { storage } from "../storage";
-import type { ContentChunk } from "@shared/schema";
+import type { ContentChunk } from "../../shared/schema";
 
 export interface MCPContext {
   route: string;

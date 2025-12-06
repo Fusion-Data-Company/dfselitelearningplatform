@@ -1,8 +1,8 @@
 import OpenAI from 'openai';
 import { storage } from '../storage';
-import type { Track, Module, Lesson, InsertLesson, InsertLessonCheckpoint } from '@shared/schema';
+import type { Track, Module, Lesson, InsertLesson, InsertLessonCheckpoint } from '../../shared/schema';
 import { db } from '../db';
-import { lessonCheckpoints, lessons } from '@shared/schema';
+import { lessonCheckpoints, lessons } from '../../shared/schema';
 import { eq } from 'drizzle-orm';
 
 const openai = new OpenAI({

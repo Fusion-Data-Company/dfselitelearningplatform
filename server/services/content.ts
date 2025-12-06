@@ -1,5 +1,5 @@
 import { storage } from "../storage";
-import type { Track, Module, Lesson, InsertTrack, InsertModule, InsertLesson } from "@shared/schema";
+import type { Track, Module, Lesson, InsertTrack, InsertModule, InsertLesson } from "../../shared/schema";
 
 export class ContentService {
   async initializeDefaultContent(): Promise<void> {

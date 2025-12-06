@@ -14,7 +14,7 @@ import { checkpointsService } from "./services/lessons/checkpoints.service";
 import { progressService } from "./services/lessons/progress.service";
 import { lessonDTOSchema } from "../shared/schemas/lesson";
 import { db } from "./db";
-import { lessons } from "@shared/schema";
+import { lessons } from "../shared/schema";
 import { eq } from "drizzle-orm";
 
 export async function registerRoutes(app: Express): Promise<Server> {

@@ -1,5 +1,5 @@
 import { storage } from "../../storage";
-import type { InsertExamConfig, InsertExamSession } from "@shared/schema";
+import type { InsertExamConfig, InsertExamSession } from "../../../shared/schema";
 
 export interface ExamBlueprint {
   id: string;

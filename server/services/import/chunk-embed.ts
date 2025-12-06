@@ -1,6 +1,6 @@
 import { storage } from "../../storage";
 import { OpenAI } from "openai";
-import type { Lesson } from "@shared/schema";
+import type { Lesson } from "../../../shared/schema";
 
 export interface ContentChunk {
   lessonId: string;

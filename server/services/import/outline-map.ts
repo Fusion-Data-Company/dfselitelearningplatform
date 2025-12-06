@@ -1,6 +1,6 @@
 import { storage } from "../../storage";
 import type { ParsedNode } from './docx-parse';
-import type { Track, Module, Lesson, InsertTrack, InsertModule, InsertLesson } from "@shared/schema";
+import type { Track, Module, Lesson, InsertTrack, InsertModule, InsertLesson } from "../../../shared/schema";
 
 export interface OutlineStructure {
   tracks: (InsertTrack & {

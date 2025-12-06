@@ -1,6 +1,6 @@
 import { storage } from "../../storage";
 import type { ParsedNode } from './docx-parse';
-import type { InsertQuestion, InsertQuestionBank } from "@shared/schema";
+import type { InsertQuestion, InsertQuestionBank } from "../../../shared/schema";
 
 export interface ExtractedQuestion {
   type: 'mcq' | 'tf' | 'ms';

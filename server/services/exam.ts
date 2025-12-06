@@ -1,5 +1,5 @@
 import { storage } from "../storage";
-import type { QuestionBank, Question, QuizAttempt, InsertQuizAttempt } from "@shared/schema";
+import type { QuestionBank, Question, QuizAttempt, InsertQuizAttempt } from "../../shared/schema";
 
 export interface ExamQuestion {
   id: string;

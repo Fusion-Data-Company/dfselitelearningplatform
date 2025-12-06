@@ -1,6 +1,6 @@
 import { eq, and } from "drizzle-orm";
 import { db } from "../../db";
-import { lessons, tracks, modules, type Lesson } from "../../../shared/schema";
+import { lessons, tracks, modules, type Lesson } from "../../../../../shared/schema";
 
 interface PublishLessonInput {
   trackId: string;

@@ -5,7 +5,7 @@ import type {
   Track as OldTrack, 
   Module as OldModule, 
   Lesson as OldLesson 
-} from '@shared/schema';
+} from '../../shared/schema';
 import type {
   DFS215Track,
   DFS215Module, 
@@ -14,7 +14,7 @@ import type {
   DFS215Checkpoint,
   InsertStage,
   InsertCheckpoint
-} from '@shared/enhanced-schema';
+} from '../../shared/enhanced-schema';
 
 export class SchemaMigrationService {
   

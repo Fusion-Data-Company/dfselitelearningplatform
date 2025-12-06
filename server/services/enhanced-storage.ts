@@ -11,7 +11,7 @@ import {
   type InsertStage,
   type InsertCheckpoint,
   type InsertEnhancedUserProgress
-} from '@shared/schema';
+} from '../../shared/schema';
 
 export class EnhancedStorageService {
 

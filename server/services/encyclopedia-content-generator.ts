@@ -1,6 +1,6 @@
 import OpenAI from 'openai';
 import { storage } from '../storage';
-import type { Track, Module, Lesson, InsertLesson } from '@shared/schema';
+import type { Track, Module, Lesson, InsertLesson } from '../../shared/schema';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
