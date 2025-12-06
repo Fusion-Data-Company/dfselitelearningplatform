@@ -3,10 +3,10 @@ import express from 'express';
 import { storage } from '../server/storage';
 import { contentService } from '../server/services/content';
 import { iflashService } from '../server/services/iflash';
-import { agentService } from '../server/services/agents';
 import { examService } from '../server/services/exam';
 import { checkpointsService } from '../server/services/lessons/checkpoints.service';
 import { progressService } from '../server/services/lessons/progress.service';
+import type { UserProgress } from '../shared/schema';
 
 const app = express();
 app.use(express.json());
@@ -90,7 +90,7 @@ app.get('/api/lessons/:slug', async (req, res) => {
 
 app.get('/api/lessons/:lessonId/checkpoints', async (req, res) => {
   try {
-    const checkpoints = await checkpointsService.getCheckpoints(req.params.lessonId);
+    const checkpoints = await checkpointsService.getCheckpointsByLesson(req.params.lessonId);
     res.json(checkpoints);
   } catch (error) {
     console.error('Error:', error);
@@ -100,7 +100,7 @@ app.get('/api/lessons/:lessonId/checkpoints', async (req, res) => {
 
 app.get('/api/lessons/:lessonId/progress', async (req, res) => {
   try {
-    const progress = await progressService.getProgress('guest', req.params.lessonId);
+    const progress = await progressService.getLessonProgressSummary('guest', req.params.lessonId);
     res.json(progress || { completed: false, currentCheckpoint: 0 });
   } catch (error) {
     console.error('Error:', error);
@@ -110,7 +110,8 @@ app.get('/api/lessons/:lessonId/progress', async (req, res) => {
 
 app.post('/api/lessons/:lessonId/progress', async (req, res) => {
   try {
-    const progress = await progressService.updateProgress('guest', req.params.lessonId, req.body);
+    await progressService.updateLessonProgress('guest', req.params.lessonId);
+    const progress = await progressService.getLessonProgressSummary('guest', req.params.lessonId);
     res.json(progress);
   } catch (error) {
     console.error('Error:', error);
@@ -121,7 +122,7 @@ app.post('/api/lessons/:lessonId/progress', async (req, res) => {
 // Flashcards
 app.get('/api/flashcards', async (_req, res) => {
   try {
-    const flashcards = await iflashService.getFlashcards();
+    const flashcards = await storage.getUserFlashcards('system');
     res.json(flashcards);
   } catch (error) {
     console.error('Error:', error);
@@ -131,7 +132,7 @@ app.get('/api/flashcards', async (_req, res) => {
 
 app.get('/api/flashcards/review', async (_req, res) => {
   try {
-    const cards = await iflashService.getCardsForReview('guest');
+    const cards = await iflashService.getFlashcardsForReview('guest');
     res.json(cards);
   } catch (error) {
     console.error('Error:', error);
@@ -141,7 +142,8 @@ app.get('/api/flashcards/review', async (_req, res) => {
 
 app.post('/api/flashcards/:id/review', async (req, res) => {
   try {
-    const result = await iflashService.reviewCard(req.params.id, req.body.quality);
+    const quality = parseInt(req.body.quality, 10);
+    const result = await iflashService.reviewFlashcard(req.params.id, quality, 'guest');
     res.json(result);
   } catch (error) {
     console.error('Error:', error);
@@ -205,7 +207,7 @@ app.post('/api/exams/:sessionId/finish', async (req, res) => {
 // Agents
 app.get('/api/agents', async (_req, res) => {
   try {
-    const agents = await agentService.getAgents();
+    const agents = await storage.getAgentProfiles();
     res.json(agents);
   } catch (error) {
     console.error('Error:', error);
@@ -215,7 +217,7 @@ app.get('/api/agents', async (_req, res) => {
 
 app.get('/api/agents/:id', async (req, res) => {
   try {
-    const agent = await agentService.getAgent(req.params.id);
+    const agent = await storage.getAgentProfile(req.params.id);
     if (!agent) return res.status(404).json({ message: 'Agent not found' });
     res.json(agent);
   } catch (error) {
@@ -240,11 +242,11 @@ app.get('/api/dashboard/stats', async (_req, res) => {
   try {
     const [lessons, flashcards, progress] = await Promise.all([
       storage.getAllLessons(),
-      storage.getFlashcards(),
+      storage.getUserFlashcards('system'),
       storage.getUserProgress('guest')
     ]);
 
-    const completedLessons = progress.filter(p => p.completed).length;
+    const completedLessons = progress.filter((p: UserProgress) => p.completed).length;
 
     res.json({
       totalLessons: lessons.length,
