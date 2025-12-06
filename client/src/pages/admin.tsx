@@ -36,7 +36,9 @@ import {
   TrendingUp,
   Users,
   FileText,
-  Database
+  Database,
+  CheckCircle,
+  AlertTriangle
 } from "lucide-react";
 
 interface AgentProfile {
@@ -113,6 +115,19 @@ export default function AdminPage() {
     enabled: isAdmin,
   });
 
+  // Import status
+  const { data: importStatus, isLoading: importStatusLoading, refetch: refetchImportStatus } = useQuery<{
+    documentsAvailable: number;
+    documentsFound: number;
+    documentsMissing: number;
+    found: Array<{ id: string; title: string; pages: number }>;
+    missing: Array<{ id: string; filename: string }>;
+    ready: boolean;
+  }>({
+    queryKey: ['/api/admin/import/status'],
+    enabled: isAdmin,
+  });
+
   const updateAgentMutation = useMutation({
     mutationFn: async ({ agentId, data }: { agentId: string; data: any }) => {
       await apiRequest("POST", `/api/admin/agents/${agentId}`, data);
@@ -168,6 +183,62 @@ export default function AdminPage() {
     },
   });
 
+  // Import mutations
+  const [importInProgress, setImportInProgress] = useState(false);
+  
+  const runImportMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("POST", '/api/admin/import/all');
+      return response.json();
+    },
+    onMutate: () => {
+      setImportInProgress(true);
+    },
+    onSuccess: (data) => {
+      setImportInProgress(false);
+      refetchImportStatus();
+      queryClient.invalidateQueries({ queryKey: ['/api/lessons/recent'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/lessons/enhanced-list'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/courses'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/question-banks'] });
+      toast({
+        title: "Import Completed",
+        description: `Imported ${data.lessons || 0} lessons, ${data.questions || 0} questions, ${data.flashcards || 0} flashcards`,
+      });
+    },
+    onError: (error) => {
+      setImportInProgress(false);
+      toast({
+        title: "Import Failed",
+        description: error instanceof Error ? error.message : "Import failed",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const clearContentMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("POST", '/api/admin/import/clear');
+      return response.json();
+    },
+    onSuccess: () => {
+      refetchImportStatus();
+      queryClient.invalidateQueries({ queryKey: ['/api/lessons/recent'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/courses'] });
+      toast({
+        title: "Content Cleared",
+        description: "All course content has been cleared.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Clear Failed",
+        description: error instanceof Error ? error.message : "Failed to clear content",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleAgentUpdate = (agentId: string, updates: any) => {
     updateAgentMutation.mutate({ agentId, data: updates });
   };
@@ -213,7 +284,7 @@ export default function AdminPage() {
             <Tabs value={activeTab} className="space-y-8">
               <Card className="glassmorphism border-border">
                 <CardContent className="p-4">
-                  <TabsList className="grid grid-cols-6 w-full bg-transparent">
+                  <TabsList className="grid grid-cols-7 w-full bg-transparent">
                     <TabsTrigger 
                       value="content" 
                       className="data-[state=active]:section-active"
@@ -261,6 +332,14 @@ export default function AdminPage() {
                     >
                       <Tag className="w-4 h-4 mr-2" />
                       CE Management
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="import" 
+                      className="data-[state=active]:section-active"
+                      data-testid="tab-import"
+                    >
+                      <Upload className="w-4 h-4 mr-2" />
+                      Import
                     </TabsTrigger>
                   </TabsList>
                 </CardContent>
@@ -1063,6 +1142,158 @@ export default function AdminPage() {
                             <div className="flex justify-between items-center">
                               <span className="text-sm">Overdue</span>
                               <Badge className="bg-red-500/20 text-red-400">12</Badge>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+
+              {/* Import Tab */}
+              <TabsContent value="import">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  {/* Import Status */}
+                  <Card className="glassmorphism border-border">
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between mb-6">
+                        <h3 className="cinzel text-xl font-bold">DFS-215 Document Status</h3>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => refetchImportStatus()}
+                          disabled={importStatusLoading}
+                        >
+                          <RotateCcw className="w-4 h-4 mr-2" />
+                          Refresh
+                        </Button>
+                      </div>
+                      
+                      {importStatusLoading ? (
+                        <div className="space-y-4">
+                          <div className="elite-skeleton h-8 rounded"></div>
+                          <div className="elite-skeleton h-24 rounded"></div>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="flex items-center justify-between mb-4">
+                            <span className="text-muted-foreground">Documents Ready</span>
+                            <Badge className={importStatus?.ready ? "bg-green-500/20 text-green-400" : "bg-yellow-500/20 text-yellow-400"}>
+                              {importStatus?.documentsFound || 0} / {importStatus?.documentsAvailable || 5}
+                            </Badge>
+                          </div>
+                          
+                          <div className="space-y-3">
+                            <h4 className="font-semibold text-sm">Found Documents:</h4>
+                            {importStatus?.found?.map((doc) => (
+                              <div key={doc.id} className="flex items-center justify-between p-3 bg-card rounded-lg border border-border">
+                                <div className="flex items-center space-x-3">
+                                  <CheckCircle className="w-4 h-4 text-green-400" />
+                                  <span className="text-sm">{doc.title}</span>
+                                </div>
+                                <Badge variant="outline">{doc.pages} pages</Badge>
+                              </div>
+                            ))}
+                            
+                            {importStatus?.missing && importStatus.missing.length > 0 && (
+                              <>
+                                <h4 className="font-semibold text-sm mt-4 text-yellow-400">Missing Documents:</h4>
+                                {importStatus.missing.map((doc) => (
+                                  <div key={doc.id} className="flex items-center justify-between p-3 bg-card rounded-lg border border-yellow-500/30">
+                                    <div className="flex items-center space-x-3">
+                                      <AlertTriangle className="w-4 h-4 text-yellow-400" />
+                                      <span className="text-sm text-muted-foreground">{doc.filename}</span>
+                                    </div>
+                                    <Badge variant="outline" className="text-yellow-400">Missing</Badge>
+                                  </div>
+                                ))}
+                              </>
+                            )}
+                          </div>
+                        </>
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  {/* Import Actions */}
+                  <Card className="glassmorphism border-border">
+                    <CardContent className="p-6">
+                      <h3 className="cinzel text-xl font-bold mb-6">Import Actions</h3>
+                      
+                      <div className="space-y-6">
+                        <div className="p-4 bg-card rounded-xl border border-primary/20">
+                          <div className="flex items-center justify-between mb-3">
+                            <div>
+                              <h4 className="font-semibold">Run Full Import</h4>
+                              <p className="text-sm text-muted-foreground">
+                                Parse and import all 5 DFS-215 compliance documents
+                              </p>
+                            </div>
+                            <Button 
+                              onClick={() => runImportMutation.mutate()}
+                              disabled={importInProgress || !importStatus?.ready}
+                              className="bg-primary"
+                            >
+                              {importInProgress ? (
+                                <>
+                                  <RotateCcw className="w-4 h-4 mr-2 animate-spin" />
+                                  Importing...
+                                </>
+                              ) : (
+                                <>
+                                  <Upload className="w-4 h-4 mr-2" />
+                                  Start Import
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                          {!importStatus?.ready && (
+                            <p className="text-xs text-yellow-400">
+                              ⚠️ Not all documents are available. Import may be incomplete.
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="p-4 bg-card rounded-xl border border-red-500/20">
+                          <div className="flex items-center justify-between mb-3">
+                            <div>
+                              <h4 className="font-semibold text-red-400">Clear All Content</h4>
+                              <p className="text-sm text-muted-foreground">
+                                Remove all imported content (tracks, modules, lessons, questions)
+                              </p>
+                            </div>
+                            <Button 
+                              variant="outline"
+                              onClick={() => {
+                                if (confirm("Are you sure you want to clear all content? This cannot be undone.")) {
+                                  clearContentMutation.mutate();
+                                }
+                              }}
+                              disabled={clearContentMutation.isPending}
+                              className="border-red-500/30 text-red-400 hover:bg-red-500/10"
+                            >
+                              <RotateCcw className="w-4 h-4 mr-2" />
+                              Clear Content
+                            </Button>
+                          </div>
+                        </div>
+
+                        <div className="p-4 bg-card rounded-xl border border-border">
+                          <h4 className="font-semibold mb-3">Import Results</h4>
+                          <div className="grid grid-cols-2 gap-4 text-center">
+                            <div>
+                              <p className="text-2xl font-bold text-primary">
+                                {courseStructure?.tracks?.reduce((sum, t) => 
+                                  sum + t.modules.reduce((mSum, m) => mSum + m.lessons.length, 0), 0) || 0}
+                              </p>
+                              <p className="text-xs text-muted-foreground">Lessons</p>
+                            </div>
+                            <div>
+                              <p className="text-2xl font-bold text-secondary">
+                                {questionBanks?.length || 0}
+                              </p>
+                              <p className="text-xs text-muted-foreground">Question Banks</p>
                             </div>
                           </div>
                         </div>

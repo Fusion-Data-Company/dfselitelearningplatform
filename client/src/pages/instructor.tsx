@@ -34,12 +34,12 @@ interface LessonItem {
 }
 
 export default function InstructorPage() {
-  // Query lessons for comprehensive display
+  // Query full lesson library with enhanced info
   const { data: lessons = [], isLoading } = useQuery<LessonItem[]>({
-    queryKey: ['/api/lessons/recent'],
+    queryKey: ['/api/lessons/enhanced-list'],
     queryFn: async () => {
       try {
-        const response = await fetch('/api/lessons/recent');
+        const response = await fetch('/api/lessons/enhanced-list');
         if (!response.ok) throw new Error('Failed to fetch lessons');
         const lessonsData = await response.json();
         
@@ -49,14 +49,19 @@ export default function InstructorPage() {
           return [];
         }
         
-        // Add missing fields for display
+        // Map to expected format with enhanced fields
         return lessonsData.map((lesson: any) => ({
-          ...lesson,
+          id: lesson.id,
+          slug: lesson.slug,
+          title: lesson.title,
           trackId: lesson.trackId || 'default',
           track: lesson.track || 'DFS-215 Course Content',
           module: lesson.module || 'Professional Content',
-          estMinutes: 25,
-          ceHours: lesson.ceHours || 0
+          estMinutes: lesson.estMinutes || 25,
+          ceHours: lesson.ceHours || 0,
+          hasDFS215Structure: lesson.hasDFS215Structure || false,
+          stageCount: lesson.stageCount || 0,
+          checkpointCount: lesson.checkpointCount || 0
         }));
       } catch (error) {
         console.error('Error fetching lessons:', error);

@@ -310,7 +310,9 @@ Licensed insurance professionals must understand:
         ],
         orderIndex: 1,
         duration: 45,
-        ceHours: 0.75
+        ceHours: 0.75,
+        published: true,
+        visibility: 'public'
       });
     }
 
@@ -443,7 +445,9 @@ Networks must monitor:
         ],
         orderIndex: startIndex + 1,
         duration: 40,
-        ceHours: 0.75
+        ceHours: 0.75,
+        published: true,
+        visibility: 'public'
       });
     }
     
@@ -539,7 +543,9 @@ Plans must base authorization decisions on:
         ],
         orderIndex: startIndex + 2,
         duration: 45,
-        ceHours: 0.75
+        ceHours: 0.75,
+        published: true,
+        visibility: 'public'
       });
     }
     
@@ -635,7 +641,9 @@ This advanced content prepares insurance professionals to:
         ],
         orderIndex: startIndex + 1,
         duration: 35,
-        ceHours: 0.65
+        ceHours: 0.65,
+        published: true,
+        visibility: 'public'
       });
     }
     
@@ -653,19 +661,44 @@ This advanced content prepares insurance professionals to:
     }>;
     overallProgress: number;
   }> {
-    // Simple fast version - return sample data for now to fix loading speed
     const tracks = await storage.getTracks();
     
-    const trackProgress = tracks.map((track, index) => ({
-      id: track.id,
-      title: track.title,
-      progress: Math.floor(Math.random() * 70) + 10, // 10-80% progress
-      ceHours: track.ceHours ?? 0,
-      completedLessons: Math.floor(Math.random() * 15) + 5,
-      totalLessons: Math.floor(Math.random() * 20) + 15
+    // Get actual lesson counts and user progress per track
+    const trackProgress = await Promise.all(tracks.map(async (track) => {
+      const modules = await storage.getModulesByTrack(track.id);
+      let totalLessons = 0;
+      let completedLessons = 0;
+      
+      for (const module of modules) {
+        const lessons = await storage.getLessonsByModule(module.id);
+        const publishedLessons = lessons.filter(l => l.published);
+        totalLessons += publishedLessons.length;
+        
+        // Get user progress for each lesson
+        for (const lesson of publishedLessons) {
+          const progress = await storage.getUserProgress(userId, lesson.id);
+          if (progress.length > 0 && progress[0].completed) {
+            completedLessons++;
+          }
+        }
+      }
+      
+      const progress = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
+      
+      return {
+        id: track.id,
+        title: track.title,
+        progress,
+        ceHours: track.ceHours ?? 0,
+        completedLessons,
+        totalLessons
+      };
     }));
 
-    const overallProgress = Math.floor(Math.random() * 50) + 25; // 25-75%
+    // Calculate overall progress
+    const totalAllLessons = trackProgress.reduce((sum, t) => sum + t.totalLessons, 0);
+    const completedAllLessons = trackProgress.reduce((sum, t) => sum + t.completedLessons, 0);
+    const overallProgress = totalAllLessons > 0 ? Math.round((completedAllLessons / totalAllLessons) * 100) : 0;
 
     return {
       tracks: trackProgress,

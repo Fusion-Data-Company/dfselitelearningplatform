@@ -108,42 +108,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/lessons/recent', async (req, res) => {
     try {
-      // Query database directly to ensure we get correct slugs
-      const lessonsData = await db
-        .select({
-          id: lessons.id,
-          title: lessons.title,
-          slug: lessons.slug,
-          content: lessons.content,
-          description: lessons.description,
-          duration: lessons.duration,
-          ceHours: lessons.ceHours,
-          published: lessons.published
-        })
-        .from(lessons)
-        .where(eq(lessons.published, true))
-        .limit(20);
+      // Get all tracks and their lessons with full hierarchy
+      const tracks = await storage.getTracks();
+      const allLessons: any[] = [];
       
-      const validLessons = lessonsData.filter(lesson => 
-        lesson.slug && 
-        lesson.slug.trim().length > 0 &&
-        lesson.title && 
-        lesson.title.trim().length > 0
-      );
+      for (const track of tracks) {
+        const trackModules = await storage.getModulesByTrack(track.id);
+        for (const module of trackModules) {
+          const moduleLessons = await storage.getLessonsByModule(module.id);
+          // Filter to published lessons and add track/module info
+          allLessons.push(...moduleLessons
+            .filter(lesson => lesson.published && lesson.slug && lesson.title)
+            .map(lesson => ({
+              id: lesson.id,
+              title: lesson.title,
+              slug: lesson.slug,
+              content: lesson.content || '',
+              description: lesson.description || '',
+              duration: lesson.duration || 25,
+              ceHours: lesson.ceHours || 0,
+              track: track.title,
+              module: module.title,
+              trackId: track.id
+            })));
+        }
+      }
       
-      const formattedLessons = validLessons.map(lesson => ({
-        id: lesson.id,
-        title: lesson.title,
-        slug: lesson.slug, // Use the actual database slug
-        content: lesson.content || '',
-        description: lesson.description || '',
-        duration: lesson.duration || 25,
-        ceHours: lesson.ceHours || 0
-      }));
+      // Return most recent lessons (limit 20)
+      const recentLessons = allLessons.slice(0, 20);
       
-      console.log(`Recent lessons found with slugs:`, formattedLessons.slice(0, 5).map(l => `${l.title} -> /lesson/${l.slug}`));
+      console.log(`Recent lessons found: ${recentLessons.length}`);
       
-      res.json(formattedLessons);
+      res.json(recentLessons);
     } catch (error) {
       console.error("Error fetching recent lessons:", error);
       res.status(500).json({ message: "Failed to fetch recent lessons" });
@@ -153,73 +149,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Enhanced lessons list endpoint (must be before slug route)
   app.get('/api/lessons/enhanced-list', async (req, res) => {
     try {
-      // Get all lessons from storage
+      // Get all lessons with track/module info
       const tracks = await storage.getTracks();
       const allLessons: any[] = [];
       
       for (const track of tracks) {
         const modules = await storage.getModulesByTrack(track.id);
         for (const module of modules) {
-          const lessons = await storage.getLessonsByModule(module.id);
-          // Add track info to each lesson
-          allLessons.push(...lessons.map(lesson => ({
-            ...lesson,
-            trackId: track.id,
-            track: track.title,
-            module: module.title
-          })));
+          const moduleLessons = await storage.getLessonsByModule(module.id);
+          // Add track info to each lesson, filter to published only
+          allLessons.push(...moduleLessons
+            .filter(lesson => lesson.published)
+            .map(lesson => ({
+              ...lesson,
+              trackId: track.id,
+              track: track.title,
+              module: module.title
+            })));
         }
       }
       
-      // For now, return regular lessons with enhanced structure flag
-      const enhancedLessons = allLessons.map(lesson => ({
-        id: lesson.id,
-        slug: lesson.slug,
-        title: lesson.title,
-        track: lesson.track,
-        module: lesson.module,
-        trackId: lesson.trackId,
-        estMinutes: lesson.estMinutes || 25,
-        ceHours: lesson.ceHours || 0,
-        hasDFS215Structure: false, // Will be true when enhanced structure is working
-        stageCount: 0,
-        checkpointCount: 0
-      }));
-      
-      res.json(enhancedLessons);
-    } catch (error) {
-      console.error("Error fetching enhanced lessons list:", error);
-      res.status(500).json({ message: "Failed to fetch enhanced lessons" });
-    }
-  });
-
-  // Enhanced lessons list must be before :id route
-  app.get('/api/lessons/enhanced-list', async (req, res) => {
-    try {
-      // Get all published lessons directly with a simple query
-      const allLessons = await db
-        .select({
-          id: lessons.id,
-          slug: lessons.slug,
-          title: lessons.title,
-          ceHours: lessons.ceHours,
-          published: lessons.published
-        })
-        .from(lessons)
-        .where(eq(lessons.published, true))
-        .limit(50); // Limit for performance
-      
-      // Add basic metadata for display
-      const enhancedLessons = allLessons.map(lesson => ({
-        id: lesson.id,
-        slug: lesson.slug,
-        title: lesson.title,
-        track: "DFS-215 Course Content", // Simplified track info
-        module: "Professional Content",
-        trackId: "default",
-        estMinutes: 25,
-        ceHours: lesson.ceHours || 0,
-        published: lesson.published
+      // Get checkpoint counts for each lesson
+      const enhancedLessons = await Promise.all(allLessons.map(async (lesson) => {
+        // Try to get checkpoint count
+        let checkpointCount = 0;
+        let stageCount = 0;
+        try {
+          const checkpoints = await checkpointsService.getCheckpointsByLesson(lesson.id);
+          checkpointCount = checkpoints.length;
+          stageCount = checkpointCount > 0 ? Math.ceil(checkpointCount / 3) : 0;
+        } catch (e) {
+          // Ignore errors
+        }
+        
+        return {
+          id: lesson.id,
+          slug: lesson.slug,
+          title: lesson.title,
+          track: lesson.track,
+          module: lesson.module,
+          trackId: lesson.trackId,
+          estMinutes: lesson.duration || 25,
+          ceHours: lesson.ceHours || 0,
+          hasDFS215Structure: checkpointCount > 0,
+          stageCount,
+          checkpointCount
+        };
       }));
       
       res.json(enhancedLessons);

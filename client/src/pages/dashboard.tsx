@@ -48,6 +48,23 @@ interface Lesson {
   description: string;
   duration: number;
   ceHours: number;
+  track?: string;
+  module?: string;
+}
+
+interface IFlashStats {
+  totalCards: number;
+  dueToday: number;
+  reviewStreak: number;
+  accuracy: number;
+  timeToday: number;
+}
+
+interface CERecord {
+  id: string;
+  lessonId: string;
+  hours: number;
+  completedAt: string;
 }
 
 export default function Dashboard() {
@@ -74,6 +91,17 @@ export default function Dashboard() {
       return response.json();
     },
   });
+  
+  const { data: iflashStats } = useQuery<IFlashStats>({
+    queryKey: ['/api/iflash/stats'],
+  });
+  
+  const { data: ceRecords } = useQuery<CERecord[]>({
+    queryKey: ['/api/ce/records'],
+  });
+  
+  // Calculate total CE hours from records
+  const totalCEHours = ceRecords?.reduce((sum, record) => sum + (record.hours || 0), 0) || 0;
 
   return (
     <div className="min-h-screen relative overflow-hidden">
@@ -142,7 +170,7 @@ export default function Dashboard() {
               
               <ProgressCard
                 title="Study Streak"
-                value="12 days"
+                value={`${iflashStats?.reviewStreak || 0} days`}
                 icon={Flame}
                 gradient="from-blue-500 to-blue-600"
                 testId="card-study-streak"
@@ -150,7 +178,7 @@ export default function Dashboard() {
               
               <ProgressCard
                 title="iFlash Due"
-                value="27"
+                value={String(iflashStats?.dueToday || 0)}
                 icon={Layers3}
                 gradient="from-cyan-500 to-cyan-600"
                 testId="card-iflash-due"
@@ -158,7 +186,7 @@ export default function Dashboard() {
               
               <ProgressCard
                 title="CE Hours"
-                value="4.5/24"
+                value={`${totalCEHours.toFixed(1)}/24`}
                 icon={Award}
                 gradient="from-slate-600 to-slate-700"
                 testId="card-ce-hours"

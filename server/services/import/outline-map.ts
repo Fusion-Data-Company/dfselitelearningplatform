@@ -126,7 +126,9 @@ export class OutlineMapper {
               duration: this.estimateDuration(node.text),
               objectives: this.extractObjectives(nodes, i),
               ceHours: isCE ? 1 : 0,
-              isActive: true
+              isActive: true,
+              published: true,
+              visibility: 'public'
             };
           }
         }
@@ -152,7 +154,9 @@ export class OutlineMapper {
             duration: 20,
             objectives: this.extractObjectives(nodes, i),
             ceHours: 0,
-            isActive: true
+            isActive: true,
+            published: true,
+            visibility: 'public'
           };
           lessonContent.push(node.content);
         }
