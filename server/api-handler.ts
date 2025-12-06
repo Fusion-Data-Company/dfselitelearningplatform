@@ -1,5 +1,18 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import express from 'express';
+import { storage } from './storage';
+import { contentService } from './services/content';
+import { iflashService } from './services/iflash';
+import { examService } from './services/exam';
+import { agentService } from './services/agents';
+import { voiceQAService } from './services/voice-qa';
+import { importService } from './services/import/import-service';
+import { enhancedStorage } from './services/enhanced-storage';
+import { checkpointsService } from './services/lessons/checkpoints.service';
+import { progressService } from './services/lessons/progress.service';
+import { db } from './db';
+import { lessons } from '../shared/schema';
+import { eq } from 'drizzle-orm';
 
 // Debug endpoint that doesn't require any other imports
 const debugApp = express();
@@ -15,102 +28,8 @@ debugApp.get('/api/debug', (_req, res) => {
   });
 });
 
-// Dynamic import services for ESM compatibility
-let storage: any;
-let contentService: any;
-let iflashService: any;
-let examService: any;
-let agentService: any;
-let voiceQAService: any;
-let importService: any;
-let enhancedStorage: any;
-let checkpointsService: any;
-let progressService: any;
-let db: any;
-let lessons: any;
-let eq: any;
-
-let initPromise: Promise<void> | null = null;
-let initError: Error | null = null;
-
-async function initServices() {
-  if (storage) return; // Already initialized
-  
-  try {
-    const [
-      storageModule,
-      contentModule,
-      iflashModule,
-      examModule,
-      agentModule,
-      voiceModule,
-      importModule,
-      enhancedModule,
-      checkpointsModule,
-      progressModule,
-      dbModule,
-      schemaModule,
-      drizzleModule
-    ] = await Promise.all([
-      import('./storage.js'),
-      import('./services/content.js'),
-      import('./services/iflash.js'),
-      import('./services/exam.js'),
-      import('./services/agents.js'),
-      import('./services/voice-qa.js'),
-      import('./services/import/import-service.js'),
-      import('./services/enhanced-storage.js'),
-      import('./services/lessons/checkpoints.service.js'),
-      import('./services/lessons/progress.service.js'),
-      import('./db.js'),
-      import('../shared/schema.js'),
-      import('drizzle-orm')
-    ]);
-    
-    storage = storageModule.storage;
-    contentService = contentModule.contentService;
-    iflashService = iflashModule.iflashService;
-    examService = examModule.examService;
-    agentService = agentModule.agentService;
-    voiceQAService = voiceModule.voiceQAService;
-    importService = importModule.importService;
-    enhancedStorage = enhancedModule.enhancedStorage;
-    checkpointsService = checkpointsModule.checkpointsService;
-    progressService = progressModule.progressService;
-    db = dbModule.db;
-    lessons = schemaModule.lessons;
-    eq = drizzleModule.eq;
-  } catch (error) {
-    initError = error as Error;
-    console.error('Service initialization failed:', error);
-    throw error;
-  }
-}
-
-// Start initialization immediately
-initPromise = initServices().catch(e => { initError = e; });
-
 const app = express();
 app.use(express.json());
-
-// Middleware to ensure services are initialized
-app.use(async (_req, res, next) => {
-  try {
-    await initPromise;
-    if (initError) {
-      return res.status(500).json({
-        error: 'Service initialization failed',
-        message: initError.message
-      });
-    }
-    next();
-  } catch (error: any) {
-    return res.status(500).json({
-      error: 'Service initialization failed',
-      message: error?.message
-    });
-  }
-});
 
 const ADMIN_SECRET = process.env.ADMIN_SECRET || process.env.MCP_SERVER_SECRET || 'dev-secret-key';
 const getAdminSecret = (req: express.Request) =>
