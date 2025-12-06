@@ -2,11 +2,14 @@
   "version": 2,
   "buildCommand": "npm run build",
   "outputDirectory": "dist/public",
+  "framework": null,
+  "installCommand": "npm install",
   "functions": {
     "api/index.js": {
       "maxDuration": 30,
       "runtime": "nodejs20.x",
-      "memory": 1024
+      "memory": 1024,
+      "includeFiles": "api/index.js"
     }
   },
   "routes": [
