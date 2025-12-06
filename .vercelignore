@@ -1,6 +1,5 @@
 # Ignore source files - we use pre-bundled api/index.js
-server/
-shared/
+_source/
 client/
 *.ts
 !api/index.js
