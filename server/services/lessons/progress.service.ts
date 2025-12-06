@@ -1,6 +1,6 @@
 import { eq, and, desc } from "drizzle-orm";
 import { db } from "../../db";
-import { lessonProgress, userProgress, lessons, lessonCheckpoints } from "../../../../../shared/schema";
+import { lessonProgress, userProgress, lessons, lessonCheckpoints } from "../../../shared/schema";
 
 interface CheckpointProgressData {
   checkpointId: string;

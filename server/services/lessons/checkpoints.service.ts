@@ -8,7 +8,7 @@ import {
   type ContentUnit,
   type InsertContentUnit,
   type InsertLessonCheckpoint
-} from "../../../../../shared/schema";
+} from "../../../shared/schema";
 
 interface CheckpointMeta {
   ceMeta?: {
