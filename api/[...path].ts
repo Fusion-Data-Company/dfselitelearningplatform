@@ -1,89 +1,21 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import express from 'express';
-
-// Lazy load heavy dependencies to avoid cold start issues
-let storage: any;
-let contentService: any;
-let iflashService: any;
-let examService: any;
-let agentService: any;
-let voiceQAService: any;
-let importService: any;
-let enhancedStorage: any;
-let checkpointsService: any;
-let progressService: any;
-let db: any;
-let lessons: any;
-let eq: any;
-
-async function initServices() {
-  if (!storage) {
-    const storageModule = await import('../server/storage');
-    storage = storageModule.storage;
-  }
-  if (!contentService) {
-    const contentModule = await import('../server/services/content');
-    contentService = contentModule.contentService;
-  }
-  if (!iflashService) {
-    const iflashModule = await import('../server/services/iflash');
-    iflashService = iflashModule.iflashService;
-  }
-  if (!examService) {
-    const examModule = await import('../server/services/exam');
-    examService = examModule.examService;
-  }
-  if (!agentService) {
-    const agentModule = await import('../server/services/agents');
-    agentService = agentModule.agentService;
-  }
-  if (!voiceQAService) {
-    const voiceModule = await import('../server/services/voice-qa');
-    voiceQAService = voiceModule.voiceQAService;
-  }
-  if (!importService) {
-    const importModule = await import('../server/services/import/import-service');
-    importService = importModule.importService;
-  }
-  if (!enhancedStorage) {
-    const enhancedModule = await import('../server/services/enhanced-storage');
-    enhancedStorage = enhancedModule.enhancedStorage;
-  }
-  if (!checkpointsService) {
-    const checkpointsModule = await import('../server/services/lessons/checkpoints.service');
-    checkpointsService = checkpointsModule.checkpointsService;
-  }
-  if (!progressService) {
-    const progressModule = await import('../server/services/lessons/progress.service');
-    progressService = progressModule.progressService;
-  }
-  if (!db) {
-    const dbModule = await import('../server/db');
-    db = dbModule.db;
-  }
-  if (!lessons) {
-    const schemaModule = await import('../shared/schema');
-    lessons = schemaModule.lessons;
-  }
-  if (!eq) {
-    const drizzleModule = await import('drizzle-orm');
-    eq = drizzleModule.eq;
-  }
-}
+import { storage } from '../server/storage';
+import { contentService } from '../server/services/content';
+import { iflashService } from '../server/services/iflash';
+import { examService } from '../server/services/exam';
+import { agentService } from '../server/services/agents';
+import { voiceQAService } from '../server/services/voice-qa';
+import { importService } from '../server/services/import/import-service';
+import { enhancedStorage } from '../server/services/enhanced-storage';
+import { checkpointsService } from '../server/services/lessons/checkpoints.service';
+import { progressService } from '../server/services/lessons/progress.service';
+import { db } from '../server/db';
+import { lessons } from '../shared/schema';
+import { eq } from 'drizzle-orm';
 
 const app = express();
 app.use(express.json());
-
-// Middleware to initialize services on first request
-app.use(async (_req, res, next) => {
-  try {
-    await initServices();
-    next();
-  } catch (error) {
-    console.error('Service initialization failed:', error);
-    res.status(500).json({ error: 'Service initialization failed', details: String(error) });
-  }
-});
 
 const ADMIN_SECRET = process.env.ADMIN_SECRET || process.env.MCP_SERVER_SECRET || 'dev-secret-key';
 const getAdminSecret = (req: express.Request) =>
